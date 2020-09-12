@@ -1,0 +1,19 @@
+---
+stages:
+    - analyse
+    - build
+    - publish container version
+    - publish container latest
+cache:
+    paths:
+        - resume/src/node_modules/
+variables:
+    DOCKER_DRIVER: overlay
+
+include:
+    - ci-jobs.yaml
+    - black/ci.yaml
+    - flake8/ci.yaml
+    - mypy/ci.yaml
+    - pre-commit/ci.yaml
+    - pytest/ci.yaml

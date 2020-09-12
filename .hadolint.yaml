@@ -1,0 +1,12 @@
+---
+ignored:
+    - DL3008
+    - DL3013
+    - DL3018
+    - DL4006
+    - SC2021
+    - SC2102
+
+trustedRegistries:
+    - docker.io
+    - registry.gitlab.com

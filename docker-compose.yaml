@@ -1,0 +1,131 @@
+---
+version: '3.7'
+
+x-app: &default-app
+    build: &default-app-build
+        context: .
+        labels: &default-app-build-label
+            maintainer: ${MAINTAINER_NAME-} <${GITLAB_USER_EMAIL-MAINTAINER_MAIL}>
+            build_date: ${BUILD_DATE:-}
+            commit_id: ${CI_COMMIT_SHA:-}
+            vcs-url: ${CI_REPOSITORY_URL-VCS}
+            vcs-ref: ${CI_COMMIT_SHA-}
+    command: bash
+    tty: true
+    working_dir: /app
+services:
+    black:
+        <<: *default-app
+        build:
+            <<: *default-app-build
+            cache_from:
+                - python:3.8-alpine
+                - ${CI_REGISTRY_IMAGE}/black
+            dockerfile: black/Dockerfile
+            labels:
+                <<: *default-app-build-label
+                departement: QA
+                description: linter for python projects
+        image: ${CI_REGISTRY_IMAGE}/black:0.0.1
+        volumes:
+            - .:/app
+    flake8:
+        <<: *default-app
+        build:
+            <<: *default-app-build
+            cache_from:
+                - python:3.8-alpine
+                - ${CI_REGISTRY_IMAGE}/flake8
+            dockerfile: flake8/Dockerfile
+            labels:
+                <<: *default-app-build-label
+                departement: QA
+                description: guideline checker for python projects
+        image: ${CI_REGISTRY_IMAGE}/flake8:0.0.1
+        volumes:
+            - .:/app
+    hadolint:
+        <<: *default-app
+        build:
+            <<: *default-app-build
+            cache_from:
+                - hadolint/hadolint:latest-debian
+                - ${CI_REGISTRY_IMAGE}/hadolint
+            dockerfile: hadolint/Dockerfile
+            labels:
+                <<: *default-app-build-label
+                departement: QA
+                description: guideline checker for python projects
+        command: hadolint Dockerfile --config=/config/.hadolint.yaml -
+        image: ${CI_REGISTRY_IMAGE}/hadolint:0.0.1
+        volumes:
+            - .:/app
+    mypy:
+        <<: *default-app
+        build:
+            <<: *default-app-build
+            cache_from:
+                - python:3.8-alpine
+                - ${CI_REGISTRY_IMAGE}/mypy
+            dockerfile: mypy/Dockerfile
+            labels:
+                <<: *default-app-build-label
+                departement: QA
+                description: guideline checker for python projects
+        image: ${CI_REGISTRY_IMAGE}/mypy:0.0.1
+        volumes:
+            - .:/app
+            - my-py-cache:.mypy_cache
+    pre-commit:
+        <<: *default-app
+        build:
+            <<: *default-app-build
+            args:
+                git_user: ${GIT_USER-}
+                git_mail: ${GIT_USER_MAIL-}
+            cache_from:
+                - python:3.8-alpine
+                - ${CI_REGISTRY_IMAGE}/pre-commit
+            dockerfile: pre-commit/Dockerfile
+            labels:
+                <<: *default-app-build-label
+                departement: QA
+                description: guideline checker for python projects
+        command: pre-commit --help
+        container_name: pre-commit
+        environment:
+            - GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+        hostname: pre-commit
+        image: ${CI_REGISTRY_IMAGE}/pre-commit:0.0.1
+        volumes:
+            - type: bind
+              source: .
+              target: /app
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+            - type: volume
+              source: pre-commit-hook
+              target: /root/.cache/pre-commit
+    pytest:
+        <<: *default-app
+        build:
+            <<: *default-app-build
+            dockerfile: pytest/Dockerfile
+            cache_from:
+                - python:3.8-alpine
+                - ${CI_REGISTRY_IMAGE}/pytest
+            labels:
+                <<: *default-app-build-label
+                departement: test
+                description: python unit test runner
+        command: pytest --help
+        container_name: pytest
+        image: ${CI_REGISTRY_IMAGE}/pytest:0.0.1
+        volumes:
+            - .:/app
+            - pytest:/app/.pytest_cache
+volumes:
+    my-py-cache:
+    pre-commit-hook:
+    pytest:

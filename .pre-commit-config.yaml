@@ -5,49 +5,54 @@ repos:
     # - repo: meta
     #   hooks:
     #       - id: identity
-    #         stages: [manual]
+    #       stages: [manual]
     #       - id: check-hooks-apply
-    #         stages: [manual]
+    #       stages: [manual]
     #       - id: check-useless-excludes
-    #         stages: [manual]
+    #       stages: [manual]
+    - repo: https://github.com/chrysa/pre-commit-hooks-changelog
+      rev: 3be37b215079a981171a173d60fdf4222a3162d4
+      hooks:
+          - id: generate-changelog
+            stages: [manual]
     - repo: https://github.com/asottile/setup-cfg-fmt
-        rev: v1.11.0
-        hooks:
-            - id: setup-cfg-fmt
+      rev: v1.11.0
+      hooks:
+          - id: setup-cfg-fmt
     # - repo: https://github.com/asottile/pyupgrade
     #   rev: 1510dc5bf302e4218f6202185b6725e6a2653e07
     #   hooks:
     #       - id: pyupgrade
-    #         args: [--py3-only, --py38-plus]
+    #       args: [--py3-only, --py38-plus]
     # - repo: https://github.com/asottile/reorder_python_imports
     #   rev: v2.3.5
     #   hooks:
     #       - id: reorder-python-imports
-    #         files: ^(src|tests)\W+.*.py$
-    #         args: [--py37-plus, --separate-relative, --separate-from-import, --application-directories=database:entrypoints:synchronous:synchronizer]
+    #       files: ^\W+/\W+.*.py$
+    #       args: [--py37-plus, --separate-relative, --separate-from-import, --application-directories=database:entrypoints:synchronous:synchronizer]
     # - repo: https://github.com/psf/black
     #   rev: c0a8e4224360a6917dcb5d889b08d5fdcfaf7c2d
     #   hooks:
     #       - id: black
-    #         args: [--config=./black.toml]
+    #       args: [--config=./black.toml]
     - repo: https://github.com/igorshubovych/markdownlint-cli
-        rev: 5d2a7420e4afe22ec6f93c87dc1f23adb42f0241
-        hooks:
-            - id: markdownlint
+      rev: 5d2a7420e4afe22ec6f93c87dc1f23adb42f0241
+      hooks:
+          - id: markdownlint
             args: [--fix]
     - repo: https://github.com/adrienverge/yamllint.git
-        rev: 333ae52c78c3968090ce5d69b15fbf58dc9dc9af
-        hooks:
-            - id: yamllint
+      rev: 333ae52c78c3968090ce5d69b15fbf58dc9dc9af
+      hooks:
+          - id: yamllint
             args: [--config-file=.yamllint.yaml, --format, parsable, --strict]
             stages: [manual]
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
-        rev: v2.0.0
-        hooks:
-            - id: docker-compose-check
+      rev: v2.0.0
+      hooks:
+          - id: docker-compose-check
             additional_dependencies: [docker-compose]
             stages: [manual]
-            - id: hadolint
+          - id: hadolint
             additional_dependencies: [docker-ce]
             args: [--config=.hadolint.yaml]
             files: \W.*.dockerfile$
@@ -56,31 +61,31 @@ repos:
     #   rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
     #   hooks:
     #       - id: makefile-doc
-    #         stages: [manual]
+    #       stages: [manual]
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-        rev: 0.1.0
-        hooks:
-            - id: yamlfmt
+      rev: 0.1.0
+      hooks:
+          - id: yamlfmt
     # - repo: https://github.com/pre-commit/mirrors-pylint
     #   rev: v2.6.0
     #   hooks:
     #       - id: pylint
-    #         files: ^(src|tests)\W+.*.py$
-    #         args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
-    #         stages: [manual]
+    #       files: ^\W+/\W+.*.py$
+    #       args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
+    #       stages: [manual]
     # - repo: https://github.com/pre-commit/mirrors-mypy
     #   rev: v0.782
     #   hooks:
     #       - id: mypy
-    #         args: [--config-file=./src/setup.cfg]
-    #         stages: [manual]
+    #       args: [--config-file=./src/setup.cfg]
+    #       stages: [manual]
     # - repo: https://gitlab.com/pycqa/flake8
     #   rev: 2c64d3ec5ab3ad40dc3e7c10ee0d7fa22f94560d
     #   hooks:
     #       - id: flake8
-    #         files: ^(src|tests)\W+.*.py$
-    #         args: [--config=./src/setup.cfg]
-    #         stages: [manual]
+    #       files: ^\W+/\W+.*.py$
+    #       args: [--config=./src/setup.cfg]
+    #       stages: [manual]
     # - repo: https://github.com/pre-commit/pygrep-hooks
     #   rev: v1.6.0
     #   hooks:
@@ -88,19 +93,15 @@ repos:
     #       - id: python-no-log-warn
     #       - id: python-use-type-annotations
     #       - id: rst-backticks
-    #         stages: [manual]
+    #       stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: 31d41ff29115a87808277ee0ec23999b17d5b583
-        hooks:
-            - id: check-toml
-            files: .toml$
-            - id: check-ast
-            - id: debug-statements
-            - id: end-of-file-fixer
-            - id: fix-encoding-pragma
-            args: [--remove]
-            - id: mixed-line-ending
+      rev: 31d41ff29115a87808277ee0ec23999b17d5b583
+      hooks:
+          # - id: check-toml
+          #   files: .toml$
+          - id: end-of-file-fixer
+          - id: mixed-line-ending
             args: [--fix=lf]
-            - id: trailing-whitespace
-            - id: check-merge-conflict
+          - id: trailing-whitespace
+          - id: check-merge-conflict
             stages: [merge-commit]
