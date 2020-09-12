@@ -1,0 +1,35 @@
+---
+hadolint:dockerfile:
+    extends: .analyse_dockerfile
+    variables:
+        service_name: hadolint
+hadolint:
+    extends: .build_service
+    needs:
+        - hadolint:dockerfile
+    rules:
+        - changes:
+              - hadolint/Dockerfile
+    variables:
+        service_name: hadolint
+hadolint:version:
+    extends: .publish_version
+    needs:
+        - hadolint
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - hadolint/Dockerfile
+    variables:
+        service_name: hadolint
+
+hadolint:latest:
+    extends: .publish_latest
+    needs:
+        - hadolint
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+              - hadolint/Dockerfile
+    variables:
+        service_name: hadolint

@@ -1,0 +1,34 @@
+---
+black:dockerfile:
+    extends: .analyse_dockerfile
+    variables:
+        service_name: black
+black:
+    extends: .build_service
+    needs:
+        - black:dockerfile
+    rules:
+        - changes:
+              - black/Dockerfile
+    variables:
+        service_name: black
+black:version:
+    extends: .publish_version
+    needs:
+        - black
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - black/Dockerfile
+    variables:
+        service_name: black
+black:latest:
+    extends: .publish_latest
+    needs:
+        - black:version
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+              - black/Dockerfile
+    variables:
+        service_name: black

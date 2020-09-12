@@ -1,0 +1,35 @@
+---
+pytest:dockerfile:
+    extends: .analyse_dockerfile
+    variables:
+        service_name: pytest
+pytest:
+    extends: .build_service
+    needs:
+        - pytest:dockerfile
+    rules:
+        - changes:
+              - pytest/Dockerfile
+    variables:
+        service_name: pytest
+pytest:version:
+    extends: .publish_version
+    needs:
+        - pytest
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - pytest/Dockerfile
+    variables:
+        service_name: pytest
+
+pytest:latest:
+    extends: .publish_latest
+    needs:
+        - pytest:version
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+              - pytest/Dockerfile
+    variables:
+        service_name: pytest

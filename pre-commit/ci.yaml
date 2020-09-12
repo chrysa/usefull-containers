@@ -1,0 +1,35 @@
+---
+pre-commit:dockerfile:
+    extends: .analyse_dockerfile
+    variables:
+        service_name: pre-commit
+pre-commit:
+    extends: .build_service
+    needs:
+        - pre-commit:dockerfile
+    rules:
+        - changes:
+              - pre-commit/Dockerfile
+    variables:
+        service_name: pre-commit
+pre-commit:version:
+    extends: .publish_version
+    needs:
+        - pre-commit
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - pre-commit/Dockerfile
+    variables:
+        service_name: pre-commit
+
+pre-commit:latest:
+    extends: .publish_latest
+    needs:
+        - pre-commit:version
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+              - pre-commit/Dockerfile
+    variables:
+        service_name: pre-commit
