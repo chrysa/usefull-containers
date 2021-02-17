@@ -1,3 +1,4 @@
 FROM  hadolint/hadolint:latest-debian
-ADD .hadolint.yaml /config/.hadolint.yaml
+ADD .hadolint.yaml /app/.hadolint.yaml
 WORKDIR  /app
+CMD ["hadolint","Dockerfile","--config=/app/.hadolint.yaml","-"]

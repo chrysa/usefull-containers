@@ -1,0 +1,35 @@
+---
+sphinx:dockerfile:
+    extends: .analyse_dockerfile
+    variables:
+        service_name: sphinx
+sphinx:
+    extends: .build_service
+    needs:
+        - sphinx:dockerfile
+    rules:
+        - changes:
+              - sphinx/Dockerfile
+    variables:
+        service_name: sphinx
+sphinx:version:
+    extends: .publish_version
+    needs:
+        - sphinx
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - sphinx/Dockerfile
+    variables:
+        service_name: sphinx
+
+sphinx:latest:
+    extends: .publish_latest
+    needs:
+        - sphinx:version
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+              - sphinx/Dockerfile
+    variables:
+        service_name: sphinx

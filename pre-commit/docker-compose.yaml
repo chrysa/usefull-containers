@@ -1,0 +1,34 @@
+---
+version: '3.8'
+
+services:
+    pre-commit:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            labels:
+                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+                build_date: ${BUILD_DATE:-}
+                commit_id: ${CI_COMMIT_SHA:-}
+                vcs-url: ${CI_REPOSITORY_URL:-}
+                vcs-ref: ${CI_COMMIT_SHA:-}
+                departement: QA
+                description: guideline checker for python projects
+                version: ${PRE_COMMIT_CONTAINER_VERSION}
+        container_name: pre-commit
+        environment:
+            - GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+        hostname: pre-commit
+        image: ${PROJECT_NAME}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION}
+        tty: true
+        volumes:
+            - type: bind
+              source: .
+              target: /app
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+            - type: volume
+              source: pre-commit-hook
+              target: /root/.cache/pre-commit
+        working_dir: /app
