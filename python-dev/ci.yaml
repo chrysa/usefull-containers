@@ -1,0 +1,35 @@
+---
+pylint:dockerfile:
+    extends: .analyse_dockerfile
+    variables:
+        service_name: pylint
+pylint:
+    extends: .build_service
+    needs:
+        - pylint:dockerfile
+    rules:
+        - changes:
+              - pylint/Dockerfile
+    variables:
+        service_name: pylint
+pylint:version:
+    extends: .publish_version
+    needs:
+        - pylint
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - pylint/Dockerfile
+    variables:
+        service_name: pylint
+
+pylint:latest:
+    extends: .publish_latest
+    needs:
+        - pylint:version
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+              - pylint/Dockerfile
+    variables:
+        service_name: pylint

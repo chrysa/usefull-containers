@@ -17,3 +17,5 @@ include:
     - mypy/ci.yaml
     - pre-commit/ci.yaml
     - pytest/ci.yaml
+    - pylint/ci.yaml
+    - sphinx/ci.yaml

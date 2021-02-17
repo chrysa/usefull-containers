@@ -1,0 +1,23 @@
+---
+version: '3.8'
+
+services:
+    pylint:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            labels:
+                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+                build_date: ${BUILD_DATE:-}
+                commit_id: ${CI_COMMIT_SHA:-}
+                vcs-url: ${CI_REPOSITORY_URL:-}
+                vcs-ref: ${CI_COMMIT_SHA:-}
+                departement: test
+                description: pylint application
+                version: ${PYLINT_CONTAINER_VERSION}
+        container_name: pylint
+        image: ${PROJECT_NAME}/pylint:${PYLINT_CONTAINER_VERSION}
+        tty: true
+        volumes:
+            - .:/app
+        working_dir: /app
