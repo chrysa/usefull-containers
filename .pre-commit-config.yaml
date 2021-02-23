@@ -10,11 +10,18 @@ repos:
     #         stages: [manual]
     #       - id: check-useless-excludes
     #        stages: [manual]
+<<<<<<< HEAD
     # - repo: https://github.com/chrysa/pre-commit-hooks-changelog
     #   rev: 3be37b215079a981171a173d60fdf4222a3162d4
     #   hooks:
     #       - id: generate-changelog
     #         stages: [manual]
+=======
+    - repo: https://github.com/asottile/setup-cfg-fmt
+      rev: 4cda3cfcfc79978f67dcf96d31262b9949be2fd5
+      hooks:
+          - id: setup-cfg-fmt
+>>>>>>> 792b7c3 (some fix)
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
       rev: v2.0.1
       hooks:
@@ -32,7 +39,11 @@ repos:
             args: [--indent, '    ', -i]
             stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
+<<<<<<< HEAD
       rev: 981dd34dcdc3cae2e35935bd762abaa63ee8347d
+=======
+      rev: 780a947d4072b9ccee324971680d824f75befd39
+>>>>>>> 792b7c3 (some fix)
       hooks:
           - id: markdownlint
             args: [--fix, --config=.markdownlint.yml]
@@ -59,7 +70,11 @@ repos:
             args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
             stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
+<<<<<<< HEAD
       rev: 96df60f75ba7dc8e659a873a7a0d7fc377f61509
+=======
+      rev: 51e14fcc979aa701431359dfb82f8583b13779fe
+>>>>>>> 792b7c3 (some fix)
       hooks:
           # - id: check-toml
           #   files: .toml$
