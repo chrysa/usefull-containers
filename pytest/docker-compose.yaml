@@ -20,5 +20,4 @@ services:
         tty: true
         volumes:
             - .:/app
-            - pytest:/app/.pytest_cache
         working_dir: /app

@@ -11,7 +11,7 @@
         - docker logout
     before_script:
         - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
         max: 2
@@ -31,7 +31,7 @@
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
         - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
@@ -49,7 +49,7 @@
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
         - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
@@ -58,3 +58,17 @@
     script:
         - docker-compose pull ${service_name} || true
         - docker-compose push ${service_name}
+
+.release_job:
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    rules:
+        - if: $CI_COMMIT_TAG
+          when: never
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    script:
+        - echo 'running release_job for $service_name $version'
+    release:
+        name: Release $service_name $version
+        tag_name: $version
+        ref: $CI_COMMIT_SHA
