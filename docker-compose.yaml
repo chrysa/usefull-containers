@@ -37,7 +37,3 @@ services:
         extends:
             file: sphinx/docker-compose.yaml
             service: sphinx
-volumes:
-    my-py-cache:
-    pre-commit-hook:
-    pytest:

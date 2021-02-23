@@ -9,7 +9,7 @@ flake8:
         - flake8:dockerfile
     rules:
         - changes:
-              - flake8/Dockerfile
+              - flake8/**
     variables:
         service_name: flake8
 flake8:version:
@@ -17,12 +17,11 @@ flake8:version:
     needs:
         - flake8
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
               - flake8/Dockerfile
     variables:
         service_name: flake8
-
 flake8:latest:
     extends: .publish_latest
     needs:
@@ -30,6 +29,15 @@ flake8:latest:
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
           changes:
-              - flake8/Dockerfile
+              - flake8/**
     variables:
         service_name: flake8
+flake8:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - flake8/**
+    variables:
+        service_name: flake8
+        version: $(cat .env | grep "FLAKE8_CONTAINER_VERSION" | cut -d"=" -f1)

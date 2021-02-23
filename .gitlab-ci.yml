@@ -4,6 +4,7 @@ stages:
     - build
     - publish container version
     - publish container latest
+    - release
 cache:
     paths:
         - resume/src/node_modules/

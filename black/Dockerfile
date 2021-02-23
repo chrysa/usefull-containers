@@ -6,16 +6,18 @@ ENV PATH=$PATH:/home/black/.local/bin
 
 RUN set -x \
  && apk add --quiet --no-cache build-base bash \
- && addgroup -S black \
- && adduser -D --system --shell /usr/bin/bash black black \
  && rm -rf /var/cache/apk/* \
- && chown -R black:black /app \
- && pip install --quiet --upgrade pip
+ && pip install --quiet --no-cache-dir --upgrade pip
+
+RUN set -x \
+ && addgroup --system black \
+ && adduser --disabled-password --system --shell /usr/bin/bash --ingroup black black \
+ && chown -R black:black /app
 
 USER black
 
 RUN set -x \
- && pip install --quiet black==20.8b1
+ && pip install --quiet --no-cache-dir black==20.8b1
 
 
 CMD ["black",  "--help"]
