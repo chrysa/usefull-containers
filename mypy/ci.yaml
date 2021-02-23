@@ -9,7 +9,7 @@ mypy:
         - mypy:dockerfile
     rules:
         - changes:
-              - mypy/Dockerfile
+              - mypy/**
     variables:
         service_name: mypy
 mypy:version:
@@ -17,12 +17,11 @@ mypy:version:
     needs:
         - mypy
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
               - mypy/Dockerfile
     variables:
         service_name: mypy
-
 mypy:latest:
     extends: .publish_latest
     needs:
@@ -30,6 +29,15 @@ mypy:latest:
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
           changes:
-              - mypy/Dockerfile
+              - mypy/**
     variables:
         service_name: mypy
+mypy:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - mypy/**
+    variables:
+        service_name: mypy
+        version: $(cat .env | grep "MYPY_CONTAINER_VERSION" | cut -d"=" -f1)

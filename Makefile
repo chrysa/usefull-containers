@@ -16,7 +16,7 @@ tail=10
 
 .DEFAULT_GOAL := help
 
-.PHONY: build clean down help logs logs-f logs-tail pre-commit prune start status stop tag-latest up up-detach
+.PHONY: build clean config down hadolint help logs logs-f logs-tail pre-commit prune start status stop up up-detach upgradable-packages
 
 COLOR[GREEN]=\e[1;92m
 COLOR[RED]=\e[1;91m
@@ -30,7 +30,7 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value @), required by target $@)))
 
-build: ## Build project => make build [service_name={service_name}]
+build: ## Build project => build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 	@docker-compose build --compress --force-rm ${service_name}
 clean: ## clean project
@@ -38,16 +38,16 @@ clean: ## clean project
 	@rm -rf .mypy_cache .pytest
 config:
 	@docker-compose config
-down: clean ## Down project containers=> make down
+down: clean ## Down project containers=> down
 	$(info Make: Down)
 	@docker-compose down --remove-orphans
-hadolint: ## lint dockerfiles => make hadolint
+hadolint: ## lint dockerfiles => hadolint
 	$(info Make: hadolint)
 	@for f in $(shell find . -name "Dockerfile"); do \
 		echo "analyse $${f}"; \
 		docker run --rm --interactive --volume ${PWD}/.hadolint.yaml:/bin/hadolint.yaml -e XDG_CONFIG_HOME=/bin hadolint/hadolint < $${f}; \
 	done
-help: ## This help dialog. => make help
+help: ## This help dialog. => help
 	@echo "Hello to the usefull-containers Makefile\n"
 	@echo "Usage: 	[rules] [variables]"
 	@IFS=$$'\n'
@@ -65,7 +65,7 @@ logs-tail: check-defined-service_name ## display logs tail => [tail=`echo ${tail
 	@docker-compose logs --tail=${tail} ${service_name}
 pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
-	@pip install --quiet pre-commit
+	@pip install --quiet --no-cache-dir pre-commit
 	@pre-commit autoupdate --bleeding-edge || true
 	@pre-commit run --all-files --verbose || true
 prune: down ## remove service on the host and prune volume image and network unused
@@ -102,5 +102,5 @@ up-detach: ## Up project containers =>  [service_name={service_name}]
 upgradable-packages: check-defined-service_name ## list outdated package in service
 	@for service in $(shell echo ${service_name}); do \
 		echo "=======>> upgradable package for ${service}"
-		docker-compose run --rm ${service} sh -c "set -ex && pip install --quiet pip-upgrade-outdated==1.5 && pip list --outdated" ; \
+		docker-compose run --rm ${service} sh -c "set -ex && pip install --quiet --no-cache-dir pip-upgrade-outdated==1.5 && pip list --outdated" ; \
 	done

@@ -9,7 +9,7 @@ pylint:
         - pylint:dockerfile
     rules:
         - changes:
-              - pylint/Dockerfile
+              - pylint/**
     variables:
         service_name: pylint
 pylint:version:
@@ -17,12 +17,11 @@ pylint:version:
     needs:
         - pylint
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
               - pylint/Dockerfile
     variables:
         service_name: pylint
-
 pylint:latest:
     extends: .publish_latest
     needs:
@@ -30,6 +29,15 @@ pylint:latest:
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
           changes:
-              - pylint/Dockerfile
+              - pylint/**
     variables:
         service_name: pylint
+pylint:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - pylint/**
+    variables:
+        service_name: pylint
+        version: $(cat .env | grep "PYLINT_CONTAINER_VERSION" | cut -d"=" -f1)

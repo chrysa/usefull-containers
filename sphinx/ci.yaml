@@ -9,7 +9,7 @@ sphinx:
         - sphinx:dockerfile
     rules:
         - changes:
-              - sphinx/Dockerfile
+              - sphinx/**
     variables:
         service_name: sphinx
 sphinx:version:
@@ -17,12 +17,11 @@ sphinx:version:
     needs:
         - sphinx
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
               - sphinx/Dockerfile
     variables:
         service_name: sphinx
-
 sphinx:latest:
     extends: .publish_latest
     needs:
@@ -30,6 +29,15 @@ sphinx:latest:
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
           changes:
-              - sphinx/Dockerfile
+              - sphinx/**
     variables:
         service_name: sphinx
+sphinx:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - sphinx/**
+    variables:
+        service_name: sphinx
+        version: $(cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d"=" -f1)
