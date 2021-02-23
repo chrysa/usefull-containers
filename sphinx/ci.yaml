@@ -14,8 +14,12 @@ sphinx:build:
           optional: true
     rules:
         - changes:
+<<<<<<< HEAD
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
+=======
+              - sphinx/**
+>>>>>>> 792b7c3 (some fix)
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: sphinx
@@ -25,14 +29,23 @@ sphinx:version:
     needs:
         - sphinx:build
     rules:
+<<<<<<< HEAD
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+=======
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
+>>>>>>> 792b7c3 (some fix)
           changes:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
+<<<<<<< HEAD
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: sphinx
 
+=======
+    variables:
+        service_name: sphinx
+>>>>>>> 792b7c3 (some fix)
 sphinx:latest:
     extends: .publish_latest
     needs:
@@ -40,8 +53,23 @@ sphinx:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+<<<<<<< HEAD
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: sphinx
+=======
+              - sphinx/**
+    variables:
+        service_name: sphinx
+sphinx:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - sphinx/**
+    variables:
+        service_name: sphinx
+        version: $(cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d"=" -f1)
+>>>>>>> 792b7c3 (some fix)

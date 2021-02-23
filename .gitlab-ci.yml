@@ -1,5 +1,19 @@
 ---
+<<<<<<< HEAD
 image: docker/compose:1.29.2
+=======
+stages:
+    - analyse
+    - build
+    - publish container version
+    - publish container latest
+    - release
+cache:
+    paths:
+        - resume/src/node_modules/
+variables:
+    DOCKER_DRIVER: overlay
+>>>>>>> 792b7c3 (some fix)
 
 include:
     - ci-jobs.yaml

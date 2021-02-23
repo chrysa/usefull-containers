@@ -14,9 +14,13 @@ pre-commit:build:
           optional: true
     rules:
         - changes:
+<<<<<<< HEAD
               - pre-commit/.pre-commit-config.yaml
               - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
+=======
+              - pre-commit/**
+>>>>>>> 792b7c3 (some fix)
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: pre-commit
@@ -26,15 +30,24 @@ pre-commit:version:
     needs:
         - pre-commit:build
     rules:
+<<<<<<< HEAD
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+=======
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
+>>>>>>> 792b7c3 (some fix)
           changes:
               - pre-commit/.pre-commit-config.yaml
               - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
+<<<<<<< HEAD
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: pre-commit
 
+=======
+    variables:
+        service_name: pre-commit
+>>>>>>> 792b7c3 (some fix)
 pre-commit:latest:
     extends: .publish_latest
     needs:
@@ -42,9 +55,24 @@ pre-commit:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+<<<<<<< HEAD
               - pre-commit/.pre-commit-config.yaml
               - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: pre-commit
+=======
+              - pre-commit/**
+    variables:
+        service_name: pre-commit
+pre-commit:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - pre-commit/**
+    variables:
+        service_name: pre-commit
+        version: $(cat .env | grep "PRE_COMMIT_CONTAINER_VERSION" | cut -d"=" -f1)
+>>>>>>> 792b7c3 (some fix)

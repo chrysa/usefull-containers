@@ -14,8 +14,12 @@ flake8:build:
           optional: true
     rules:
         - changes:
+<<<<<<< HEAD
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
+=======
+              - flake8/**
+>>>>>>> 792b7c3 (some fix)
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: flake8
@@ -25,14 +29,23 @@ flake8:version:
     needs:
         - flake8:build
     rules:
+<<<<<<< HEAD
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+=======
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
+>>>>>>> 792b7c3 (some fix)
           changes:
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
+<<<<<<< HEAD
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: flake8
 
+=======
+    variables:
+        service_name: flake8
+>>>>>>> 792b7c3 (some fix)
 flake8:latest:
     extends: .publish_latest
     needs:
@@ -40,8 +53,23 @@ flake8:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+<<<<<<< HEAD
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: flake8
+=======
+              - flake8/**
+    variables:
+        service_name: flake8
+flake8:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - flake8/**
+    variables:
+        service_name: flake8
+        version: $(cat .env | grep "FLAKE8_CONTAINER_VERSION" | cut -d"=" -f1)
+>>>>>>> 792b7c3 (some fix)

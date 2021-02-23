@@ -14,9 +14,13 @@ hadolint:build:
           optional: true
     rules:
         - changes:
+<<<<<<< HEAD
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
+=======
+              - hadolint/**
+>>>>>>> 792b7c3 (some fix)
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: hadolint
@@ -26,15 +30,24 @@ hadolint:version:
     needs:
         - hadolint:build
     rules:
+<<<<<<< HEAD
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+=======
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
+>>>>>>> 792b7c3 (some fix)
           changes:
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
+<<<<<<< HEAD
               - hadolint/.hadolint.yaml
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: hadolint
 
+=======
+    variables:
+        service_name: hadolint
+>>>>>>> 792b7c3 (some fix)
 hadolint:latest:
     extends: .publish_latest
     needs:
@@ -42,9 +55,24 @@ hadolint:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+<<<<<<< HEAD
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: hadolint
+=======
+              - hadolint/**
+    variables:
+        service_name: hadolint
+hadolint:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - hadolint/**
+    variables:
+        service_name: hadolint
+        version: $(cat .env | grep "HADOOLINT_CONTAINER_VERSION" | cut -d"=" -f1)
+>>>>>>> 792b7c3 (some fix)
