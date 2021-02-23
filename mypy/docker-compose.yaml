@@ -23,5 +23,4 @@ services:
         tty: true
         volumes:
             - .:/app
-            - my-py-cache:.mypy_cache
         working_dir: /app

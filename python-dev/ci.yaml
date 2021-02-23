@@ -1,35 +1,43 @@
 ---
-pylint:dockerfile:
+python-dev:dockerfile:
     extends: .analyse_dockerfile
     variables:
-        service_name: pylint
-pylint:
+        service_name: python-dev
+python-dev:
     extends: .build_service
     needs:
-        - pylint:dockerfile
+        - python-dev:dockerfile
     rules:
         - changes:
-              - pylint/Dockerfile
+              - python-dev/**
     variables:
-        service_name: pylint
-pylint:version:
+        service_name: python-dev
+python-dev:version:
     extends: .publish_version
     needs:
-        - pylint
+        - python-dev
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
-              - pylint/Dockerfile
+              - python-dev/Dockerfile
     variables:
-        service_name: pylint
-
-pylint:latest:
+        service_name: python-dev
+python-dev:latest:
     extends: .publish_latest
     needs:
-        - pylint:version
+        - python-dev:version
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
           changes:
-              - pylint/Dockerfile
+              - python-dev/**
     variables:
-        service_name: pylint
+        service_name: python-dev
+python-dev:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - python-dev/**
+    variables:
+        service_name: python-dev
+        version: $(cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d"=" -f1)
