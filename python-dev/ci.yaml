@@ -6,7 +6,6 @@ python-dev:dockerfile:
               - python-dev/Dockerfile
     variables:
         service_name: python-dev
-<<<<<<< HEAD
 
 python-dev:build:
     extends: .build_service
@@ -34,27 +33,6 @@ python-dev:version:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: python-dev
 
-=======
-python-dev:
-    extends: .build_service
-    needs:
-        - python-dev:dockerfile
-    rules:
-        - changes:
-              - python-dev/**
-    variables:
-        service_name: python-dev
-python-dev:version:
-    extends: .publish_version
-    needs:
-        - python-dev
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
-          changes:
-              - python-dev/Dockerfile
-    variables:
-        service_name: python-dev
->>>>>>> 792b7c3 (some fix)
 python-dev:latest:
     extends: .publish_latest
     needs:
@@ -62,23 +40,8 @@ python-dev:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-<<<<<<< HEAD
               - python-dev/docker-compose.yaml
               - python-dev/Dockerfile
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: python-dev
-=======
-              - python-dev/**
-    variables:
-        service_name: python-dev
-python-dev:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - python-dev/**
-    variables:
-        service_name: python-dev
-        version: $(cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d"=" -f1)
->>>>>>> 792b7c3 (some fix)
