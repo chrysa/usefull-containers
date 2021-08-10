@@ -10,10 +10,6 @@
     after_script:
         - docker logout
     before_script:
-<<<<<<< HEAD
-=======
-        - source ${CI_PROJECT_DIR}/.env
->>>>>>> 792b7c3 (some fix)
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
@@ -33,11 +29,6 @@
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-<<<<<<< HEAD
-=======
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
->>>>>>> 792b7c3 (some fix)
     retry:
         max: 2
         when:
@@ -60,18 +51,12 @@
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-<<<<<<< HEAD
-=======
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
->>>>>>> 792b7c3 (some fix)
     retry:
         max: 2
         when:
             - script_failure
             - missing_dependency_failure
     script:
-<<<<<<< HEAD
         - export PASSED_REPO=${DOCKER_REPO}
         - export DOCKER_REPO=${CI_REGISTRY_IMAGE}
         - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
@@ -81,22 +66,3 @@
         - env
         - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${PASSED_REPO}/${service_name}:latest
         - docker push ${DOCKER_REPO}/${service_name}:latest
-=======
-        - docker-compose pull ${service_name} || true
-        - docker-compose push ${service_name}
-
-.release_job:
-    stage: release
-    image: registry.gitlab.com/gitlab-org/release-cli:latest
-    rules:
-        - if: $CI_COMMIT_TAG
-          when: never
-        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    script:
-        - echo 'running release_job for $service_name $version'
-    release:
-        description: release $service_name $version
-        name: Release $service_name $version
-        tag_name: $version
-        ref: $CI_COMMIT_SHA
->>>>>>> 792b7c3 (some fix)

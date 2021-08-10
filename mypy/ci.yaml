@@ -14,12 +14,8 @@ mypy:build:
           optional: true
     rules:
         - changes:
-<<<<<<< HEAD
               - mypy/docker-compose.yaml
               - mypy/Dockerfile
-=======
-              - mypy/**
->>>>>>> 792b7c3 (some fix)
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: mypy
@@ -29,23 +25,14 @@ mypy:version:
     needs:
         - mypy:build
     rules:
-<<<<<<< HEAD
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
-=======
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
->>>>>>> 792b7c3 (some fix)
           changes:
               - mypy/docker-compose.yaml
               - mypy/Dockerfile
-<<<<<<< HEAD
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: mypy
 
-=======
-    variables:
-        service_name: mypy
->>>>>>> 792b7c3 (some fix)
 mypy:latest:
     extends: .publish_latest
     needs:
@@ -53,23 +40,8 @@ mypy:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-<<<<<<< HEAD
               - mypy/docker-compose.yaml
               - mypy/Dockerfile
           variables:
               DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: mypy
-=======
-              - mypy/**
-    variables:
-        service_name: mypy
-mypy:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - mypy/**
-    variables:
-        service_name: mypy
-        version: $(cat .env | grep "MYPY_CONTAINER_VERSION" | cut -d"=" -f1)
->>>>>>> 792b7c3 (some fix)
