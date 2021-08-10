@@ -99,8 +99,8 @@ up: ## Up project containers => [service_name={service_name}]
 up-detach: ## Up project containers =>  [service_name={service_name}]
 	$(info Make: Up ${service_name})
 	@docker-compose up --detach ${service_name}
-upgradable-packages: check-defined-service_name ## list outdated package in service
-	@for service in $(shell echo ${service_name}); do \
+upgradable-packages:  ## list outdated package in service
+	@for service in $(shell echo "black flake8 mypy pre-commit pylint pytest python-dev sphinx"); do \
 		echo "=======>> upgradable package for ${service}"
 		docker-compose run --rm ${service} sh -c "set -ex && pip install --quiet --no-cache-dir pip-upgrade-outdated==1.5 && pip list --outdated" ; \
 	done
