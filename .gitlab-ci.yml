@@ -4,13 +4,11 @@ stages:
     - build
     - publish container version
     - publish container latest
-cache:
-    paths:
-        - resume/src/node_modules/
+
 variables:
     DOCKER_DRIVER: overlay
     STAGGING_BRANCH: develop
----
+
 .analyse_dockerfile:
     image: hadolint/hadolint:latest-debian
     stage: analyse
