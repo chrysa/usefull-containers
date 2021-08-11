@@ -6,9 +6,11 @@ pre-commit:dockerfile:
 pre-commit:
     extends: .build_service
     needs:
-        - pre-commit:dockerfile
+        - job: pre-commit:dockerfile
+          optional: true
     rules:
         - changes:
+              - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
     variables:
         service_name: pre-commit
@@ -17,19 +19,20 @@ pre-commit:version:
     needs:
         - pre-commit
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
     variables:
         service_name: pre-commit
-
 pre-commit:latest:
     extends: .publish_latest
     needs:
         - pre-commit:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
     variables:
         service_name: pre-commit

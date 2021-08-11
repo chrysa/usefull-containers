@@ -6,9 +6,11 @@ black:dockerfile:
 black:
     extends: .build_service
     needs:
-        - black:dockerfile
+        - job: black:dockerfile
+          optional: true
     rules:
         - changes:
+              - black/docker-compose.yaml
               - black/Dockerfile
     variables:
         service_name: black
@@ -17,8 +19,9 @@ black:version:
     needs:
         - black
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - black/docker-compose.yaml
               - black/Dockerfile
     variables:
         service_name: black
@@ -27,8 +30,9 @@ black:latest:
     needs:
         - black:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - black/docker-compose.yaml
               - black/Dockerfile
     variables:
         service_name: black

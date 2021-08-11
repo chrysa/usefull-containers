@@ -9,9 +9,69 @@ cache:
         - resume/src/node_modules/
 variables:
     DOCKER_DRIVER: overlay
+    STAGGING_BRANCH: develop
+---
+.analyse_dockerfile:
+    image: hadolint/hadolint:latest-debian
+    stage: analyse
+    script:
+        - hadolint --config=.hadolint.yaml ${service_name}/Dockerfile
+.build_service:
+    image: docker/compose:latest
+    stage: build
+    after_script:
+        - docker logout
+    before_script:
+        - source ${CI_PROJECT_DIR}/.env
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
+    retry:
+        max: 2
+        when:
+            - script_failure
+            - stuck_or_timeout_failure
+            - runner_system_failure
+    script:
+        - docker-compose build --compress --force-rm ${service_name}
+        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
+        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
+.publish_latest:
+    image: docker/compose:latest
+    stage: publish container latest
+    after_script:
+        - docker logout
+    before_script:
+        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
+        - source ${CI_PROJECT_DIR}/.env
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    retry:
+        max: 2
+        when:
+            - script_failure
+            - missing_dependency_failure
+    script:
+        - docker pull ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
+        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
+        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
+.publish_version:
+    image: docker/compose:latest
+    stage: publish container version
+    after_script:
+        - docker logout
+    before_script:
+        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
+        - source ${CI_PROJECT_DIR}/.env
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    retry:
+        max: 2
+        when:
+            - script_failure
+            - missing_dependency_failure
+    script:
+        - docker-compose pull ${service_name} || true
+        - docker-compose push ${service_name}
 
 include:
-    - ci-jobs.yaml
     - black/ci.yaml
     - flake8/ci.yaml
     - mypy/ci.yaml

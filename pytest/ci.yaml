@@ -6,9 +6,11 @@ pytest:dockerfile:
 pytest:
     extends: .build_service
     needs:
-        - pytest:dockerfile
+        - job: pytest:dockerfile
+          optional: true
     rules:
         - changes:
+              - pytest/docker-compose.yaml
               - pytest/Dockerfile
     variables:
         service_name: pytest
@@ -17,19 +19,20 @@ pytest:version:
     needs:
         - pytest
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - pytest/docker-compose.yaml
               - pytest/Dockerfile
     variables:
         service_name: pytest
-
 pytest:latest:
     extends: .publish_latest
     needs:
         - pytest:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - pytest/docker-compose.yaml
               - pytest/Dockerfile
     variables:
         service_name: pytest

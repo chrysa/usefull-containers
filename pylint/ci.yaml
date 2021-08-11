@@ -6,9 +6,11 @@ pylint:dockerfile:
 pylint:
     extends: .build_service
     needs:
-        - pylint:dockerfile
+        - job: pylint:dockerfile
+          optional: true
     rules:
         - changes:
+              - pylint/docker-compose.yaml
               - pylint/Dockerfile
     variables:
         service_name: pylint
@@ -17,19 +19,20 @@ pylint:version:
     needs:
         - pylint
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - pylint/docker-compose.yaml
               - pylint/Dockerfile
     variables:
         service_name: pylint
-
 pylint:latest:
     extends: .publish_latest
     needs:
         - pylint:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - pylint/docker-compose.yaml
               - pylint/Dockerfile
     variables:
         service_name: pylint
