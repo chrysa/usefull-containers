@@ -6,10 +6,13 @@ hadolint:dockerfile:
 hadolint:
     extends: .build_service
     needs:
-        - hadolint:dockerfile
+        - job: hadolint:dockerfile
+          optional: true
     rules:
         - changes:
+              - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
     variables:
         service_name: hadolint
 hadolint:version:
@@ -17,19 +20,22 @@ hadolint:version:
     needs:
         - hadolint
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
     variables:
         service_name: hadolint
-
 hadolint:latest:
     extends: .publish_latest
     needs:
-        - hadolint
+        - hadolint:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
     variables:
         service_name: hadolint

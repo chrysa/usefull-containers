@@ -9,13 +9,10 @@ RUN set -x \
  && addgroup -S black \
  && adduser -D --system --shell /usr/bin/bash black black \
  && rm -rf /var/cache/apk/* \
- && chown -R black:black /app \
- && pip install --quiet --upgrade pip
+ && chown -R black:black /app
 
 USER black
 
-RUN set -x \
- && pip install --quiet black==20.8b1
-
+RUN pip install --quiet --no-cache-dir black==20.8b1
 
 CMD ["black",  "--help"]

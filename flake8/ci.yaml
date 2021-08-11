@@ -6,9 +6,11 @@ flake8:dockerfile:
 flake8:
     extends: .build_service
     needs:
-        - flake8:dockerfile
+        - job: flake8:dockerfile
+          optional: true
     rules:
         - changes:
+              - flake8/docker-compose.yaml
               - flake8/Dockerfile
     variables:
         service_name: flake8
@@ -17,19 +19,20 @@ flake8:version:
     needs:
         - flake8
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "release/*"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - flake8/docker-compose.yaml
               - flake8/Dockerfile
     variables:
         service_name: flake8
-
 flake8:latest:
     extends: .publish_latest
     needs:
         - flake8:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - flake8/docker-compose.yaml
               - flake8/Dockerfile
     variables:
         service_name: flake8

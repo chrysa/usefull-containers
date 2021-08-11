@@ -6,7 +6,7 @@ ENV PYTHONPATH=/app \
 WORKDIR /app/
 
 RUN set -x \
- && useradd -ms /usr/bin/bash pre-commit \ 
+ && useradd -ms /usr/bin/bash pre-commit \
  && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get install -qq -o=Dpkg::Use-Pty=0 --no-install-recommends -y bash apt-transport-https ca-certificates curl gnupg2 software-properties-common \
  && curl -fsSL "https://download.docker.com/linux/$(lsb_release -is | tr '[A-Z]' '[a-z]')/gpg" | apt-key add - \
@@ -16,12 +16,12 @@ RUN set -x \
  && DEBIAN_FRONTEND=noninteractive apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
  && git lfs install \
- && pip install --quiet --no-cache-dir --upgrade pip
+ && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip
 
 USER pre-commit
 
 RUN set -x \
- && pip install --quiet --no-cache-dir docker-compose pre-commit==2.9.3 \
+ && pip install --quiet --no-cache-dir --no-cache-dir docker-compose pre-commit==2.9.3 \
  && git config --global core.filemode false
 
 ENTRYPOINT ["pre-commit", "install", "&&", "pre-commit", "install-hooks"]

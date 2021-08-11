@@ -9,14 +9,13 @@ RUN set -x \
  && rm -rf /var/cache/apk/* \
  && addgroup -S mypy \
  && adduser -D --system --shell /usr/bin/bash mypy mypy \
- && chown -R mypy:mypy /app \
- && pip install --quiet --upgrade pip
+ && chown -R mypy:mypy /app
 
 USER mypy
 
 RUN set -x \
- && pip install -q mypy==0.800 \
- && pip install -q junit-xml==1.9
+ && pip install --quiet --no-cache-dir mypy==0.800 \
+ && pip install --quiet --no-cache-dir junit-xml==1.9
 
 WORKDIR  /app
 

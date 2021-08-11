@@ -2,21 +2,11 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")*
 endif
 
-BLACK_CONTAINER_VERSION=$(shell cat .env | grep "^BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
-FLAKE8_CONTAINER_VERSION=$(shell cat .env | grep "^FLAKE8_CONTAINER_VERSION" | cut -d "=" -f2)
-HADOOLINT_CONTAINER_VERSION=$(shell cat .env | grep "^HADOOLINT_CONTAINER_VERSION" | cut -d "=" -f2)
-MYPY_CONTAINER_VERSION=$(shell cat .env | grep "^MYPY_CONTAINER_VERSION" | cut -d "=" -f2)
-PRE_COMMIT_CONTAINER_VERSION=$(shell cat .env | grep "^PRE_COMMIT_CONTAINER_VERSION" | cut -d "=" -f2)
-PYLINT_CONTAINER_VERSION=$(shell cat .env | grep "^PYLINT_CONTAINER_VERSION" | cut -d "=" -f2)
-PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "^PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
-SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "^SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
-PROJECT_NAME=$(shell cat .env | grep "^PROJECT_NAME" | cut -d "=" -f2)
-
 tail=10
 
 .DEFAULT_GOAL := help
 
-.PHONY: build clean down help logs logs-f logs-tail pre-commit prune start status stop tag-latest up up-detach
+.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
 
 COLOR[GREEN]=\e[1;92m
 COLOR[RED]=\e[1;91m
@@ -48,12 +38,13 @@ hadolint: ## lint dockerfiles => make hadolint
 		docker run --rm --interactive --volume ${PWD}/.hadolint.yaml:/bin/hadolint.yaml -e XDG_CONFIG_HOME=/bin hadolint/hadolint < $${f}; \
 	done
 help: ## This help dialog. => make help
-	@echo "Hello to the usefull-containers Makefile\n"
-	@echo "Usage: 	[rules] [variables]"
+	@echo "Variables:"
+	@echo "\t- \"service_name\" is a docker-compose service name or a list of services separate by space as string ($(shell ${__docker_compose_cmd} ps --services | tr '\n' ' '))"
+	@echo "\n"
 	@IFS=$$'\n'
-	@printf "%-30s %-80s %-60s\n" "rule" "help" "variable"
-	@printf "%-30s %-80s %-60s\n" "------" "----" "----"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-30s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
+	@printf "%-50s %-80s %-60s\n" "target" "help" "usage"
+	@printf "%-50s %-80s %-60s\n" "------" "----" "----"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-50s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
 logs: check-defined-service_name ## display logs
 	$(info Make: Logs ${service_name})
 	@docker-compose logs ${service_name}
@@ -65,7 +56,7 @@ logs-tail: check-defined-service_name ## display logs tail => [tail=`echo ${tail
 	@docker-compose logs --tail=${tail} ${service_name}
 pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
-	@pip install --quiet pre-commit
+	@pip install --quiet --no-cache-dir pre-commit
 	@pre-commit autoupdate --bleeding-edge || true
 	@pre-commit run --all-files --verbose || true
 prune: down ## remove service on the host and prune volume image and network unused
@@ -102,5 +93,5 @@ up-detach: ## Up project containers =>  [service_name={service_name}]
 upgradable-packages: check-defined-service_name ## list outdated package in service
 	@for service in $(shell echo ${service_name}); do \
 		echo "=======>> upgradable package for ${service}"
-		docker-compose run --rm ${service} sh -c "set -ex && pip install --quiet pip-upgrade-outdated==1.5 && pip list --outdated" ; \
+		docker-compose run --rm ${service} sh -c "pip list --outdated --format columns" ; \
 	done

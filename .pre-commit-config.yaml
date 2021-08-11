@@ -16,7 +16,7 @@ repos:
           - id: generate-changelog
             stages: [manual]
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
-      rev: aeda358a4a1a064958fd994c9209047bd8c783c8
+      rev: v2.0.1
       hooks:
           - id: docker-compose-check
             stages: [manual]
@@ -26,12 +26,12 @@ repos:
             files: (\.dockerfile|\.Dockerfile|Dockerfile)$
             stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: f457fdd863eb2b6cc2160d2a52130d5db106ea9b
+      rev: 910f4518827d9ed648cbee959395e09bdb0b43fc
       hooks:
           - id: markdownlint
             args: [--fix]
     - repo: https://github.com/adrienverge/yamllint.git
-      rev: 8f682481c725047d3eb9409faecf0719caec1b8a
+      rev: v1.26.2
       hooks:
           - id: yamllint
             args: [--config-file=.yamllint.yaml, --format, parsable, --strict]
@@ -46,14 +46,14 @@ repos:
       hooks:
           - id: yamlfmt
     - repo: https://github.com/pre-commit/mirrors-pylint
-      rev: ab1d036e0d0f1f56b990f261b90115dd2899e7a8
+      rev: v3.0.0a4
       hooks:
           - id: pylint
             files: ^\W+/\W+.*.py$
             args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
             stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 11a2fdbab88e927af4d64e28a238df0f3b8693d1
+      rev: f95941eae9e108e2124c55ad97475aada32bba8d
       hooks:
           # - id: check-toml
           #   files: .toml$
