@@ -23,8 +23,15 @@ black:version:
           changes:
               - black/docker-compose.yaml
               - black/Dockerfile
-    variables:
-        service_name: black
+          variables:
+              service_name: black
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - black/docker-compose.yaml
+              - black/Dockerfile
+          variables:
+              service_name: black
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 black:latest:
     extends: .publish_latest
     needs:
@@ -36,3 +43,4 @@ black:latest:
               - black/Dockerfile
     variables:
         service_name: black
+        CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

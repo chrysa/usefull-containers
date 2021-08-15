@@ -23,8 +23,15 @@ flake8:version:
           changes:
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
-    variables:
-        service_name: flake8
+          variables:
+              service_name: flake8
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flake8/docker-compose.yaml
+              - flake8/Dockerfile
+          variables:
+              service_name: flake8
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 flake8:latest:
     extends: .publish_latest
     needs:
@@ -36,3 +43,4 @@ flake8:latest:
               - flake8/Dockerfile
     variables:
         service_name: flake8
+        CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

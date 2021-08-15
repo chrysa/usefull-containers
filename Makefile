@@ -23,6 +23,9 @@ __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(va
 build: ## Build project => make build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 	@docker-compose build --compress --force-rm ${service_name}
+build-parallel: ## Build project parallel => make build-parallel [service_name={service_name}]
+	$(info Make: Build service  ${service_name})
+	@docker-compose build --compress --force-rm --quiet --parallel ${service_name}
 clean: ## clean project
 	$(info Make: clean)
 	@rm -rf .mypy_cache .pytest
@@ -58,7 +61,7 @@ pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
 	@pip install --quiet --no-cache-dir pre-commit
 	@pre-commit autoupdate --bleeding-edge || true
-	@pre-commit run --all-files --verbose || true
+	@pre-commit run --all-files --verbose --hook-stage manual || true
 prune: down ## remove service on the host and prune volume image and network unused
 	$(info Make: Prune)
 	@docker-compose rm
@@ -81,7 +84,7 @@ status: ## display status of all service
 		fi; \
 		echo "$$color_status====>${COLOR[WHITE]} $$service: $$color_status $$status ${COLOR[WHITE]}"; \
 	done
-stop: check-defined-service_name ## Start project containers => [service_name={service_name}]
+stop: ## Start project containers => [service_name={service_name}]
 	$(info Make: stop  ${service_name})
 	@docker-compose stop ${service_name}
 up: ## Up project containers => [service_name={service_name}]

@@ -10,11 +10,11 @@ repos:
     #         stages: [manual]
     #       - id: check-useless-excludes
     #        stages: [manual]
-    - repo: https://github.com/chrysa/pre-commit-hooks-changelog
-      rev: 3be37b215079a981171a173d60fdf4222a3162d4
-      hooks:
-          - id: generate-changelog
-            stages: [manual]
+    # - repo: https://github.com/chrysa/pre-commit-hooks-changelog
+    #   rev: 3be37b215079a981171a173d60fdf4222a3162d4
+    #   hooks:
+    #       - id: generate-changelog
+    #         stages: [manual]
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
       rev: v2.0.1
       hooks:
@@ -24,6 +24,12 @@ repos:
           - id: hadolint
             args: [--config=.hadolint.yaml]
             files: (\.dockerfile|\.Dockerfile|Dockerfile)$
+            stages: [manual]
+    - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+      rev: v1.1.1
+      hooks:
+          - id: markdown-toc
+            args: [--indent, '    ', -i]
             stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
       rev: 910f4518827d9ed648cbee959395e09bdb0b43fc

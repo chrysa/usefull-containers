@@ -17,7 +17,7 @@ USER pylint
 RUN set -x \
  && pip install --quiet --no-cache-dir pylint==2.6.0 \
  && pip install --quiet --no-cache-dir pylint-junit==0.3.2 \
- && pip install --quiet --no-cache-dir pylint-report==0.1.0
+ && pip install --quiet --no-cache-dir pylint-report==0.1.8
 
 
 CMD ["pylint", "--help"]

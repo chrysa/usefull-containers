@@ -23,8 +23,15 @@ pytest:version:
           changes:
               - pytest/docker-compose.yaml
               - pytest/Dockerfile
-    variables:
-        service_name: pytest
+          variables:
+              service_name: pytest
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pytest/docker-compose.yaml
+              - pytest/Dockerfile
+          variables:
+              service_name: pytest
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 pytest:latest:
     extends: .publish_latest
     needs:
@@ -36,3 +43,4 @@ pytest:latest:
               - pytest/Dockerfile
     variables:
         service_name: pytest
+        CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
