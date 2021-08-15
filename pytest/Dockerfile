@@ -7,8 +7,8 @@ WORKDIR /app
 
 RUN set -x \
  && apk add --quiet --no-cache openssl-dev gcc libffi-dev python3-dev musl-dev build-base bash \
- && addgroup -S mypy \
- && adduser -D --system --shell /usr/bin/bash mypy mypy \
+ && addgroup -S pytest \
+ && adduser -D --system --shell /usr/bin/bash pytest pytest \
  && rm -rf /var/cache/apk/* \
  && chown -R pytest:pytest /app
 
