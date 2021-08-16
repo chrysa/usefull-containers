@@ -14,24 +14,6 @@ pylint:
               - pylint/Dockerfile
     variables:
         service_name: pylint
-pylint:version:
-    extends: .publish_version
-    needs:
-        - pylint
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - pylint/docker-compose.yaml
-              - pylint/Dockerfile
-          variables:
-              service_name: pylint
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
-          changes:
-              - pylint/docker-compose.yaml
-              - pylint/Dockerfile
-          variables:
-              service_name: pylint
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 pylint:latest:
     extends: .publish_latest
     needs:

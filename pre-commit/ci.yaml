@@ -14,24 +14,6 @@ pre-commit:
               - pre-commit/Dockerfile
     variables:
         service_name: pre-commit
-pre-commit:version:
-    extends: .publish_version
-    needs:
-        - pre-commit
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - pre-commit/docker-compose.yaml
-              - pre-commit/Dockerfile
-          variables:
-              service_name: pre-commit
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
-          changes:
-              - pre-commit/docker-compose.yaml
-              - pre-commit/Dockerfile
-          variables:
-              service_name: pre-commit
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 pre-commit:latest:
     extends: .publish_latest
     needs:
