@@ -15,14 +15,12 @@ variables:
     stage: analyse
     script:
         - hadolint --config=.hadolint.yaml ${service_name}/Dockerfile
+
 .build_service:
     image: docker/compose:latest
     stage: build
-    after_script:
-        - docker logout
     before_script:
         - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
         max: 2
@@ -34,6 +32,7 @@ variables:
         - docker-compose build --compress --force-rm ${service_name}
         - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
         - docker push ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
+
 .publish_latest:
     image: docker/compose:latest
     stage: publish container latest
@@ -42,7 +41,7 @@ variables:
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
         - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     retry:
         max: 2
         when:
@@ -52,6 +51,7 @@ variables:
         - docker pull ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
         - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
         - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
+
 .publish_version:
     image: docker/compose:latest
     stage: publish container version
@@ -60,7 +60,7 @@ variables:
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
         - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     retry:
         max: 2
         when:

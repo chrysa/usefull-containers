@@ -62,7 +62,6 @@ alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD
 <!-- START makefile-doc -->
 ```
 $ make help
-make[1]: Entering directory '/mnt/d/drive/repos/usefull-containers'
 Variables:
  - "service_name" is a docker-compose service name or a list of services separate by space as string ()
 
@@ -86,6 +85,5 @@ stop                                                Start project containers    
 up-detach                                           Up project containers                                                             [service_name#{service_name}]
 upgradable-packages                                 list outdated package in service
 up                                                  Up project containers                                                            [service_name#{service_name}]
-make[1]: Leaving directory '/mnt/d/drive/repos/usefull-containers'
 ```
 <!-- END makefile-doc -->
