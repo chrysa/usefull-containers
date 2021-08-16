@@ -22,6 +22,7 @@ variables:
     image: ${DOCKER_COMPOSE_IMAGE}
     stage: build
     before_script:
+        - set -x
         - source ${CI_PROJECT_DIR}/.env
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
@@ -32,8 +33,9 @@ variables:
             - runner_system_failure
     script:
         - docker-compose build --compress --force-rm ${service_name}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
+        - docker-compose push ${service_name}
+    services:
+        - docker:dind
 
 .publish_latest:
     image: ${DOCKER_COMPOSE_IMAGE}
@@ -41,6 +43,7 @@ variables:
     after_script:
         - docker logout
     before_script:
+        - set -x
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
         - source ${CI_PROJECT_DIR}/.env
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -50,27 +53,12 @@ variables:
             - script_failure
             - missing_dependency_failure
     script:
-        - docker pull ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
+        - docker-compose pull ${service_name}
+        - export version=`echo ${service_name^^} | sed -i "s/-/_/g" | cut -d"=" -f2`
+        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${version} ${CI_REGISTRY_IMAGE}/${service_name}:latest
         - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
-
-.publish_version:
-    image: ${DOCKER_COMPOSE_IMAGE}
-    stage: publish container version
-    after_script:
-        - docker logout
-    before_script:
-        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    retry:
-        max: 2
-        when:
-            - script_failure
-            - missing_dependency_failure
-    script:
-        - docker-compose pull ${service_name} || true
-        - docker-compose push ${service_name}
+    services:
+        - docker:dind
 
 include:
     - black/ci.yaml

@@ -14,24 +14,6 @@ pytest:
               - pytest/Dockerfile
     variables:
         service_name: pytest
-pytest:version:
-    extends: .publish_version
-    needs:
-        - pytest
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - pytest/docker-compose.yaml
-              - pytest/Dockerfile
-          variables:
-              service_name: pytest
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
-          changes:
-              - pytest/docker-compose.yaml
-              - pytest/Dockerfile
-          variables:
-              service_name: pytest
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 pytest:latest:
     extends: .publish_latest
     needs:
