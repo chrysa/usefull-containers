@@ -1,6 +1,9 @@
 ---
 hadolint:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - hadolint/Dockerfile
     variables:
         service_name: hadolint
 
@@ -15,6 +18,7 @@ hadolint:build:
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: hadolint
 
 hadolint:version:
@@ -28,35 +32,27 @@ hadolint:version:
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
           variables:
-              service_name: black
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: hadolint
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: hadolint
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 
 hadolint:latest:
     extends: .publish_latest
     needs:
         - hadolint:version
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - hadolint/docker-compose.yaml
-              - hadolint/Dockerfile
-              - hadolint/.hadolint.yaml
-          variables:
-              service_name: black
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: hadolint
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

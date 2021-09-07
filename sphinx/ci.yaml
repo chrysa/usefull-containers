@@ -1,6 +1,9 @@
 ---
 sphinx:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - sphinx/Dockerfile
     variables:
         service_name: sphinx
 
@@ -14,6 +17,7 @@ sphinx:build:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: sphinx
 
 sphinx:version:
@@ -26,32 +30,25 @@ sphinx:version:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
           variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
               service_name: sphinx
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: sphinx
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 
 sphinx:latest:
     extends: .publish_latest
     needs:
         - sphinx:version
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - sphinx/docker-compose.yaml
-              - sphinx/Dockerfile
-          variables:
-              service_name: sphinx
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: sphinx
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
