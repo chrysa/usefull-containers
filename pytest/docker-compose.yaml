@@ -16,7 +16,7 @@ services:
                 description: python unit test runner
                 version: ${PYTEST_CONTAINER_VERSION}
         container_name: pytest
-        image: ${PROJECT_NAME}/pytest:${PYTEST_CONTAINER_VERSION}
+        image: ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app

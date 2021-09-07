@@ -14,7 +14,7 @@ RUN set -x \
 USER mypy
 
 RUN set -x \
- && pip install --quiet --no-cache-dir mypy==0.800 \
+ && pip install --quiet --no-cache-dir mypy==0.910 \
  && pip install --quiet --no-cache-dir junit-xml==1.9
 
 WORKDIR  /app

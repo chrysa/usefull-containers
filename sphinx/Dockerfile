@@ -16,7 +16,7 @@ RUN set -x \
 USER sphinx
 
 RUN set -x \
- && pip install --quiet --no-cache-dir graphviz==0.16 \
+ && pip install --quiet --no-cache-dir graphviz==0.17 \
  && pip install --quiet --no-cache-dir recommonmark==0.7.1 \
- && pip install --quiet --no-cache-dir sphinx==3.4.3 \
- && pip install --quiet --no-cache-dir sphinx-rtd-theme==0.5
+ && pip install --quiet --no-cache-dir sphinx==4.1.2 \
+ && pip install --quiet --no-cache-dir sphinx-rtd-theme==0.5.2

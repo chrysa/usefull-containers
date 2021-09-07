@@ -3,7 +3,8 @@ python-dev:dockerfile:
     extends: .analyse_dockerfile
     variables:
         service_name: python-dev
-python-dev:
+
+python-dev:build:
     extends: .build_service
     needs:
         - job: python-dev:dockerfile
@@ -14,14 +15,43 @@ python-dev:
               - python-dev/Dockerfile
     variables:
         service_name: python-dev
+
+python-dev:version:
+    extends: .publish_version
+    needs:
+        - python-dev:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - python-dev/docker-compose.yaml
+              - python-dev/Dockerfile
+          variables:
+              service_name: python-dev
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - python-dev/docker-compose.yaml
+              - python-dev/Dockerfile
+          variables:
+              service_name: python-dev
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+
 python-dev:latest:
     extends: .publish_latest
     needs:
         - python-dev:version
     rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - python-dev/docker-compose.yaml
+              - python-dev/Dockerfile
+          variables:
+              service_name: python-dev
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - python-dev/docker-compose.yaml
               - python-dev/Dockerfile
-    variables:
-        service_name: python-dev
+          variables:
+              service_name: python-dev
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

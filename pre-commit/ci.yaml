@@ -3,26 +3,60 @@ pre-commit:dockerfile:
     extends: .analyse_dockerfile
     variables:
         service_name: pre-commit
-pre-commit:
+
+pre-commit:build:
     extends: .build_service
     needs:
         - job: pre-commit:dockerfile
           optional: true
     rules:
         - changes:
+              - pre-commit/.pre-commit-config.yaml
               - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
     variables:
         service_name: pre-commit
+
+pre-commit:version:
+    extends: .publish_version
+    needs:
+        - pre-commit:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - pre-commit/.pre-commit-config.yaml
+              - pre-commit/docker-compose.yaml
+              - pre-commit/Dockerfile
+          variables:
+              service_name: pre-commit
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pre-commit/.pre-commit-config.yaml
+              - pre-commit/docker-compose.yaml
+              - pre-commit/Dockerfile
+          variables:
+              service_name: pre-commit
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+
 pre-commit:latest:
     extends: .publish_latest
     needs:
         - pre-commit:version
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
           changes:
+              - pre-commit/.pre-commit-config.yaml
               - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
-    variables:
-        service_name: pre-commit
-        CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+          variables:
+              service_name: pre-commit
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pre-commit/.pre-commit-config.yaml
+              - pre-commit/docker-compose.yaml
+              - pre-commit/Dockerfile
+          variables:
+              service_name: pre-commit
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

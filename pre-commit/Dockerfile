@@ -21,9 +21,7 @@ RUN set -x \
 USER pre-commit
 
 RUN set -x \
- && pip install --quiet --no-cache-dir --no-cache-dir docker-compose pre-commit==2.9.3 \
+ && pip install --quiet --no-cache-dir --no-cache-dir docker-compose pre-commit==2.15.0 \
  && git config --global core.filemode false
 
-ENTRYPOINT ["pre-commit", "install", "&&", "pre-commit", "install-hooks"]
-
-CMD ["pre-commit", "--help"]
+CMD ["pre-commit", "run", "--all-files", "--hook-stage=manual"]

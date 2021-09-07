@@ -15,15 +15,15 @@ RUN set -x \
 USER pytest
 
 RUN set -x \
- && pip install --quiet --no-cache-dir faker==5.6.5 \
+ && pip install --quiet --no-cache-dir faker==8.12.1 \
  && pip install --quiet --no-cache-dir mock==4.0.3 \
- && pip install --quiet --no-cache-dir pytest==6.2.1 \
- && pip install --quiet --no-cache-dir pytest-benchmark==3.2.3 \
- && pip install --quiet --no-cache-dir pytest-cov==2.11.1 \
+ && pip install --quiet --no-cache-dir pytest==6.2.5 \
+ && pip install --quiet --no-cache-dir pytest-benchmark==3.4.1 \
+ && pip install --quiet --no-cache-dir pytest-cov==2.12.1 \
  && pip install --quiet --no-cache-dir pytest-depends==1.0.1 \
- && pip install --quiet --no-cache-dir pytest-func-cov==0.2.2 \
+ && pip install --quiet --no-cache-dir pytest-func-cov==0.2.3 \
  && pip install --quiet --no-cache-dir pytest-html==3.1.1 \
- && pip install --quiet --no-cache-dir pytest-mock==3.5.1
+ && pip install --quiet --no-cache-dir pytest-mock==3.6.1
 
 
 CMD ["pytest", "--help"]
