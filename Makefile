@@ -2,6 +2,17 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")*
 endif
 
+BLACK_CONTAINER_VERSION=$(shell cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
+DOCKER_REPO=$(shell cat .env | grep "DOCKER_REPO" | cut -d "=" -f2)
+FLAKE8_CONTAINER_VERSION=$(shell cat .env | grep "FLAKE8_CONTAINER_VERSION" | cut -d "=" -f2)
+HADOLINT_CONTAINER_VERSION=$(shell cat .env | grep "HADOLINT_CONTAINER_VERSION" | cut -d "=" -f2)
+MYPY_CONTAINER_VERSION=$(shell cat .env | grep "MYPY_CONTAINER_VERSION" | cut -d "=" -f2)
+PRE_COMMIT_CONTAINER_VERSION=$(shell cat .env | grep "PRE_COMMIT_CONTAINER_VERSION" | cut -d "=" -f2)
+PYLINT_CONTAINER_VERSION=$(shell cat .env | grep "PYLINT_CONTAINER_VERSION" | cut -d "=" -f2)
+PYTHON_DEV_CONTAINER_VERSION=$(shell cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d "=" -f2)
+PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
+SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
+
 tail=10
 
 .DEFAULT_GOAL := help
@@ -87,14 +98,37 @@ status: ## display status of all service
 stop: ## Start project containers => [service_name={service_name}]
 	$(info Make: stop  ${service_name})
 	@docker-compose stop ${service_name}
+tag-latest: ## tag services as latest => make tag-latest
+	$(info Make: tag latest)
+	@docker tag ${DOCKER_REPO}/black:${BLACK_CONTAINER_VERSION} ${DOCKER_REPO}/black:latest
+	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
+	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
+	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
+	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
+	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
+	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
+	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
+	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker-compose up ${service_name}
 up-detach: ## Up project containers =>  [service_name={service_name}]
 	$(info Make: Up ${service_name})
 	@docker-compose up --detach ${service_name}
-upgradable-packages: check-defined-service_name ## list outdated package in service
-	@for service in $(shell echo ${service_name}); do \
-		echo "=======>> upgradable package for ${service}"
-		docker-compose run --rm ${service} sh -c "pip list --outdated --format columns" ; \
-	done
+upgradable-packages: ## list outdated package in service
+	@echo "=======>> upgradable package for black"
+	@docker-compose run --rm black sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for flake8"
+	@docker-compose run --rm flake8 sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for mypy"
+	@docker-compose run --rm mypy sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for pre-commit"
+	@docker-compose run --rm pre-commit bash -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for pylint"
+	@docker-compose run --rm pylint sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for pytest"
+	@docker-compose run --rm pytest sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for python-dev"
+	@docker-compose run --rm python-dev sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for sphinx"
+	@docker-compose run --rm sphinx sh -c "pip list --outdated --format columns" || true

@@ -3,7 +3,8 @@ mypy:dockerfile:
     extends: .analyse_dockerfile
     variables:
         service_name: mypy
-mypy:
+
+mypy:build:
     extends: .build_service
     needs:
         - job: mypy:dockerfile
@@ -14,15 +15,43 @@ mypy:
               - mypy/Dockerfile
     variables:
         service_name: mypy
+
+mypy:version:
+    extends: .publish_version
+    needs:
+        - mypy:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - mypy/docker-compose.yaml
+              - mypy/Dockerfile
+          variables:
+              service_name: mypy
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - mypy/docker-compose.yaml
+              - mypy/Dockerfile
+          variables:
+              service_name: mypy
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+
 mypy:latest:
     extends: .publish_latest
     needs:
         - mypy:version
     rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - mypy/docker-compose.yaml
+              - mypy/Dockerfile
+          variables:
+              service_name: mypy
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - mypy/docker-compose.yaml
               - mypy/Dockerfile
-    variables:
-        service_name: mypy
-        CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+          variables:
+              service_name: mypy
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

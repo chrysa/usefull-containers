@@ -16,7 +16,7 @@ services:
                 description: pylint application
                 version: ${PYLINT_CONTAINER_VERSION}
         container_name: pylint
-        image: ${PROJECT_NAME}/pylint:${PYLINT_CONTAINER_VERSION}
+        image: ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app

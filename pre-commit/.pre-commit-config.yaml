@@ -1,0 +1,135 @@
+---
+default_language_version:
+    python: python3.9
+fail_fast: false
+minimum_pre_commit_version: 2.11.1
+repos:
+#    -   repo: meta
+#        hooks:
+#        -   id: identity
+#        -   id: check-hooks-apply
+#        -   id: check-useless-excludes
+    - repo: https://github.com/asottile/setup-cfg-fmt
+      rev: 5842b32061da26bfab6508c61306d210d84215ec
+      hooks:
+          - id: setup-cfg-fmt
+    - repo: https://github.com/IamTheFij/docker-pre-commit.git
+      rev: v2.0.1
+      hooks:
+          - id: docker-compose-check
+            files: docker-compose.[a-zZ-Z\-_.]+y[a]{0,1}ml$
+            stages: [manual]
+          - id: hadolint
+            args: [--config=./.hadolint.yaml]
+            files: ^src/dockerfiles/\.*(\.dockerfile|\.Dockerfile)$
+    - repo: https://github.com/asottile/pyupgrade
+      rev: v2.23.1
+      hooks:
+          - id: pyupgrade
+            args: [--py3-plus, --py3-only, --py39-plus]
+    - repo: https://github.com/asottile/reorder_python_imports
+      rev: 9a9b8bdaa2f1bc448258c66afd6c89f7a7b9d6ef
+      hooks:
+          - id: reorder-python-imports
+            files: ^src\W+.*.py$
+            args: [--py3-plus, --py39-plus, --application-directories=src/]
+    - repo: https://github.com/psf/black
+      rev: 8ea641eed5b9540287a8e9a9afa1458b72b9b630
+      hooks:
+          - id: black
+            args: [--config=./black.toml]
+            files: .py$
+    - repo: https://github.com/asottile/blacken-docs
+      rev: fe09e3425d43b28550f76deee7fbe67262e0d7a6
+      hooks:
+          - id: blacken-docs
+            additional_dependencies: [black==21.5b2]
+    - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+      rev: v1.1.1
+      hooks:
+#          - id: htmllint
+          - id: markdown-toc
+            args: [--indent, '    ', -i]
+            stages: [manual]
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: fb029a2977e244ba6d72f9482f624a9812e48e14
+      hooks:
+          - id: markdownlint
+            args: [--fix, --ignore=src/**/node_modules]
+            stages: [manual]
+    - repo: https://github.com/smian/pre-commit-makefile.git
+      rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
+      hooks:
+          - id: makefile-doc
+            stages: [manual]
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: 4742cdf3460544a4bcbe095ba090bd0fa56ed198
+      hooks:
+          - id: check-toml
+            files: .toml$
+          - id: check-ast
+          - id: debug-statements
+          - id: end-of-file-fixer
+          - id: fix-encoding-pragma
+            args: [--remove]
+          - id: mixed-line-ending
+            args: [--fix=lf]
+          - id: trailing-whitespace
+          - id: check-merge-conflict
+            stages: [merge-commit]
+    - repo: https://github.com/pre-commit/mirrors-csslint
+      rev: 2da8122bb4506b52a710588605ec46e79d3f5bd1
+      hooks:
+          - id: csslint
+    - repo: https://github.com/pre-commit/mirrors-eslint
+      rev: v7.31.0
+      hooks:
+          - id: eslint
+            stages: [manual]
+    - repo: https://github.com/pre-commit/mirrors-jshint
+      rev: v2.13.0
+      hooks:
+          - id: jshint
+            stages: [manual]
+    - repo: https://github.com/asottile/dead
+      rev: 4465de5b324804d61d2dd800b655069d5df4b2d6
+      hooks:
+          - id: dead
+            args: [--files, ^src/\W+.*.py$, --exclude, ^docs\W+.*.py$]
+    - repo: https://github.com/pre-commit/mirrors-pylint
+      rev: v3.0.0a4
+      hooks:
+          - id: pylint
+            files: ^src/\W+.*.py$
+            args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=no, --score=no, --disable=E0401]
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: 449ace5e55cb1e43057ab67349dce1208e657768
+      hooks:
+          - id: mypy
+            args: [--config-file=./src/setup.cfg, --ignore-missing-imports]
+            files: ^src/\W+.*.py$
+    - repo: https://gitlab.com/pycqa/flake8
+      rev: c8d1be624612d338ab70ee523d01beca9f019bdc
+      hooks:
+          - id: flake8
+            files: ^src/\W+.*.py$
+            args: [--config=./src/setup.cfg]
+    - repo: https://github.com/pre-commit/pygrep-hooks
+      rev: 56ee62fd758cbc2c1bb27bc3220083a11a4cfd11
+      hooks:
+          - id: python-no-eval
+          - id: python-no-log-warn
+          - id: python-use-type-annotations
+          - id: rst-backticks
+    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+      rev: 0.1.0
+      hooks:
+          - id: yamlfmt
+    - repo: https://github.com/econchick/interrogate
+      rev: 1.4.0
+      hooks:
+          - id: interrogate
+            args: [--ignore-init-method, --ignore-init-module=false, --ignore-magic=false, --ignore-semiprivate=false, --ignore-private=false, --ignore-property-decorators=false,
+                --ignore-module, --ignore-nested-functions=false, --ignore-nested-classes, --ignore-setters=false, --fail-under=95, --verbose=2, --quiet=false,
+                --color, --generate-badge=".", --badge-format="svg"]
+            stages: [manual]

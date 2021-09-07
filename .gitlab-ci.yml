@@ -1,4 +1,7 @@
 ---
+services:
+    - docker:dind
+
 stages:
     - analyse
     - build
@@ -6,61 +9,14 @@ stages:
     - publish container latest
 
 variables:
-    DOCKER_COMPOSE_IMAGE: docker/compose:debian-1.29.2
+    DOCKER_COMPOSE_IMAGE: docker/compose:1.29.2
     DOCKER_DRIVER: overlay
     DOCKER_HUB_REPO: chrys4
     HADOLINT_IMAGE: hadolint/hadolint:latest-debian
     STAGGING_BRANCH: develop
 
-.analyse_dockerfile:
-    image: ${HADOLINT_IMAGE}
-    stage: analyse
-    script:
-        - hadolint --config=.hadolint.yaml ${service_name}/Dockerfile
-
-.build_service:
-    image: ${DOCKER_COMPOSE_IMAGE}
-    stage: build
-    before_script:
-        - set -x
-        - source ${CI_PROJECT_DIR}/.env
-        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-    retry:
-        max: 2
-        when:
-            - script_failure
-            - stuck_or_timeout_failure
-            - runner_system_failure
-    script:
-        - docker-compose build --compress --force-rm ${service_name}
-        - docker-compose push ${service_name}
-    services:
-        - docker:dind
-
-.publish_latest:
-    image: ${DOCKER_COMPOSE_IMAGE}
-    stage: publish container latest
-    after_script:
-        - docker logout
-    before_script:
-        - set -x
-        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    retry:
-        max: 2
-        when:
-            - script_failure
-            - missing_dependency_failure
-    script:
-        - docker-compose pull ${service_name}
-        - export version=`echo ${service_name^^} | sed -i "s/-/_/g" | cut -d"=" -f2`
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${version} ${CI_REGISTRY_IMAGE}/${service_name}:latest
-        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
-    services:
-        - docker:dind
-
 include:
+    - ci-jobs.yaml
     - black/ci.yaml
     - flake8/ci.yaml
     - mypy/ci.yaml

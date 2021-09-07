@@ -3,7 +3,8 @@ hadolint:dockerfile:
     extends: .analyse_dockerfile
     variables:
         service_name: hadolint
-hadolint:
+
+hadolint:build:
     extends: .build_service
     needs:
         - job: hadolint:dockerfile
@@ -15,16 +16,47 @@ hadolint:
               - hadolint/.hadolint.yaml
     variables:
         service_name: hadolint
-hadolint:latest:
-    extends: .publish_latest
+
+hadolint:version:
+    extends: .publish_version
     needs:
-        - hadolint:version
+        - hadolint:build
     rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+          variables:
+              service_name: black
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
-    variables:
-        service_name: hadolint
-        CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+          variables:
+              service_name: hadolint
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+
+hadolint:latest:
+    extends: .publish_latest
+    needs:
+        - hadolint:version
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+          variables:
+              service_name: black
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+          variables:
+              service_name: hadolint
+              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
