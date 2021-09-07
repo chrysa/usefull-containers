@@ -1,6 +1,9 @@
 ---
 flake8:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - flake8/Dockerfile
     variables:
         service_name: flake8
 
@@ -14,6 +17,7 @@ flake8:build:
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: flake8
 
 flake8:version:
@@ -26,32 +30,25 @@ flake8:version:
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
           variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
               service_name: flake8
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: flake8
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 
 flake8:latest:
     extends: .publish_latest
     needs:
         - flake8:version
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - flake8/docker-compose.yaml
-              - flake8/Dockerfile
-          variables:
-              service_name: flake8
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - flake8/docker-compose.yaml
               - flake8/Dockerfile
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: flake8
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

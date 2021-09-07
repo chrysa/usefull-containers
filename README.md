@@ -68,11 +68,11 @@ Variables:
 
 target                                             help                                                                             usage
 ------                                             ----                                                                             ----
-build                                               Build project                                                                    make build [service_name#{service_name}]
+build                                               Build project                                                                    build [service_name#{service_name}]
 build-parallel                                      Build project parallel                                                           make build-parallel [service_name#{service_name}]
 clean                                               clean project
-down                                                Down project containers                                                          make down
-hadolint                                            lint dockerfiles                                                                 make hadolint
+down                                                Down project containers                                                          down
+hadolint                                            lint dockerfiles                                                                 hadolint
 help                                                This help dialog.                                                                make help
 logs                                                display logs
 logs-f                                              display logs with follow
@@ -82,6 +82,7 @@ prune                                               remove service on the host a
 start                                               Start project containers                                                         [service_name#{service_name}]
 status                                              display status of all service
 stop                                                Start project containers                                                         [service_name#{service_name}]
+tag-latest                                          tag services as latest                                                           make tag-latest
 up-detach                                           Up project containers                                                             [service_name#{service_name}]
 upgradable-packages                                 list outdated package in service
 up                                                  Up project containers                                                            [service_name#{service_name}]

@@ -6,9 +6,9 @@ ENV PATH=$PATH:/home/black/.local/bin
 
 RUN set -x \
  && apk add --quiet --no-cache build-base bash \
+ && rm -rf /var/cache/apk/* \
  && addgroup -S black \
  && adduser -D --system --shell /usr/bin/bash black black \
- && rm -rf /var/cache/apk/* \
  && chown -R black:black /app
 
 USER black

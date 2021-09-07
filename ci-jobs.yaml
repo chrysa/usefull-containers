@@ -4,15 +4,12 @@
     stage: analyse
     script:
         - hadolint --config=.hadolint.yaml ${service_name}/Dockerfile
+
 .build_service:
-    image:
-        name: ${DOCKER_COMPOSE_IMAGE}
-        entrypoint: [/bin/sh, -c]
     stage: build
     after_script:
         - docker logout
     before_script:
-        - source ${CI_PROJECT_DIR}/.env
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
@@ -22,39 +19,33 @@
             - stuck_or_timeout_failure
             - runner_system_failure
     script:
-        - docker-compose build --compress --force-rm ${service_name}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name} || true
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env build --compress --force-rm ${service_name}
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env push ${service_name}
+
 .publish_latest:
-    image:
-        name: ${DOCKER_COMPOSE_IMAGE}
-        entrypoint: [/bin/sh, -c]
     stage: publish container latest
-    after_script:
-        - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
             - script_failure
             - missing_dependency_failure
     script:
-        - docker pull ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
-        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
+        - docker logout
+        - export GITLAB_REGISTRY=${CI_REGISTRY_IMAGE}
+        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${DOCKER_REPO}/${service_name}:latest
+        - docker push ${DOCKER_REPO}/${service_name}:latest
+
 .publish_version:
-    image:
-        name: ${DOCKER_COMPOSE_IMAGE}
-        entrypoint: [/bin/sh, -c]
     stage: publish container version
     after_script:
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - source ${CI_PROJECT_DIR}/.env
         - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
@@ -62,20 +53,5 @@
             - script_failure
             - missing_dependency_failure
     script:
-        - docker-compose pull ${service_name} || true
-        - docker-compose push ${service_name}
-
-.release_job:
-    stage: release
-    image: registry.gitlab.com/gitlab-org/release-cli:latest
-    rules:
-        - if: $CI_COMMIT_TAG
-          when: never
-        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    script:
-        - echo 'running release_job for $service_name $version'
-    release:
-        description: release $service_name $version
-        name: Release $service_name $version
-        tag_name: $version
-        ref: $CI_COMMIT_SHA
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull ${service_name} || true
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env push ${service_name}

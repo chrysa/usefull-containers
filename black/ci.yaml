@@ -1,6 +1,9 @@
 ---
 black:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - black/Dockerfile
     variables:
         service_name: black
 
@@ -14,6 +17,7 @@ black:build:
               - black/docker-compose.yaml
               - black/Dockerfile
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: black
 
 black:version:
@@ -26,32 +30,25 @@ black:version:
               - black/docker-compose.yaml
               - black/Dockerfile
           variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
               service_name: black
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - black/docker-compose.yaml
               - black/Dockerfile
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: black
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
 
 black:latest:
     extends: .publish_latest
     needs:
         - black:version
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
-          variables:
-              service_name: black
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - black/docker-compose.yaml
               - black/Dockerfile
           variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: black
-              CI_REGISTRY_IMAGE: ${DOCKER_HUB_REPO}

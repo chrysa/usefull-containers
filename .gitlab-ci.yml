@@ -1,19 +1,5 @@
 ---
-services:
-    - docker:dind
-
-stages:
-    - analyse
-    - build
-    - publish container version
-    - publish container latest
-
-variables:
-    DOCKER_COMPOSE_IMAGE: docker/compose:1.29.2
-    DOCKER_DRIVER: overlay
-    DOCKER_HUB_REPO: chrys4
-    HADOLINT_IMAGE: hadolint/hadolint:latest-debian
-    STAGGING_BRANCH: develop
+image: docker/compose:1.29.2
 
 include:
     - ci-jobs.yaml
@@ -24,3 +10,18 @@ include:
     - pytest/ci.yaml
     - pylint/ci.yaml
     - sphinx/ci.yaml
+
+services:
+    - docker:dind
+
+stages:
+    - analyse
+    - build
+    - publish container version
+    - publish container latest
+
+variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HUB_USER: chrys4
+    HADOLINT_IMAGE: hadolint/hadolint:latest-debian
+    STAGGING_BRANCH: develop
