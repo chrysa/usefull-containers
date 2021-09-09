@@ -16,7 +16,7 @@ services:
                 description: python documentation project
                 version: ${SPHINX_CONTAINER_VERSION}
         container_name: sphinx
-        image: ${PROJECT_NAME}/sphinx:${SPHINX_CONTAINER_VERSION}
+        image: ${DOCKER_REPO-local}/sphinx:${SPHINX_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app
