@@ -16,7 +16,7 @@ services:
                 description: guideline checker for python projects
                 version: ${HADOOLINT_CONTAINER_VERSION}
         container_name: hadolint
-        image: ${DOCKER_REPO-local}/hadolint:${HADOOLINT_CONTAINER_VERSION}
+        image: ${DOCKER_REPO:-local}/hadolint:${HADOOLINT_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app
