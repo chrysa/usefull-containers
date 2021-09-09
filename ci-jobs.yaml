@@ -25,19 +25,20 @@
 
 .publish_latest:
     stage: publish container latest
-    after_script:
-        - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
             - script_failure
             - missing_dependency_failure
     script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
+        - docker logout
+        - export GITLAB_REGISTRY=${CI_REGISTRY_IMAGE}
+        - unset ${CI_REGISTRY_IMAGE}
+        - docker tag ${GITLAB_REGISTRY}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
         - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
 
 .publish_version:

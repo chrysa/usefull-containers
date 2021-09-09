@@ -16,7 +16,7 @@ services:
                 description: guideline checker for python projects
                 version: ${FLAKE8_CONTAINER_VERSION}
         container_name: flake8
-        image: ${DOCKER_REPO-local}/flake8:${FLAKE8_CONTAINER_VERSION}
+        image: ${DOCKER_REPO:-local}/flake8:${FLAKE8_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app
