@@ -16,7 +16,7 @@ services:
                 vcs-url: ${CI_REPOSITORY_URL:-}
                 vcs-ref: ${CI_COMMIT_SHA:-}
         container_name: black
-        image: ${PROJECT_NAME}/black:${BLACK_CONTAINER_VERSION}
+        image: ${DOCKER_REPO-local}/black:${BLACK_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app

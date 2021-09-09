@@ -1,43 +1,54 @@
 ---
 pytest:dockerfile:
     extends: .analyse_dockerfile
-    variables:
-        service_name: pytest
-pytest:
-    extends: .build_service
-    needs:
-        - pytest:dockerfile
     rules:
         - changes:
-              - pytest/**
-    variables:
-        service_name: pytest
-pytest:version:
-    extends: .publish_version
-    needs:
-        - pytest
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
-          changes:
               - pytest/Dockerfile
     variables:
         service_name: pytest
+
+pytest:build:
+    extends: .build_service
+    needs:
+        - job: pytest:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - pytest/docker-compose.yaml
+              - pytest/Dockerfile
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: pytest
+
+pytest:version:
+    extends: .publish_version
+    needs:
+        - pytest:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - pytest/docker-compose.yaml
+              - pytest/Dockerfile
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: pytest
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pytest/docker-compose.yaml
+              - pytest/Dockerfile
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: pytest
+
 pytest:latest:
     extends: .publish_latest
     needs:
         - pytest:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pytest/**
-    variables:
-        service_name: pytest
-pytest:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - pytest/**
-    variables:
-        service_name: pytest
-        version: $(cat .env | grep "PYTEST_CONTAINER_VERSION" | cut -d"=" -f1)
+              - pytest/docker-compose.yaml
+              - pytest/Dockerfile
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: pytest
