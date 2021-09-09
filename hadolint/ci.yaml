@@ -1,43 +1,58 @@
 ---
 hadolint:dockerfile:
     extends: .analyse_dockerfile
-    variables:
-        service_name: hadolint
-hadolint:
-    extends: .build_service
-    needs:
-        - hadolint:dockerfile
     rules:
         - changes:
-              - hadolint/**
-    variables:
-        service_name: hadolint
-hadolint:version:
-    extends: .publish_version
-    needs:
-        - hadolint
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
-          changes:
               - hadolint/Dockerfile
     variables:
         service_name: hadolint
+
+hadolint:build:
+    extends: .build_service
+    needs:
+        - job: hadolint:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: hadolint
+
+hadolint:version:
+    extends: .publish_version
+    needs:
+        - hadolint:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: hadolint
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: hadolint
+
 hadolint:latest:
     extends: .publish_latest
     needs:
         - hadolint:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - hadolint/**
-    variables:
-        service_name: hadolint
-hadolint:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - hadolint/**
-    variables:
-        service_name: hadolint
-        version: $(cat .env | grep "HADOOLINT_CONTAINER_VERSION" | cut -d"=" -f1)
+              - hadolint/docker-compose.yaml
+              - hadolint/Dockerfile
+              - hadolint/.hadolint.yaml
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: hadolint

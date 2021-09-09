@@ -1,43 +1,54 @@
 ---
 sphinx:dockerfile:
     extends: .analyse_dockerfile
-    variables:
-        service_name: sphinx
-sphinx:
-    extends: .build_service
-    needs:
-        - sphinx:dockerfile
     rules:
         - changes:
-              - sphinx/**
-    variables:
-        service_name: sphinx
-sphinx:version:
-    extends: .publish_version
-    needs:
-        - sphinx
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
-          changes:
               - sphinx/Dockerfile
     variables:
         service_name: sphinx
+
+sphinx:build:
+    extends: .build_service
+    needs:
+        - job: sphinx:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - sphinx/docker-compose.yaml
+              - sphinx/Dockerfile
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: sphinx
+
+sphinx:version:
+    extends: .publish_version
+    needs:
+        - sphinx:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - sphinx/docker-compose.yaml
+              - sphinx/Dockerfile
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: sphinx
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - sphinx/docker-compose.yaml
+              - sphinx/Dockerfile
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: sphinx
+
 sphinx:latest:
     extends: .publish_latest
     needs:
         - sphinx:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - sphinx/**
-    variables:
-        service_name: sphinx
-sphinx:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - sphinx/**
-    variables:
-        service_name: sphinx
-        version: $(cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d"=" -f1)
+              - sphinx/docker-compose.yaml
+              - sphinx/Dockerfile
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: sphinx
