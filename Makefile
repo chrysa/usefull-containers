@@ -2,21 +2,22 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")*
 endif
 
-BLACK_CONTAINER_VERSION=$(shell cat .env | grep "^BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
-FLAKE8_CONTAINER_VERSION=$(shell cat .env | grep "^FLAKE8_CONTAINER_VERSION" | cut -d "=" -f2)
-HADOOLINT_CONTAINER_VERSION=$(shell cat .env | grep "^HADOOLINT_CONTAINER_VERSION" | cut -d "=" -f2)
-MYPY_CONTAINER_VERSION=$(shell cat .env | grep "^MYPY_CONTAINER_VERSION" | cut -d "=" -f2)
-PRE_COMMIT_CONTAINER_VERSION=$(shell cat .env | grep "^PRE_COMMIT_CONTAINER_VERSION" | cut -d "=" -f2)
-PYLINT_CONTAINER_VERSION=$(shell cat .env | grep "^PYLINT_CONTAINER_VERSION" | cut -d "=" -f2)
-PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "^PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
-SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "^SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
-PROJECT_NAME=$(shell cat .env | grep "^PROJECT_NAME" | cut -d "=" -f2)
+BLACK_CONTAINER_VERSION=$(shell cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
+DOCKER_REPO=$(shell cat .env | grep "DOCKER_REPO" | cut -d "=" -f2)
+FLAKE8_CONTAINER_VERSION=$(shell cat .env | grep "FLAKE8_CONTAINER_VERSION" | cut -d "=" -f2)
+HADOLINT_CONTAINER_VERSION=$(shell cat .env | grep "HADOLINT_CONTAINER_VERSION" | cut -d "=" -f2)
+MYPY_CONTAINER_VERSION=$(shell cat .env | grep "MYPY_CONTAINER_VERSION" | cut -d "=" -f2)
+PRE_COMMIT_CONTAINER_VERSION=$(shell cat .env | grep "PRE_COMMIT_CONTAINER_VERSION" | cut -d "=" -f2)
+PYLINT_CONTAINER_VERSION=$(shell cat .env | grep "PYLINT_CONTAINER_VERSION" | cut -d "=" -f2)
+PYTHON_DEV_CONTAINER_VERSION=$(shell cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d "=" -f2)
+PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
+SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
 
 tail=10
 
 .DEFAULT_GOAL := help
 
-.PHONY: build clean config down hadolint help logs logs-f logs-tail pre-commit prune start status stop up up-detach upgradable-packages
+.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
 
 COLOR[GREEN]=\e[1;92m
 COLOR[RED]=\e[1;91m
@@ -33,6 +34,9 @@ __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(va
 build: ## Build project => build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 	@docker-compose build --compress --force-rm ${service_name}
+build-parallel: ## Build project parallel => make build-parallel [service_name={service_name}]
+	$(info Make: Build service  ${service_name})
+	@docker-compose build --compress --force-rm --quiet --parallel ${service_name}
 clean: ## clean project
 	$(info Make: clean)
 	@rm -rf .mypy_cache .pytest
@@ -47,13 +51,14 @@ hadolint: ## lint dockerfiles => hadolint
 		echo "analyse $${f}"; \
 		docker run --rm --interactive --volume ${PWD}/.hadolint.yaml:/bin/hadolint.yaml -e XDG_CONFIG_HOME=/bin hadolint/hadolint < $${f}; \
 	done
-help: ## This help dialog. => help
-	@echo "Hello to the usefull-containers Makefile\n"
-	@echo "Usage: 	[rules] [variables]"
+help: ## This help dialog. => make help
+	@echo "Variables:"
+	@echo "\t- \"service_name\" is a docker-compose service name or a list of services separate by space as string ($(shell ${__docker_compose_cmd} ps --services | tr '\n' ' '))"
+	@echo "\n"
 	@IFS=$$'\n'
-	@printf "%-30s %-80s %-60s\n" "rule" "help" "variable"
-	@printf "%-30s %-80s %-60s\n" "------" "----" "----"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-30s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
+	@printf "%-50s %-80s %-60s\n" "target" "help" "usage"
+	@printf "%-50s %-80s %-60s\n" "------" "----" "----"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-50s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
 logs: check-defined-service_name ## display logs
 	$(info Make: Logs ${service_name})
 	@docker-compose logs ${service_name}
@@ -67,7 +72,7 @@ pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
 	@pip install --quiet --no-cache-dir pre-commit
 	@pre-commit autoupdate --bleeding-edge || true
-	@pre-commit run --all-files --verbose || true
+	@pre-commit run --all-files --verbose --hook-stage manual || true
 prune: down ## remove service on the host and prune volume image and network unused
 	$(info Make: Prune)
 	@docker-compose rm
@@ -90,17 +95,40 @@ status: ## display status of all service
 		fi; \
 		echo "$$color_status====>${COLOR[WHITE]} $$service: $$color_status $$status ${COLOR[WHITE]}"; \
 	done
-stop: check-defined-service_name ## Start project containers => [service_name={service_name}]
+stop: ## Start project containers => [service_name={service_name}]
 	$(info Make: stop  ${service_name})
 	@docker-compose stop ${service_name}
+tag-latest: ## tag services as latest => make tag-latest
+	$(info Make: tag latest)
+	@docker tag ${DOCKER_REPO-local}/black:${BLACK_CONTAINER_VERSION} ${DOCKER_REPO-local}/black:latest
+	@docker tag ${DOCKER_REPO-local}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO-local}/flake8:latest
+	@docker tag ${DOCKER_REPO-local}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO-local}/hadolint:latest
+	@docker tag ${DOCKER_REPO-local}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO-local}/mypy:latest
+	@docker tag ${DOCKER_REPO-local}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO-local}/pre-commit:latest
+	@docker tag ${DOCKER_REPO-local}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO-local}/pylint:latest
+	@docker tag ${DOCKER_REPO-local}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO-local}/python-dev:latest
+	@docker tag ${DOCKER_REPO-local}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO-local}/pytest:latest
+	@docker tag ${DOCKER_REPO-local}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO-local}/sphinx:latest
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker-compose up ${service_name}
 up-detach: ## Up project containers =>  [service_name={service_name}]
 	$(info Make: Up ${service_name})
 	@docker-compose up --detach ${service_name}
-upgradable-packages: check-defined-service_name ## list outdated package in service
-	@for service in $(shell echo ${service_name}); do \
-		echo "=======>> upgradable package for ${service}"
-		docker-compose run --rm ${service} sh -c "set -ex && pip install --quiet --no-cache-dir pip-upgrade-outdated==1.5 && pip list --outdated" ; \
-	done
+upgradable-packages: ## list outdated package in service
+	@echo "=======>> upgradable package for black"
+	@docker-compose run --rm black sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for flake8"
+	@docker-compose run --rm flake8 sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for mypy"
+	@docker-compose run --rm mypy sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for pre-commit"
+	@docker-compose run --rm pre-commit bash -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for pylint"
+	@docker-compose run --rm pylint sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for pytest"
+	@docker-compose run --rm pytest sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for python-dev"
+	@docker-compose run --rm python-dev sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for sphinx"
+	@docker-compose run --rm sphinx sh -c "pip list --outdated --format columns" || true

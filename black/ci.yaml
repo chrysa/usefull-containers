@@ -1,43 +1,54 @@
 ---
 black:dockerfile:
     extends: .analyse_dockerfile
-    variables:
-        service_name: black
-black:
-    extends: .build_service
-    needs:
-        - black:dockerfile
     rules:
         - changes:
-              - black/**
-    variables:
-        service_name: black
-black:version:
-    extends: .publish_version
-    needs:
-        - black
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
-          changes:
               - black/Dockerfile
     variables:
         service_name: black
+
+black:build:
+    extends: .build_service
+    needs:
+        - job: black:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - black/docker-compose.yaml
+              - black/Dockerfile
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: black
+
+black:version:
+    extends: .publish_version
+    needs:
+        - black:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - black/docker-compose.yaml
+              - black/Dockerfile
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: black
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - black/docker-compose.yaml
+              - black/Dockerfile
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: black
+
 black:latest:
     extends: .publish_latest
     needs:
         - black:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - black/**
-    variables:
-        service_name: black
-black:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - black/**
-    variables:
-        service_name: black
-        version: $(cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d"=" -f1)
+              - black/docker-compose.yaml
+              - black/Dockerfile
+          variables:
+              DOCKER_REPO: ${DOCKER_HUB_USER}
+              service_name: black
