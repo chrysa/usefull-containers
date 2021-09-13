@@ -21,10 +21,17 @@ mypy:build:
         service_name: mypy
 
 mypy:version:
-    extends: .publish_version_master
+    extends: .publish_version
     needs:
         - mypy:build
     rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - mypy/docker-compose.yaml
+              - mypy/Dockerfile
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: mypy
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - mypy/docker-compose.yaml
