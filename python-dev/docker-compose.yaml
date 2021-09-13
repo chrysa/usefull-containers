@@ -16,7 +16,7 @@ services:
                 description: python container for dev
                 version: ${PYTHON_DEV_CONTAINER_VERSION}
         container_name: python-dev
-        image: ${DOCKER_REPO:-local}/pylint:${PYTHON_DEV_CONTAINER_VERSION}
+        image: ${DOCKER_REPO:-local}/python-dev:${PYTHON_DEV_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app
