@@ -41,6 +41,7 @@
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
         - docker logout
         - export VERSION=`docker-compose config | grep "${DOCKER_REPO}/${service_name}:" | cut -d":" -f3`
+        - env
         - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${PASSED_REPO}/${service_name}:${VERSION}
         - docker push ${DOCKER_REPO}/${service_name}:${VERSION}
 
@@ -62,5 +63,6 @@
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
         - docker logout
         - export VERSION=`docker-compose config | grep "${DOCKER_REPO}/${service_name}:" | cut -d":" -f3`
+        - env
         - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${PASSED_REPO}/${service_name}:latest
         - docker push ${DOCKER_REPO}/${service_name}:latest
