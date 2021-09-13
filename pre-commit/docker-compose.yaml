@@ -19,7 +19,7 @@ services:
         environment:
             - GIT_DISCOVERY_ACROSS_FILESYSTEM=1
         hostname: pre-commit
-        image: ${PROJECT_NAME}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION}
+        image: ${DOCKER_REPO:-local}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION}
         tty: true
         volumes:
             - type: bind

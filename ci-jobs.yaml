@@ -4,8 +4,8 @@
     stage: analyse
     script:
         - hadolint --config=.hadolint.yaml ${service_name}/Dockerfile
+
 .build_service:
-    image: docker/compose:latest
     stage: build
     after_script:
         - docker logout
@@ -20,12 +20,12 @@
             - stuck_or_timeout_failure
             - runner_system_failure
     script:
-        - docker-compose build --compress --force-rm ${service_name}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-.publish_latest:
-    image: docker/compose:latest
-    stage: publish container latest
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name} || true
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env build --compress --force-rm ${service_name}
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env push ${service_name}
+
+.publish_version_master:
+    stage: publish container version
     after_script:
         - docker logout
     before_script:
@@ -38,12 +38,18 @@
             - script_failure
             - missing_dependency_failure
     script:
-        - docker pull ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE}/${service_name}:latest
-        - docker push ${CI_REGISTRY_IMAGE}/${service_name}:latest
-.publish_version:
-    image: docker/compose:latest
-    stage: publish container version
+        - export PASSED_REPO=${DOCKER_REPO}
+        - export DOCKER_REPO=${CI_REGISTRY_IMAGE}
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
+        - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
+        - docker logout
+        - export VERSION=`docker-compose config | grep "${DOCKER_REPO}/${service_name}:" | cut -d":" -f3`
+        - env
+        - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${PASSED_REPO}/${service_name}:${VERSION}
+        - docker push ${DOCKER_REPO}/${service_name}:${VERSION}
+
+.publish_latest:
+    stage: publish container latest
     after_script:
         - docker logout
     before_script:

@@ -1,6 +1,9 @@
 ---
 python-dev:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - python-dev/Dockerfile
     variables:
         service_name: python-dev
 python-dev:
@@ -27,7 +30,7 @@ python-dev:latest:
     needs:
         - python-dev:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - python-dev/**
     variables:

@@ -1,24 +1,32 @@
 ---
 mypy:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - mypy/Dockerfile
     variables:
         service_name: mypy
-mypy:
+
+mypy:build:
     extends: .build_service
     needs:
-        - mypy:dockerfile
+        - job: mypy:dockerfile
+          optional: true
     rules:
         - changes:
               - mypy/**
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: mypy
+
 mypy:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
-        - mypy
+        - mypy:build
     rules:
         - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
+              - mypy/docker-compose.yaml
               - mypy/Dockerfile
     variables:
         service_name: mypy
@@ -27,7 +35,7 @@ mypy:latest:
     needs:
         - mypy:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - mypy/**
     variables:

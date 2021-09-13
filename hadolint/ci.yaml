@@ -1,24 +1,32 @@
 ---
 hadolint:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - hadolint/Dockerfile
     variables:
         service_name: hadolint
-hadolint:
+
+hadolint:build:
     extends: .build_service
     needs:
-        - hadolint:dockerfile
+        - job: hadolint:dockerfile
+          optional: true
     rules:
         - changes:
               - hadolint/**
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: hadolint
+
 hadolint:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
-        - hadolint
+        - hadolint:build
     rules:
         - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
+              - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
     variables:
         service_name: hadolint
@@ -27,7 +35,7 @@ hadolint:latest:
     needs:
         - hadolint:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - hadolint/**
     variables:

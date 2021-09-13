@@ -1,16 +1,4 @@
 ---
-stages:
-    - analyse
-    - build
-    - publish container version
-    - publish container latest
-    - release
-cache:
-    paths:
-        - resume/src/node_modules/
-variables:
-    DOCKER_DRIVER: overlay
-
 include:
     - ci-jobs.yaml
     - black/ci.yaml
@@ -20,3 +8,18 @@ include:
     - pytest/ci.yaml
     - pylint/ci.yaml
     - sphinx/ci.yaml
+
+services:
+    - docker:dind
+
+stages:
+    - analyse
+    - build
+    - publish container version
+    - publish container latest
+
+variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HUB_USER: chrys4
+    HADOLINT_IMAGE: hadolint/hadolint:latest-debian
+    STAGGING_BRANCH: develop

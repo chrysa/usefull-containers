@@ -7,7 +7,7 @@ services:
             context: .
             cache_from:
                 - python:3.8-alpine
-                - ${PROJECT_NAME}/mypy
+                - ${DOCKER_REPO:-local}/mypy
             dockerfile: Dockerfile
             labels:
                 maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
@@ -19,7 +19,7 @@ services:
                 description: guideline checker for python projects
                 version: ${MYPY_CONTAINER_VERSION}
         container_name: mypy
-        image: ${PROJECT_NAME}/mypy:${MYPY_CONTAINER_VERSION}
+        image: ${DOCKER_REPO:-local}/mypy:${MYPY_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app
