@@ -10,6 +10,7 @@
     after_script:
         - docker logout
     before_script:
+        - source ${CI_PROJECT_DIR}/.env
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
@@ -29,6 +30,8 @@
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
+        - source ${CI_PROJECT_DIR}/.env
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
@@ -51,6 +54,8 @@
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
+        - source ${CI_PROJECT_DIR}/.env
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:

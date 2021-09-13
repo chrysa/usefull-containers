@@ -17,11 +17,7 @@ tail=10
 
 .DEFAULT_GOAL := help
 
-<<<<<<< HEAD
 .PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
-=======
-.PHONY: build clean config down hadolint help logs logs-f logs-tail pre-commit prune start status stop up up-detach upgradable-packages
->>>>>>> 792b7c3 (some fix)
 
 COLOR[GREEN]=\e[1;92m
 COLOR[RED]=\e[1;91m
@@ -35,13 +31,8 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value @), required by target $@)))
 
-<<<<<<< HEAD
 build: ## build service
 	$(info Make: Build service ${service_name})
-=======
-build: ## Build project => build [service_name={service_name}]
-	$(info Make: Build service  ${service_name})
->>>>>>> 792b7c3 (some fix)
 	@docker-compose build --compress --force-rm ${service_name}
 build-parallel: ## build service  in parallel
 	$(info Make: Building ${service_name})
@@ -57,16 +48,10 @@ hadolint: ## lint dockerfiles => hadolint
 		echo "analyse $${f}"; \
 		docker run --rm --interactive --volume ${PWD}/.hadolint.yaml:/bin/hadolint.yaml -e XDG_CONFIG_HOME=/bin hadolint/hadolint < $${f}; \
 	done
-<<<<<<< HEAD
 help: ## This help dialog. => make help
 	@echo "Variables:"
 	@echo "\t- \"service_name\" is a docker-compose service name or a list of services separate by space as string ($(shell ${__docker_compose_cmd} ps --services | tr '\n' ' '))"
 	@echo "\n"
-=======
-help: ## This help dialog. => help
-	@echo "Hello to the usefull-containers Makefile\n"
-	@echo "Usage: 	[rules] [variables]"
->>>>>>> 792b7c3 (some fix)
 	@IFS=$$'\n'
 	@printf "%-50s %-80s %-60s\n" "target" "help" "usage"
 	@printf "%-50s %-80s %-60s\n" "------" "----" "----"
@@ -136,8 +121,6 @@ up: ## Up project containers => [service_name={service_name}]
 up-detach: ## Up project containers =>  [service_name={service_name}]
 	$(info Make: Up ${service_name})
 	@docker-compose up --detach ${service_name}
-<<<<<<< HEAD
-<<<<<<< HEAD
 upgradable-packages: ## list outdated package in service
 	@echo "=======>> upgradable package for black"
 	@docker-compose run --rm black sh -c "pip list --outdated --format columns" || true
@@ -155,14 +138,3 @@ upgradable-packages: ## list outdated package in service
 	@docker-compose run --rm python-dev sh -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for sphinx"
 	@docker-compose run --rm sphinx sh -c "pip list --outdated --format columns" || true
-=======
-upgradable-packages: check-defined-service_name ## list outdated package in service
-	@for service in $(shell echo ${service_name}); do \
-=======
-upgradable-packages:  ## list outdated package in service
-	@for service in $(shell echo "black flake8 mypy pre-commit pylint pytest python-dev sphinx"); do \
->>>>>>> ac20618 (update)
-		echo "=======>> upgradable package for ${service}"
-		docker-compose run --rm ${service} sh -c "set -ex && pip install --quiet --no-cache-dir pip-upgrade-outdated==1.5 && pip list --outdated" ; \
-	done
->>>>>>> 792b7c3 (some fix)
