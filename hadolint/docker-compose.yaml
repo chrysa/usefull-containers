@@ -14,9 +14,9 @@ services:
                 vcs-ref: ${CI_COMMIT_SHA:-}
                 departement: QA
                 description: guideline checker for python projects
-                version: ${HADOOLINT_CONTAINER_VERSION}
+                version: ${HADOLINT_CONTAINER_VERSION}
         container_name: hadolint
-        image: ${DOCKER_REPO:-local}/hadolint:${HADOOLINT_CONTAINER_VERSION}
+        image: ${DOCKER_REPO:-local}/hadolint:${HADOLINT_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app
