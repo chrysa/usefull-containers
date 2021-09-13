@@ -24,6 +24,12 @@ repos:
             args: [--config=.hadolint.yaml]
             files: (\.dockerfile|\.Dockerfile|Dockerfile)$
             stages: [manual]
+    - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+      rev: v1.1.1
+      hooks:
+          - id: markdown-toc
+            args: [--indent, '    ', -i]
+            stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
       rev: 910f4518827d9ed648cbee959395e09bdb0b43fc
       hooks:

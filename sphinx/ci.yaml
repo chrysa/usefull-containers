@@ -1,24 +1,32 @@
 ---
 sphinx:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - sphinx/Dockerfile
     variables:
         service_name: sphinx
-sphinx:
+
+sphinx:build:
     extends: .build_service
     needs:
-        - sphinx:dockerfile
+        - job: sphinx:dockerfile
+          optional: true
     rules:
         - changes:
               - sphinx/**
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: sphinx
+
 sphinx:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
-        - sphinx
+        - sphinx:build
     rules:
         - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
+              - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
     variables:
         service_name: sphinx
@@ -27,7 +35,7 @@ sphinx:latest:
     needs:
         - sphinx:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - sphinx/**
     variables:

@@ -1,24 +1,33 @@
 ---
 pre-commit:dockerfile:
     extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - pre-commit/Dockerfile
     variables:
         service_name: pre-commit
-pre-commit:
+
+pre-commit:build:
     extends: .build_service
     needs:
-        - pre-commit:dockerfile
+        - job: pre-commit:dockerfile
+          optional: true
     rules:
         - changes:
               - pre-commit/**
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: pre-commit
+
 pre-commit:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
-        - pre-commit
+        - pre-commit:build
     rules:
         - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop"
           changes:
+              - pre-commit/.pre-commit-config.yaml
+              - pre-commit/docker-compose.yaml
               - pre-commit/Dockerfile
     variables:
         service_name: pre-commit
@@ -27,7 +36,7 @@ pre-commit:latest:
     needs:
         - pre-commit:version
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - pre-commit/**
     variables:

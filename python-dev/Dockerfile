@@ -1,6 +1,7 @@
-FROM  python:3.9-alpine
+FROM  python:3.9-slim
 
-ENV PYTHONPATH=/app \
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONPATH=/app \
     PYTHONBREAKPOINT=ipdb.set_trace
 
 WORKDIR /app
