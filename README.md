@@ -68,9 +68,8 @@ Variables:
 
 target                                             help                                                                             usage
 ------                                             ----                                                                             ----
-build                                               Build project                                                                    build [service_name#{service_name}]
-build-parallel                                      Build project parallel                                                           make build-parallel [service_name#{service_name}]
-clean                                               clean project
+build                                               build service
+build-parallel                                      build service  in parallel
 down                                                Down project containers                                                          down
 hadolint                                            lint dockerfiles                                                                 hadolint
 help                                                This help dialog.                                                                make help
