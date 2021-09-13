@@ -35,11 +35,13 @@
             - script_failure
             - missing_dependency_failure
     script:
+        - export PASSED_REPO=${DOCKER_REPO}
+        - export DOCKER_REPO=${CI_REGISTRY_IMAGE}
         - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
         - docker logout
-        - export GITLAB_REGISTRY=${DOCKER_REPO}
-        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${$CI_COMMIT_REF_SLUG} ${DOCKER_REPO}/${service_name}:latest
+        - export DOCKER_REPO=${PASSED_REPO}
+        - docker tag ${CI_REGISTRY_IMAGE}/${service_name}:${CI_COMMIT_REF_SLUG} ${DOCKER_REPO}/${service_name}:latest
         - docker push ${DOCKER_REPO}/${service_name}:latest
 
 .publish_version:
@@ -54,9 +56,11 @@
             - script_failure
             - missing_dependency_failure
     script:
+        - export PASSED_REPO=${DOCKER_REPO}
+        - export DOCKER_REPO=${CI_REGISTRY_IMAGE}
         - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
         - docker logout
-        - export GITLAB_REGISTRY=${DOCKER_REPO}
+        - export DOCKER_REPO=${PASSED_REPO}
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull ${service_name} || true
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env push ${service_name}
