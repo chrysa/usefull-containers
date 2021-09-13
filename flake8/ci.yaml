@@ -21,10 +21,17 @@ flake8:build:
         service_name: flake8
 
 flake8:version:
-    extends: .publish_version_master
+    extends: .publish_version
     needs:
         - flake8:build
     rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - flake8/docker-compose.yaml
+              - flake8/Dockerfile
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: flake8
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - flake8/docker-compose.yaml

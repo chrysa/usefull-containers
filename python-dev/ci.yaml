@@ -21,10 +21,17 @@ python-dev:build:
         service_name: python-dev
 
 python-dev:version:
-    extends: .publish_version_master
+    extends: .publish_version
     needs:
         - python-dev:build
     rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
+          changes:
+              - python-dev/docker-compose.yaml
+              - python-dev/Dockerfile
+          variables:
+              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+              service_name: python-dev
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - python-dev/docker-compose.yaml
