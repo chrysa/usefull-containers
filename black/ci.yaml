@@ -14,8 +14,7 @@ black:build:
           optional: true
     rules:
         - changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
+              - black/**
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: black
@@ -40,8 +39,15 @@ black:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
-          variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
-              service_name: black
+              - black/**
+    variables:
+        service_name: black
+black:release:
+    extends: .release_job
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
+          changes:
+              - black/**
+    variables:
+        service_name: black
+        version: $(cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d"=" -f1)
