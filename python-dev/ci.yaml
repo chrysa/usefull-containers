@@ -6,25 +6,32 @@ python-dev:dockerfile:
               - python-dev/Dockerfile
     variables:
         service_name: python-dev
-python-dev:
+
+python-dev:build:
     extends: .build_service
     needs:
-        - python-dev:dockerfile
+        - job: python-dev:dockerfile
+          optional: true
     rules:
         - changes:
-              - python-dev/**
+              - python-dev/docker-compose.yaml
+              - python-dev/Dockerfile
     variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: python-dev
+
 python-dev:version:
     extends: .publish_version_master
     needs:
-        - python-dev
+        - python-dev:build
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
+              - python-dev/docker-compose.yaml
               - python-dev/Dockerfile
-    variables:
-        service_name: python-dev
+          variables:
+              service_name: python-dev
+
 python-dev:latest:
     extends: .publish_latest
     needs:
@@ -32,15 +39,7 @@ python-dev:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - python-dev/**
-    variables:
-        service_name: python-dev
-python-dev:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - python-dev/**
-    variables:
-        service_name: python-dev
-        version: $(cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d"=" -f1)
+              - python-dev/docker-compose.yaml
+              - python-dev/Dockerfile
+          variables:
+              service_name: python-dev

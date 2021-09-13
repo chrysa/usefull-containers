@@ -10,7 +10,6 @@
     after_script:
         - docker logout
     before_script:
-        - source ${CI_PROJECT_DIR}/.env
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
@@ -30,23 +29,23 @@
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
             - script_failure
             - missing_dependency_failure
     script:
-        - export PASSED_REPO=${DOCKER_REPO}
         - export DOCKER_REPO=${CI_REGISTRY_IMAGE}
         - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
         - docker logout
+        - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD  $DH_REGISTRY
         - export VERSION=`docker-compose config | grep "${DOCKER_REPO}/${service_name}:" | cut -d":" -f3`
-        - env
-        - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${PASSED_REPO}/${service_name}:${VERSION}
-        - docker push ${DOCKER_REPO}/${service_name}:${VERSION}
+        - docker images
+        - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${DH_REGISTRY_USER}/${service_name}:${VERSION}
+        - docker images
+        - docker push ${DH_REGISTRY_USER}/${service_name}:${VERSION}
+        - docker logout
 
 .publish_latest:
     stage: publish container latest
@@ -54,20 +53,20 @@
         - docker logout
     before_script:
         - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
-        - source ${CI_PROJECT_DIR}/.env
-        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
     retry:
         max: 2
         when:
             - script_failure
             - missing_dependency_failure
     script:
-        - export PASSED_REPO=${DOCKER_REPO}
         - export DOCKER_REPO=${CI_REGISTRY_IMAGE}
         - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN  $CI_REGISTRY
         - docker-compose --env-file ${CI_PROJECT_DIR}/.env pull --include-dep ${service_name}
         - docker logout
+        - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD  $DH_REGISTRY
         - export VERSION=`docker-compose config | grep "${DOCKER_REPO}/${service_name}:" | cut -d":" -f3`
-        - env
-        - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${PASSED_REPO}/${service_name}:latest
-        - docker push ${DOCKER_REPO}/${service_name}:latest
+        - docker images
+        - docker tag ${DOCKER_REPO}/${service_name}:${VERSION} ${DH_REGISTRY_USER}/${service_name}:latest
+        - docker images
+        - docker push ${DH_REGISTRY_USER}/${service_name}:latest
+        - docker logout

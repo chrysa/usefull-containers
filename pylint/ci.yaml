@@ -14,7 +14,8 @@ pylint:build:
           optional: true
     rules:
         - changes:
-              - pylint/**
+              - pylint/docker-compose.yaml
+              - pylint/Dockerfile
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: pylint
@@ -29,7 +30,6 @@ pylint:version:
               - pylint/docker-compose.yaml
               - pylint/Dockerfile
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: pylint
 
 pylint:latest:
@@ -39,15 +39,7 @@ pylint:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pylint/**
-    variables:
-        service_name: pylint
-pylint:release:
-    extends: .release_job
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release/*"
-          changes:
-              - pylint/**
-    variables:
-        service_name: pylint
-        version: $(cat .env | grep "PYLINT_CONTAINER_VERSION" | cut -d"=" -f1)
+              - pylint/docker-compose.yaml
+              - pylint/Dockerfile
+          variables:
+              service_name: pylint

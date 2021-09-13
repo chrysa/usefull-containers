@@ -1,4 +1,6 @@
 ---
+image: docker/compose:1.29.2
+
 include:
     - ci-jobs.yaml
     - black/ci.yaml
@@ -20,6 +22,5 @@ stages:
 
 variables:
     DOCKER_DRIVER: overlay
-    DOCKER_HUB_USER: chrys4
     HADOLINT_IMAGE: hadolint/hadolint:latest-debian
     STAGGING_BRANCH: develop
