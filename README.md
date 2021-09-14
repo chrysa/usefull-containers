@@ -1,4 +1,3 @@
-
 <!-- toc -->
 
 - [Alias](#alias)
@@ -114,7 +113,7 @@ alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD
 - graphviz==0.17
 - recommonmark==0.7.1
 - sphinx==4.2.0
-- sphinx-rtd-theme==0.5.2
+- sphinx-rtd-theme==1.0.0
 
 # Makefile rules
 
