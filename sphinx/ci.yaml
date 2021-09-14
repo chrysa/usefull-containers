@@ -21,23 +21,15 @@ sphinx:build:
         service_name: sphinx
 
 sphinx:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
         - sphinx:build
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - sphinx/docker-compose.yaml
-              - sphinx/Dockerfile
-          variables:
-              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
-              service_name: sphinx
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: sphinx
 
 sphinx:latest:
@@ -50,5 +42,4 @@ sphinx:latest:
               - sphinx/docker-compose.yaml
               - sphinx/Dockerfile
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: sphinx
