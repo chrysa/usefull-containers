@@ -21,23 +21,15 @@ black:build:
         service_name: black
 
 black:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
         - black:build
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
-          variables:
-              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
-              service_name: black
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - black/docker-compose.yaml
               - black/Dockerfile
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: black
 
 black:latest:
@@ -50,5 +42,4 @@ black:latest:
               - black/docker-compose.yaml
               - black/Dockerfile
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: black
