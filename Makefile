@@ -36,19 +36,24 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value @), required by target $@)))
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 build: ## build service
 	$(info Make: Build service ${service_name})
 =======
 build: ## Build project => build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 >>>>>>> 792b7c3 (some fix)
+=======
+build: ## Build project => build [service_name={service_name}]
+	$(info Make: Build service  ${service_name})
+>>>>>>> develop
 	@docker-compose build --compress --force-rm ${service_name}
 build-parallel: ## build service  in parallel
 	$(info Make: Building ${service_name})
 	@docker-compose build --compress --force-rm --parallel --quiet ${service_name}
 config:
 	@docker-compose config
-down: clean ## Down project containers=> down
+down: ## Down project containers=> down
 	$(info Make: Down)
 	@docker-compose down --remove-orphans
 hadolint: ## lint dockerfiles => hadolint

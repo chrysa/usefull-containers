@@ -1,4 +1,3 @@
-
 <!-- toc -->
 
 - [Alias](#alias)
@@ -11,12 +10,14 @@
     - [Packages](#packages-2)
   - [Pre-commit](#pre-commit)
     - [Packages](#packages-3)
-  - [Pylint](#pylint)
+  - [Pre-commit](#pre-commit-1)
     - [Packages](#packages-4)
-  - [Pytest](#pytest)
+  - [Pylint](#pylint)
     - [Packages](#packages-5)
-  - [Sphinx](#sphinx)
+  - [Pytest](#pytest)
     - [Packages](#packages-6)
+  - [Sphinx](#sphinx)
+    - [Packages](#packages-7)
 - [Makefile rules](#makefile-rules)
 
 <!-- tocstop -->
@@ -57,6 +58,17 @@ alias my_hadolint="docker run --rm -ti --name=hadolint --workdir=/app --volume $
 
 ```
 alias my_mypy="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/mypy:latest"
+```
+
+### Packages
+
+- mypy==0.910
+- junit-xml==1.9
+
+## Pre-commit
+
+```
+alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/pre-commit:latest"
 ```
 
 ### Packages
@@ -114,7 +126,7 @@ alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD
 - graphviz==0.17
 - recommonmark==0.7.1
 - sphinx==4.2.0
-- sphinx-rtd-theme==0.5.2
+- sphinx-rtd-theme==1.0.0
 
 # Makefile rules
 
