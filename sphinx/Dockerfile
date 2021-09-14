@@ -19,4 +19,8 @@ RUN set -x \
  && pip install --quiet --no-cache-dir graphviz==0.17 \
  && pip install --quiet --no-cache-dir recommonmark==0.7.1 \
  && pip install --quiet --no-cache-dir sphinx==4.2.0 \
+<<<<<<< HEAD
  && pip install --quiet --no-cache-dir sphinx-rtd-theme==0.5.2
+=======
+ && pip install --quiet --no-cache-dir sphinx-rtd-theme==1.0.0
+>>>>>>> develop
