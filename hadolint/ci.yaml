@@ -22,25 +22,16 @@ hadolint:build:
         service_name: hadolint
 
 hadolint:version:
-    extends: .publish_version
+    extends: .publish_version_master
     needs:
         - hadolint:build
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $STAGGING_BRANCH
-          changes:
-              - hadolint/docker-compose.yaml
-              - hadolint/Dockerfile
-              - hadolint/.hadolint.yaml
-          variables:
-              DOCKER_REPO: ${CI_REGISTRY_IMAGE}
-              service_name: hadolint
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
               - hadolint/docker-compose.yaml
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: hadolint
 
 hadolint:latest:
@@ -54,5 +45,4 @@ hadolint:latest:
               - hadolint/Dockerfile
               - hadolint/.hadolint.yaml
           variables:
-              DOCKER_REPO: ${DOCKER_HUB_USER}
               service_name: hadolint
