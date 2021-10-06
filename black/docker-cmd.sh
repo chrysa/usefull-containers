@@ -1,9 +1,10 @@
 #!/bin/sh
 
 cmd="black"
-if [ -f "./black.toml" ]; then
-    cmd="${cmd} --config=./black.toml"
+if [ -f "/app/black.toml" ]; then
+    cmd="${cmd} --config=/app/black.toml"
+elif [ -f "/app/pyproject.toml" ]; then
+    cmd="${cmd} --config=/app/pyproject.toml"
 fi
-cmd="${cmd} /app/**/*.py"
 
-${cmd}
+${cmd} /app/**/*.py
