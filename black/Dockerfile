@@ -2,6 +2,8 @@ FROM  python:3.9-alpine
 
 WORKDIR  /app
 
+COPY docker-cmd.sh /opt/docker-cmd.sh
+
 ENV PATH=$PATH:/home/black/.local/bin
 
 RUN set -x \
@@ -9,10 +11,11 @@ RUN set -x \
  && rm -rf /var/cache/apk/* \
  && addgroup -S black \
  && adduser -D --system --shell /usr/bin/bash black black \
- && chown -R black:black /app
+ && chown -R black:black /app \
+ && chmod +x /opt/docker-cmd.sh
 
 USER black
 
-RUN pip install --quiet --no-cache-dir black==20.8b1
+RUN pip install --quiet --no-cache-dir black==21.9b0
 
-CMD ["black",  "--help"]
+CMD ["/opt/docker-cmd.sh"]

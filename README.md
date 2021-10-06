@@ -25,17 +25,17 @@
 ## Black
 
 ```
-alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest bash -c 'black --config=./black.toml /app/**/*.py'"
+alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest"
 ```
 
 ### Packages
 
-- black==20.8b1
+- black==21.9b0
 
 ## Flake8
 
 ```
-alias my_flake8="docker run --rm -ti --name=flake8 --workdir=/app --volume ${PWD}:/app chrys4/flake8:latest bash -c 'flake8 --config=./setup.cfg /app/**/*.py'"
+alias my_flake8="docker run --rm -ti --name=flake8 --workdir=/app --volume ${PWD}:/app chrys4/flake8:latest"
 ```
 
 ### Packages
@@ -76,11 +76,12 @@ alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${P
 ## Pylint
 
 ```
-alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD}:/app chrys4/pylint:latest bash -c 'pylint --rcfile=./setup.cfg /app/**/*.py'"
+alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD}:/app chrys4/pylint:latest"
 ```
 
 ### Packages
 
+- pylint==2.11.1
 - pylint-junit==0.3.2
 - pylint-report==0.1.8
 
@@ -92,11 +93,11 @@ alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD
 
 ### Packages
 
-- faker==8.12.1
+- faker==8.16.0
 - mock==4.0.3
 - pytest==6.2.5
 - pytest-benchmark==3.4.1
-- pytest-cov==2.12.1
+- pytest-cov==3.0.0
 - pytest-depends==1.0.1
 - pytest-func-cov==0.2.3
 - pytest-html==3.1.1
