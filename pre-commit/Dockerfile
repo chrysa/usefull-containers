@@ -16,7 +16,7 @@ RUN set -x \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
  && git lfs install \
- && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip
+ && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip 
 
 USER pre-commit
 
