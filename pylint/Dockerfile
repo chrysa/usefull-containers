@@ -1,5 +1,7 @@
 FROM  python:3.9-alpine
 
+COPY docker-cmd.sh /opt/docker-cmd.sh
+
 ENV PYTHONPATH=/app \
     PATH=$PATH:/home/pylint/.local/bin
 
@@ -10,14 +12,14 @@ RUN set -x \
  && addgroup -S pylint \
  && adduser -D --system --shell /usr/bin/bash pylint pylint \
  && rm -rf /var/cache/apk/* \
- && chown -R pylint:pylint /app
+ && chown -R pylint:pylint /app \
+ && chmod +x /opt/docker-cmd.sh
 
 USER pylint
 
 RUN set -x \
- && pip install --quiet --no-cache-dir pylint==2.10.2 \
+ && pip install --quiet --no-cache-dir pylint==2.11.1 \
  && pip install --quiet --no-cache-dir pylint-junit==0.3.2 \
  && pip install --quiet --no-cache-dir pylint-report==0.1.8
 
-
-CMD ["pylint", "--help"]
+CMD ["/opt/docker-cmd.sh"]
