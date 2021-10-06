@@ -10,7 +10,7 @@ RUN set -x \
  && apk add --quiet --no-cache build-base bash \
  && rm -rf /var/cache/apk/* \
  && addgroup -S black \
- && adduser -D --system --shell /usr/bin/bash black black \
+ && adduser --system -u 1001 black black \
  && chown -R black:black /app \
  && chmod +x /opt/docker-cmd.sh
 
