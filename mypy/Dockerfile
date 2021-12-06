@@ -2,7 +2,7 @@ FROM  python:3.9-alpine
 
 COPY docker-cmd.sh /opt/docker-cmd.sh
 
-ENV PATH=$PATH:/home/mypy/.local/bin 
+ENV PATH=$PATH:/home/mypy/.local/bin
 ENV MYPYPATH=/app
 
 WORKDIR  /app
@@ -18,8 +18,9 @@ RUN set -x \
 USER mypy
 
 RUN set -x \
- && pip install --quiet --no-cache-dir mypy==0.910 \
- && pip install --quiet --no-cache-dir junit-xml==1.9 
+  && pip install --upgrade pip \
+  && pip install --quiet --no-cache-dir mypy==0.910 \
+  && pip install --quiet --no-cache-dir junit-xml==1.9
 
 WORKDIR  /app
 

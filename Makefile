@@ -2,6 +2,8 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")
 endif
 
+export COMPOSE_DOCKER_CLI_BUILD=0
+
 BLACK_CONTAINER_VERSION=$(shell cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
 DOCKER_REPO=$(shell cat .env | grep "DOCKER_REPO" | cut -d "=" -f2)
 FLAKE8_CONTAINER_VERSION=$(shell cat .env | grep "FLAKE8_CONTAINER_VERSION" | cut -d "=" -f2)
@@ -15,14 +17,16 @@ SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "SPHINX_CONTAINER_VERSION" | cu
 
 tail=10
 
-.DEFAULT_GOAL := help
-
-.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
-
 COLOR[GREEN]=\e[1;92m
 COLOR[RED]=\e[1;91m
 COLOR[WHITE]=\e[39m
 COLOR[YELLOW]=\e[1;93m
+
+
+.DEFAULT_GOAL := help
+
+.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
+
 
 check-defined-% :
 	@:$(call check_defined, $*, target-specific)
@@ -98,23 +102,23 @@ stop: ## Start project containers => [service_name={service_name}]
 tag-latest: ## tag services as latest => make tag-latest
 	$(info Make: tag latest)
 	@echo "=======>> tag black"
-	@docker tag local/black:${BLACK_CONTAINER_VERSION} local/black:latest
+	@docker tag ${DOCKER_REPO}/black:${BLACK_CONTAINER_VERSION} ${DOCKER_REPO}/black:latest
 	@echo "=======>> tag flake8"
-	@docker tag local/flake8:${FLAKE8_CONTAINER_VERSION} local/flake8:latest
+	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
 	@echo "=======>> tag hadolint"
-	@docker tag local/hadolint:${HADOLINT_CONTAINER_VERSION} local/hadolint:latest
+	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
 	@echo "=======>> tag mypy"
-	@docker tag local/mypy:${MYPY_CONTAINER_VERSION} local/mypy:latest
+	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
 	@echo "=======>> tag pre-commit"
-	@docker tag local/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} local/pre-commit:latest
+	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
 	@echo "=======>> tag pylint"
-	@docker tag local/pylint:${PYLINT_CONTAINER_VERSION} local/pylint:latest
+	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
 	@echo "=======>> tag python-dev"
-	@docker tag local/python-dev:${PYTHON_DEV_CONTAINER_VERSION} local/python-dev:latest
+	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
 	@echo "=======>> tag pytest"
-	@docker tag local/pytest:${PYTEST_CONTAINER_VERSION} local/pytest:latest
+	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
 	@echo "=======>> tag sphinx"
-	@docker tag local/sphinx:${SPHINX_CONTAINER_VERSION} local/sphinx:latest
+	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker-compose up ${service_name}

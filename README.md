@@ -1,3 +1,4 @@
+
 <!-- toc -->
 
 - [Alias](#alias)
@@ -27,7 +28,7 @@
 ## Black
 
 ```
-alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest"
+alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest $@"
 ```
 
 ### Packages
@@ -37,7 +38,7 @@ alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:
 ## Flake8
 
 ```
-alias my_flake8="docker run --rm -ti --name=flake8 --workdir=/app --volume ${PWD}:/app chrys4/flake8:latest"
+alias my_flake8="docker run --rm -ti --name=flake8 --workdir=/app --volume ${PWD}:/app chrys4/flake8:latest $@"
 ```
 
 ### Packages
@@ -57,7 +58,7 @@ alias my_hadolint="docker run --rm -ti --name=hadolint --workdir=/app --volume $
 ## Mypy
 
 ```
-alias my_mypy="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/mypy:latest"
+alias my_mypy="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/mypy:latest $@"
 ```
 
 ### Packages
@@ -68,7 +69,7 @@ alias my_mypy="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/a
 ## Pre-commit
 
 ```
-alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/pre-commit:latest"
+alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/pre-commit:latest $@"
 ```
 
 ### Packages
@@ -89,7 +90,7 @@ alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${P
 ## Pylint
 
 ```
-alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD}:/app chrys4/pylint:latest"
+alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD}:/app chrys4/pylint:latest $@"
 ```
 
 ### Packages
@@ -101,7 +102,7 @@ alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD
 ## Pytest
 
 ```
-alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD}:/app chrys4/pytest:latest bash -c 'pytest --rcfile=./setup.cfg'"
+alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD}:/app chrys4/pytest:latest pytest --rcfile=./setup.cfg $@"
 ```
 
 ### Packages
@@ -119,7 +120,7 @@ alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD
 ## Sphinx
 
 ```
-alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD}:/app chrys4/sphinx:latest bash"
+alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD}:/app chrys4/sphinx:latest bash $@"
 ```
 
 ### Packages
@@ -135,12 +136,12 @@ alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD
 ```
 $ make help
 Variables:
- - "service_name" is a docker-compose service name or a list of services separate by space as string ()
+	- "service_name" is a docker-compose service name or a list of services separate by space as string ()
 
 
 target                                             help                                                                             usage
 ------                                             ----                                                                             ----
-build                                               build service
+build                                               Build project                                                                    build [service_name#{service_name}]
 build-parallel                                      build service  in parallel
 down                                                Down project containers                                                          down
 hadolint                                            lint dockerfiles                                                                 hadolint

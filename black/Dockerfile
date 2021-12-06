@@ -16,6 +16,8 @@ RUN set -x \
 
 USER black
 
-RUN pip install --quiet --no-cache-dir black==21.9b0
+RUN set -x \
+  && pip install --upgrade pip \
+  && pip install --quiet --no-cache-dir black==21.9b0
 
 CMD ["/opt/docker-cmd.sh"]

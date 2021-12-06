@@ -1,8 +1,6 @@
 #!/bin/sh
 
 cmd="pytest"
-if [ -f "./setup.cfg" ]; then
-    cmd="${cmd} --rcfile=./setup.cfg"
 if [ -f "/app/setup.cfg" ]; then
     cmd="${cmd} --rcfile=/app/setup.cfg"
 elif [ -f "/app/pytest.ini" ]; then
