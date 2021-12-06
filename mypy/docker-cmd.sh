@@ -10,3 +10,4 @@ elif [ -f "/app/.mypy.ini" ]; then
 elif [ -f "/app/pyproject.toml" ]; then
     cmd="${cmd} --config=/app/pyproject.toml"
 fi
+${cmd} /app/**/*.py

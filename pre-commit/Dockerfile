@@ -15,12 +15,12 @@ RUN set -x \
  && apt-get install -qq -o=Dpkg::Use-Pty=0 --no-install-recommends -y build-essential docker-ce git git-lfs jq curl vim \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
- && git lfs install \
- && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip 
+ && git lfs install
 
 USER pre-commit
 
 RUN set -x \
+ && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
  && pip install --quiet --no-cache-dir --no-cache-dir docker-compose pre-commit==2.15.0 \
  && git config --global core.filemode false
 
