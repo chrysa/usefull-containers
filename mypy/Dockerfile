@@ -18,8 +18,8 @@ RUN set -x \
 USER mypy
 
 RUN set -x \
-  && pip install --upgrade pip \
-  && pip install --quiet --no-cache-dir mypy==0.910 \
+  && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+  && pip install --quiet --no-cache-dir mypy==0.931 \
   && pip install --quiet --no-cache-dir junit-xml==1.9
 
 WORKDIR  /app

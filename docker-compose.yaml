@@ -1,5 +1,5 @@
 ---
-version: '3.8'
+version: '3.9'
 
 services:
     black:
@@ -34,6 +34,10 @@ services:
         extends:
             file: python-dev/docker-compose.yaml
             service: python-dev
+    reorder-python-imports:
+        extends:
+            file: reorder-python-imports/docker-compose.yaml
+            service: reorder-python-imports
     sphinx:
         extends:
             file: sphinx/docker-compose.yaml

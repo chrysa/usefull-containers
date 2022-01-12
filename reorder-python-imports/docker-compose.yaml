@@ -2,21 +2,21 @@
 version: '3.9'
 
 services:
-    sphinx:
+    reorder-python-imports:
         build:
             context: .
             dockerfile: Dockerfile
             labels:
+                departement: QA
+                description: linter for python projects
+                version: ${reorder-python-imports_CONTAINER_VERSION}
                 maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
                 build_date: ${BUILD_DATE:-}
                 commit_id: ${CI_COMMIT_SHA:-}
                 vcs-url: ${CI_REPOSITORY_URL:-}
                 vcs-ref: ${CI_COMMIT_SHA:-}
-                departement: documentation
-                description: python documentation project
-                version: ${SPHINX_CONTAINER_VERSION}
-        container_name: sphinx
-        image: ${DOCKER_REPO:-local}/sphinx:${SPHINX_CONTAINER_VERSION}
+        container_name: reorder-python-imports
+        image: ${DOCKER_REPO:-local}/reorder-python-imports:${REORDER_PYTHON_IMPORTS_CONTAINER_VERSION}
         tty: true
         volumes:
             - .:/app

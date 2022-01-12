@@ -20,8 +20,8 @@ RUN set -x \
 USER pre-commit
 
 RUN set -x \
- && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
- && pip install --quiet --no-cache-dir --no-cache-dir docker-compose pre-commit==2.15.0 \
+ && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+ && pip install --quiet --no-cache-dir --no-cache-dir docker-compose pre-commit==2.16.0 \
  && git config --global core.filemode false
 
 CMD ["pre-commit", "run", "--all-files", "--hook-stage=manual"]

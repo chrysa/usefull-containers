@@ -27,12 +27,12 @@ repos:
             args: [--indent, '    ', -i]
             stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: 799ed61795fc9455545070a032be4708f96f1e5f
+      rev: 5276c7093b9e29c0594d173c4d253c2380f1e51d
       hooks:
           - id: markdownlint
             args: [--fix, --config=.markdownlint.yml]
     - repo: https://github.com/adrienverge/yamllint.git
-      rev: d0392b34ca15fb56061a4edc594ae2dd67b0cff9
+      rev: 4f1bbc33dcb550b27a77e10c9831b9ff732bc5a8
       hooks:
           - id: yamllint
             args: [--config-file=.yamllint.yaml, --format, parsable, --strict]
@@ -54,7 +54,7 @@ repos:
             args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
             stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 083b0d8174f80e7a4c4322800115d2dbede53980
+      rev: c8a7a4d446cf3f275c5b153e5f537e11989944ba
       hooks:
           # - id: check-toml
           #   files: .toml$

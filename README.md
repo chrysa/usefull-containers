@@ -17,8 +17,10 @@
     - [Packages](#packages-5)
   - [Pytest](#pytest)
     - [Packages](#packages-6)
-  - [Sphinx](#sphinx)
+  - [Reorder Python Imports](#reorder-python-imports)
     - [Packages](#packages-7)
+  - [Sphinx](#sphinx)
+    - [Packages](#packages-8)
 - [Makefile rules](#makefile-rules)
 
 <!-- tocstop -->
@@ -117,6 +119,16 @@ alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD
 - pytest-html==3.1.1
 - pytest-mock==3.6.1
 
+## Reorder Python Imports
+
+```
+alias my_reorder="docker run --rm -ti --name=reorder-python-imports --workdir=/app --volume ${PWD}:/app chrys4/reorder-python-imports:latest reorder-python-imports $@"
+```
+
+### Packages
+
+- reorder-python-imports==2.6.0
+
 ## Sphinx
 
 ```
@@ -142,7 +154,7 @@ Variables:
 target                                             help                                                                             usage
 ------                                             ----                                                                             ----
 build                                               Build project                                                                    build [service_name#{service_name}]
-build-parallel                                      build service  in parallel
+build-parallel                                      build service in parallel
 down                                                Down project containers                                                          down
 hadolint                                            lint dockerfiles                                                                 hadolint
 help                                                This help dialog.                                                                make help

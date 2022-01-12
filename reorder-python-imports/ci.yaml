@@ -1,0 +1,45 @@
+---
+reorder-python-imports:dockerfile:
+    extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - reorder-python-imports/Dockerfile
+    variables:
+        service_name: reorder-python-imports
+
+reorder-python-imports:build:
+    extends: .build_service
+    needs:
+        - job: reorder-python-imports:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - reorder-python-imports/docker-compose.yaml
+              - reorder-python-imports/Dockerfile
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: reorder-python-imports
+
+reorder-python-imports:version:
+    extends: .publish_version_master
+    needs:
+        - reorder-python-imports:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - reorder-python-imports/docker-compose.yaml
+              - reorder-python-imports/Dockerfile
+          variables:
+              service_name: reorder-python-imports
+
+reorder-python-imports:latest:
+    extends: .publish_latest
+    needs:
+        - reorder-python-imports:version
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - reorder-python-imports/docker-compose.yaml
+              - reorder-python-imports/Dockerfile
+          variables:
+              service_name: reorder-python-imports
