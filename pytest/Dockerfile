@@ -18,8 +18,8 @@ RUN set -x \
 USER pytest
 
 RUN set -x \
- && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
- && pip install --quiet --no-cache-dir faker==9.8.4 \
+ && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+ && pip install --quiet --no-cache-dir faker==11.3.0 \
  && pip install --quiet --no-cache-dir mock==4.0.3 \
  && pip install --quiet --no-cache-dir pytest==6.2.5 \
  && pip install --quiet --no-cache-dir pytest-benchmark==3.4.1 \

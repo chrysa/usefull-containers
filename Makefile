@@ -2,7 +2,9 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")
 endif
 
-export COMPOSE_DOCKER_CLI_BUILD=0
+.DEFAULT_GOAL := help
+
+.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
 
 BLACK_CONTAINER_VERSION=$(shell cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
 DOCKER_REPO=$(shell cat .env | grep "DOCKER_REPO" | cut -d "=" -f2)
@@ -22,12 +24,6 @@ COLOR[RED]=\e[1;91m
 COLOR[WHITE]=\e[39m
 COLOR[YELLOW]=\e[1;93m
 
-
-.DEFAULT_GOAL := help
-
-.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
-
-
 check-defined-% :
 	@:$(call check_defined, $*, target-specific)
 
@@ -38,12 +34,12 @@ __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(va
 build: ## Build project => build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 	@docker-compose build --compress --force-rm ${service_name}
-build-parallel: ## build service  in parallel
+build-parallel: ## build service in parallel
 	$(info Make: Building ${service_name})
 	@docker-compose build --compress --force-rm --parallel --quiet ${service_name}
 config:
 	@docker-compose config
-down: ## Down project containers=> down
+down: ## Down project containers => down
 	$(info Make: Down)
 	@docker-compose down --remove-orphans
 hadolint: ## lint dockerfiles => hadolint
@@ -140,5 +136,7 @@ upgradable-packages: ## list outdated package in service
 	@docker-compose run --rm pytest sh -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for python-dev"
 	@docker-compose run --rm python-dev sh -c "pip list --outdated --format columns" || true
+	@echo "=======>> upgradable package for reorder-python-imports"
+	@docker-compose run --rm reorder-python-imports sh -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for sphinx"
 	@docker-compose run --rm sphinx sh -c "pip list --outdated --format columns" || true

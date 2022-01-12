@@ -18,9 +18,9 @@ RUN set -x \
 USER pylint
 
 RUN set -x \
- && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
- && pip install --quiet --no-cache-dir pylint==2.12.1 \
+ && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+ && pip install --quiet --no-cache-dir pylint==2.12.2 \
  && pip install --quiet --no-cache-dir pylint-junit==0.3.2 \
- && pip install --quiet --no-cache-dir pylint-report==0.1.8
+ && pip install --quiet --no-cache-dir pylint-report==0.2.1
 
 CMD ["/opt/docker-cmd.sh"]

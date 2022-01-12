@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 WORKDIR /app
 
 RUN set -x \
- && pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
- && pip install --quiet --no-cache-dir ipython==7.30.0 \
+ && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+ && pip install --quiet --no-cache-dir ipython==7.31.0 \
  && pip install --quiet --no-cache-dir ipdb==0.13.9 \
- && pip install --quiet --no-cache-dir prompt-toolkit==3.0.23
+ && pip install --quiet --no-cache-dir prompt-toolkit==3.0.24
