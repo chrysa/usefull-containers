@@ -1,26 +1,18 @@
 <<<<<<< HEAD
-#!/bin/sh
-
-cmd="black"
-if [ -f "/app/black.toml" ]; then
-    cmd="${cmd} --config=/app/black.toml"
-elif [ -f "/app/pyproject.toml" ]; then
-    cmd="${cmd} --config=/app/pyproject.toml"
-fi
-
-${cmd} /app/**/*.py
+#!/bin/sh
+
+cmd="black"
+if [ -f "/app/black.toml" ]; then
+    cmd="${cmd} --config=/app/black.toml"
+elif [ -f "/app/pyproject.toml" ]; then
+    cmd="${cmd} --config=/app/pyproject.toml"
+fi
+
+${cmd} /app/**/*.py
 =======
 #!/bin/sh
 
 cmd="black"
-
-files=/app/**/*.py
-
-if [ -f "/app/black.toml" ]; then
-    config="--config=/app/black.toml"
-elif [ -f "/app/pyproject.toml" ]; then
-    config="--config=/app/pyproject.toml"
-fi
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -39,5 +31,20 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-${cmd} ${config} $files
->>>>>>> d98b6dc (test update)
+if [ -z ${config} ]; then
+    if [ -f "/app/black.toml" ]; then
+        config="--config=/app/black.toml"
+    elif [ -f "/app/pyproject.toml" ]; then
+        config="--config=/app/pyproject.toml"
+    else
+        config="--config=/opt/setup-default.cfg"
+    fi
+fi
+
+if [ -z ${files} ]; then
+    files=/app/**/*.py
+else
+    files=`echo $files | cut -d ' '`
+fi
+
+${cmd} ${config} ${files}

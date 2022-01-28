@@ -6,11 +6,11 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # R�PONDRE � UN BESOIN PARTICULIER.
 
 # Ce logiciel est construit pour i386-pc-mingw32
- 
+
 'grep' n'est pas reconnu en tant que commande interne
 ou externe, un programme ex�cutable ou un fichier de commandes.
 make.exe: *** Pas de r�gle pour fabriquer la cible � all �. Arr�t.
- 
+
 
 # Base de donn�es de Make, imprim�e le Mon Dec 06 17:14:49 2021
 
@@ -173,7 +173,7 @@ MAKE_COMMAND := make.exe
 # environnement
 PROCESSOR_ARCHITEW6432 = AMD64
 # d�faut
-.VARIABLES := 
+.VARIABLES :=
 # automatique
 *F = $(notdir $*)
 # environnement
@@ -209,7 +209,7 @@ TEMP = C:\Users\greau\AppData\Local\Temp
 # environnement
 COMSPEC = C:\WINDOWS\system32\cmd.exe
 # d�faut
-MAKEFILES := 
+MAKEFILES :=
 # automatique
 <F = $(notdir $<)
 # makefile (de � makefile �, ligne 34)
@@ -221,7 +221,7 @@ LC_ALL = C
 # automatique
 ^F = $(notdir $^)
 # d�faut
-SUFFIXES := 
+SUFFIXES :=
 # environnement
 SYSTEMDRIVE = C:
 # environnement
@@ -291,7 +291,7 @@ USERDOMAIN_ROAMINGPROFILE = CHRYSATHINK
 check-defined-%:
 #  commandes � ex�cuter (de � makefile �, ligne 32):
 	@:$(call check_defined, $*, target-specific)
-	
+
 
 # 1 r�gles implicites, 0 (0,0%) terminales.
 
@@ -304,7 +304,7 @@ stop:
 #  commandes � ex�cuter (de � makefile �, ligne 100):
 	$(info Make: stop  ${service_name})
 	@docker-compose stop ${service_name}
-	
+
 
 # Pas une cible :
 check-defined-service_name:
@@ -318,7 +318,7 @@ config:
 #  Fichier n'a pas �t� mis � jour.
 #  commandes � ex�cuter (de � makefile �, ligne 45):
 	@docker-compose config
-	
+
 
 # Pas une cible :
 all:
@@ -357,7 +357,7 @@ status:
 	fi; \
 	echo "$$color_status====>${COLOR[WHITE]} $$service: $$color_status $$status ${COLOR[WHITE]}"; \
 	done
-	
+
 
 logs-tail: check-defined-service_name
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -366,7 +366,7 @@ logs-tail: check-defined-service_name
 #  commandes � ex�cuter (de � makefile �, ligne 70):
 	$(info Make: Logs tail ${service_name})
 	@docker-compose logs --tail=${tail} ${service_name}
-	
+
 
 up:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -375,7 +375,7 @@ up:
 #  commandes � ex�cuter (de � makefile �, ligne 123):
 	$(info Make: Up detach ${service_name})
 	@docker-compose up ${service_name}
-	
+
 
 start: check-defined-service_name
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -384,7 +384,7 @@ start: check-defined-service_name
 #  commandes � ex�cuter (de � makefile �, ligne 84):
 	$(info Make: start ${service_name})
 	docker-compose start ${service_name} || make --quiet -s up service_name=${service_name}
-	
+
 
 # Pas une cible :
 makefile:
@@ -402,7 +402,7 @@ build:
 #  commandes � ex�cuter (de � makefile �, ligne 39):
 	$(info Make: Build service  ${service_name})
 	@docker-compose build --compress --force-rm ${service_name}
-	
+
 
 up-detach:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -411,7 +411,7 @@ up-detach:
 #  commandes � ex�cuter (de � makefile �, ligne 126):
 	$(info Make: Up ${service_name})
 	@docker-compose up --detach ${service_name}
-	
+
 
 tag-latest:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -437,7 +437,7 @@ tag-latest:
 	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
 	@echo "=======>> tag sphinx"
 	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
-	
+
 
 help:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -451,7 +451,7 @@ help:
 	@printf "%-50s %-80s %-60s\n" "target" "help" "usage"
 	@printf "%-50s %-80s %-60s\n" "------" "----" "----"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-50s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
-	
+
 
 prune: down
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -463,7 +463,7 @@ prune: down
 	@docker rm `docker-compose ps --filter status=created --filter status=exited -q` || true
 	@docker rmi `docker-compose images ls -q` || true
 	@docker rmi `docker images -f "dangling=true" -q` || true
-	
+
 
 # Pas une cible :
 .SUFFIXES:
@@ -481,7 +481,7 @@ hadolint:
 	echo "analyse $${f}"; \
 	docker run --rm --interactive --volume ${PWD}/.hadolint.yaml:/bin/hadolint.yaml -e XDG_CONFIG_HOME=/bin hadolint/hadolint < $${f}; \
 	done
-	
+
 
 logs-f: check-defined-service_name
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -490,7 +490,7 @@ logs-f: check-defined-service_name
 #  commandes � ex�cuter (de � makefile �, ligne 67):
 	$(info Make: Follow logs ${service_name})
 	@docker-compose logs -f ${service_name}
-	
+
 
 build-parallel:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -499,7 +499,7 @@ build-parallel:
 #  commandes � ex�cuter (de � makefile �, ligne 42):
 	$(info Make: Building ${service_name})
 	@docker-compose build --compress --force-rm --parallel --quiet ${service_name}
-	
+
 
 pre-commit:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -510,7 +510,7 @@ pre-commit:
 	@pip install --quiet --no-cache-dir pre-commit
 	@pre-commit autoupdate --bleeding-edge || true
 	@pre-commit run --all-files --verbose --hook-stage manual || true
-	
+
 
 upgradable-packages:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -535,7 +535,7 @@ upgradable-packages:
 	@docker-compose run --rm reorder-python-imports sh -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for sphinx"
 	@docker-compose run --rm sphinx sh -c "pip list --outdated --format columns" || true
-	
+
 
 logs: check-defined-service_name
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -544,7 +544,7 @@ logs: check-defined-service_name
 #  commandes � ex�cuter (de � makefile �, ligne 64):
 	$(info Make: Logs ${service_name})
 	@docker-compose logs ${service_name}
-	
+
 
 down:
 #  Recherche de r�gle implicite n'a pas �t� effectu�e.
@@ -553,7 +553,7 @@ down:
 #  commandes � ex�cuter (de � makefile �, ligne 47):
 	$(info Make: Down)
 	@docker-compose down --remove-orphans
-	
+
 
 # statistiques des fichiers de la table de hachage:
 # Charge=24/1024=2%, Refait le hachage=0, Collisions=0/40=0%
@@ -569,5 +569,3 @@ down:
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
 # Fin de la base de donn�es de Make le Mon Dec 06 17:14:49 2021
-
- 

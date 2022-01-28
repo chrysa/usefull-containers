@@ -1,33 +1,21 @@
 <<<<<<< HEAD
-#!/bin/sh
-
-cmd="mypy"
-if [ -f "/app/setup.cfg" ]; then
-    cmd="${cmd} --config=/app/setup.cfg"
-elif [ -f "/app/mypy.ini" ]; then
-    cmd="${cmd} --config=/app/mypy.ini"
-elif [ -f "/app/.mypy.ini" ]; then
-    cmd="${cmd} --config=/app/.mypy.ini"
-elif [ -f "/app/pyproject.toml" ]; then
-    cmd="${cmd} --config=/app/pyproject.toml"
-fi
-${cmd} /app/**/*.py
+#!/bin/sh
+
+cmd="mypy"
+if [ -f "/app/setup.cfg" ]; then
+    cmd="${cmd} --config=/app/setup.cfg"
+elif [ -f "/app/mypy.ini" ]; then
+    cmd="${cmd} --config=/app/mypy.ini"
+elif [ -f "/app/.mypy.ini" ]; then
+    cmd="${cmd} --config=/app/.mypy.ini"
+elif [ -f "/app/pyproject.toml" ]; then
+    cmd="${cmd} --config=/app/pyproject.toml"
+fi
+${cmd} /app/**/*.py
 =======
 #!/bin/sh
 
 cmd="mypy"
-
-files=/app/**/*.py
-
-if [ -f "/app/setup.cfg" ]; then
-    config="--config=/app/setup.cfg"
-elif [ -f "/app/mypy.ini" ]; then
-    config="--config=/app/mypy.ini"
-elif [ -f "/app/.mypy.ini" ]; then
-    config="--config=/app/.mypy.ini"
-elif [ -f "/app/pyproject.toml" ]; then
-    config="--config=/app/pyproject.toml"
-fi
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,5 +34,24 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-${cmd} ${config} $files
->>>>>>> d98b6dc (test update)
+if [ -z ${config} ]; then
+    if [ -f "/app/setup.cfg" ]; then
+        config="--config=/app/setup.cfg"
+    elif [ -f "/app/mypy.ini" ]; then
+        config="--config=/app/mypy.ini"
+    elif [ -f "/app/.mypy.ini" ]; then
+        config="--config=/app/.mypy.ini"
+    elif [ -f "/app/pyproject.toml" ]; then
+        config="--config=/app/pyproject.toml"
+    else
+        config="--config=/opt/setup-default.cfg"
+    fi
+fi
+
+if [ -z ${files} ]; then
+    files=/app/**/*.py
+else
+    files=`echo $files | cut -d ' '`
+fi
+
+${cmd} ${config} ${files}

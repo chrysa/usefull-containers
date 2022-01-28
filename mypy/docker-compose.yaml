@@ -18,9 +18,8 @@ services:
                 departement: QA
                 description: guideline checker for python projects
                 version: ${MYPY_CONTAINER_VERSION}
+        command: --git
         container_name: mypy
         image: ${DOCKER_REPO:-local}/mypy:${MYPY_CONTAINER_VERSION}
         tty: true
-        volumes:
-            - .:/app
         working_dir: /app
