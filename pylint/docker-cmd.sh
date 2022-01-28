@@ -1,25 +1,17 @@
 <<<<<<< HEAD
-#!/bin/sh
-
-cmd="pylint"
-if [ -f "/app/setup.cfg" ]; then
-    cmd="${cmd} --rcfile=/app/setup.cfg"
-elif [ -f "/app/.pylintrc" ]; then
-    cmd="${cmd} --rcfile=/app/.pylintrc"
-fi
-${cmd} /app/**/*.py
+#!/bin/sh
+
+cmd="pylint"
+if [ -f "/app/setup.cfg" ]; then
+    cmd="${cmd} --rcfile=/app/setup.cfg"
+elif [ -f "/app/.pylintrc" ]; then
+    cmd="${cmd} --rcfile=/app/.pylintrc"
+fi
+${cmd} /app/**/*.py
 =======
 #!/bin/sh
 
 cmd="pylint"
-
-files=/app/**/*.py
-
-if [ -f "/app/setup.cfg" ]; then
-    config="--rcfile=/app/setup.cfg"
-elif [ -f "/app/.pylintrc" ]; then
-    config="--rcfile=/app/.pylintrc"
-fi
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -38,5 +30,20 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-${cmd} ${config} $files
->>>>>>> d98b6dc (test update)
+if [ -z ${config} ]; then
+    if [ -f "/app/setup.cfg" ]; then
+        config="--rcfile=/app/setup.cfg"
+    elif [ -f "/app/.pylintrc" ]; then
+        config="--rcfile=/app/.pylintrc"
+    else
+        config="--config=/opt/setup-default.cfg"
+    fi
+fi
+
+if [ -z ${files} ]; then
+    files=/app/**/*.py
+else
+    files=`echo $files | cut -d ' '`
+fi
+
+${cmd} ${config} ${files}

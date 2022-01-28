@@ -8,7 +8,6 @@ printf "%-50s %-80s %-60s\n" "target" "help" "usage"
 printf "%-50s %-80s %-60s\n" "------" "----" "----"
 grep -E '^[a-zA-Z_-]+:.*?## .*$'  makefile | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-50s\033[0m %-80s %-60s\n", $1, $2, $3}'
 make.exe: quittant le r�pertoire � e:/drive/repos/usefull-containers �
- 
+
 process_begin: CreateProcess(NULL, "", ...) failed.
 process_begin: CreateProcess(NULL, "", ...) failed.
- 

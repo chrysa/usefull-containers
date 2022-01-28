@@ -2,9 +2,6 @@
 
 cmd="reorder-python-imports"
 
-files=/app/**/*.py
-config="--py39-plus --application-directories=."
-
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --config)
@@ -22,4 +19,18 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-${cmd} ${config} $files
+if [ -z ${config} ]; then
+    if [ -f "/app/setup.cfg" ]; then
+        config="--config=/app/setup.cfg"
+    else
+        config="--py39-plus --application-directories=."
+    fi
+fi
+
+if [ -z ${files} ]; then
+    files=/app/**/*.py
+else
+    files=`echo $files | cut -d ' '`
+fi
+
+${cmd} ${config} ${files}

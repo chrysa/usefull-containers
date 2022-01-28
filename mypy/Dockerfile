@@ -1,6 +1,7 @@
 FROM  python:3.9-alpine
 
 COPY docker-cmd.sh /opt/docker-cmd.sh
+COPY setup-default.cfg /opt/setup-default.cfg
 
 ENV PATH=$PATH:/home/mypy/.local/bin
 ENV MYPYPATH=/app
@@ -8,7 +9,7 @@ ENV MYPYPATH=/app
 WORKDIR  /app
 
 RUN set -x \
- && apk add --quiet --no-cache build-base bash \
+ && apk add --quiet --no-cache build-base bash git \
  && rm -rf /var/cache/apk/* \
  && addgroup -S mypy \
  && adduser -D --system --shell /usr/bin/bash mypy mypy \
