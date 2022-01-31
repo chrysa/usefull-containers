@@ -17,7 +17,7 @@ RUN set -x \
 USER reorder-python-imports
 
 RUN set -x \
-  && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
-  && pip install --quiet --no-cache-dir reorder-python-imports==2.6.0
+  && python -m pip install --quiet --no-cache-dir --upgrade pip \
+  && pip install --quiet --no-cache-dir reorder-python-imports==2.7.1
 
 CMD ["/opt/docker-cmd.sh"]

@@ -17,9 +17,9 @@ RUN set -x \
 USER flake8
 
 RUN set -x \
-  && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+  && python -m pip install --quiet --no-cache-dir --upgrade pip \
   && pip install --quiet --no-cache-dir flake8==4.0.1 \
-  && pip install --quiet --no-cache-dir flake8-black==0.2.3 \
+  && pip install --quiet --no-cache-dir flake8-black==0.2.4 \
   && pip install --quiet --no-cache-dir flake8-html==0.4.1 \
   && pip install --quiet --no-cache-dir flake8-junit-report==2.1.0 \
   && pip install --quiet --no-cache-dir flake8-mypy==17.8.0

@@ -18,7 +18,7 @@ RUN set -x \
 USER pylint
 
 RUN set -x \
- && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+ && python -m pip install --quiet --no-cache-dir --upgrade pip \
  && pip install --quiet --no-cache-dir pylint==2.12.2 \
  && pip install --quiet --no-cache-dir pylint-junit==0.3.2 \
  && pip install --quiet --no-cache-dir pylint-report==0.2.1
