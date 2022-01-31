@@ -18,7 +18,7 @@ RUN set -x \
 USER pytest
 
 RUN set -x \
- && python -m pip install --quiet --no-cache-dir --no-cache-dir --upgrade pip \
+ && python -m pip install --quiet --no-cache-dir --upgrade pip \
  && pip install --quiet --no-cache-dir faker==11.3.0 \
  && pip install --quiet --no-cache-dir mock==4.0.3 \
  && pip install --quiet --no-cache-dir pytest==6.2.5 \
@@ -27,6 +27,6 @@ RUN set -x \
  && pip install --quiet --no-cache-dir pytest-depends==1.0.1 \
  && pip install --quiet --no-cache-dir pytest-func-cov==0.2.3 \
  && pip install --quiet --no-cache-dir pytest-html==3.1.1 \
- && pip install --quiet --no-cache-dir pytest-mock==3.6.1
+ && pip install --quiet --no-cache-dir pytest-mock==3.7.0
 
 CMD ["/opt/docker-cmd.sh"]
