@@ -7,7 +7,7 @@ COPY docker-cmd.sh /opt/docker-cmd.sh
 ENV PATH=$PATH:/home/black/.local/bin
 
 RUN set -x \
- && apk add --quiet --no-cache build-base bash \
+ && apk add --quiet --no-cache build-base bash git \
  && rm -rf /var/cache/apk/* \
  && addgroup -S black \
  && adduser --system -u 1001 black black \
@@ -20,4 +20,5 @@ RUN set -x \
   && python -m pip install --quiet --no-cache-dir --upgrade pip \
   && pip install --quiet --no-cache-dir black==22.1.0
 
-CMD ["/opt/docker-cmd.sh"]
+ENTRYPOINT ["/opt/docker-cmd.sh"]
+CMD ["--git"]

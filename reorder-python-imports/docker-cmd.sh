@@ -13,7 +13,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
         ;;
         --git)
-            files=`git status | grep -E "modified" | grep ".py$" | cut -d":" -f2 | xargs`
+            files=` git status | grep -E "modified" | grep ".py$" | sort -u | args`
             shift 2
         ;;
     esac

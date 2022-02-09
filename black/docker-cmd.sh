@@ -14,18 +14,27 @@ ${cmd} /app/**/*.py
 
 cmd="black"
 
+opts=$(getopt \
+    --longoptions "config,file,git" \
+    --name "$(basename "$0")" \
+    --options "c,f,g" \
+    -- "$@"
+)
+
+eval set --$opts
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --config)
+        -c|--config)
             config="--config=$1"
             shift 2
         ;;
-        --file)
+        -f|--file)
             files="$1"
             shift 2
         ;;
-        --git)
-            files=`git status | grep -E "modified" | grep ".py$" | cut -d":" -f2 | xargs`
+        -g|--git)
+            files=`git status | grep -E "modified" | grep ".py$" | sort -u | xargs`
             shift 2
         ;;
     esac

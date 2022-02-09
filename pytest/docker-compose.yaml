@@ -18,6 +18,4 @@ services:
         container_name: pytest
         image: ${DOCKER_REPO:-local}/pytest:${PYTEST_CONTAINER_VERSION}
         tty: true
-        volumes:
-            - .:/app
         working_dir: /app

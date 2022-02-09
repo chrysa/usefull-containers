@@ -18,6 +18,4 @@ services:
         container_name: python-dev
         image: ${DOCKER_REPO:-local}/python-dev:${PYTHON_DEV_CONTAINER_VERSION}
         tty: true
-        volumes:
-            - .:/app
         working_dir: /app

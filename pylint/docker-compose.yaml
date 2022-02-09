@@ -15,10 +15,8 @@ services:
                 departement: test
                 description: pylint application
                 version: ${PYLINT_CONTAINER_VERSION}
-        command: --git
+
         container_name: pylint
         image: ${DOCKER_REPO:-local}/pylint:${PYLINT_CONTAINER_VERSION}
         tty: true
-        volumes:
-            - .:/app
         working_dir: /app

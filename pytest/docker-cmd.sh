@@ -18,7 +18,32 @@ ${cmd}
 
 cmd="pytest"
 
-files=/app/**/*.py
+
+opts=$(getopt \
+    --longoptions "config,file,git" \
+    --name "$(basename "$0")" \
+    --options "c,f,g" \
+    -- "$@"
+)
+
+eval set --$opts
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c|--config)
+            config="--config=$1"
+            shift 2
+        ;;
+        -f|--file)
+            files="$1"
+            shift 2
+        ;;
+        -g|--git)
+            files=`git status | grep -E "modified" | grep ".py$" | sort -u | xargs`
+            shift 2
+        ;;
+    esac
+done
 
 if [ -f "/app/setup.cfg" ]; then
     config="--rcfile=/app/setup.cfg"
@@ -30,22 +55,11 @@ elif [ -f "/app/tox.ini" ]; then
     config="--rcfile=/app/tox.ini"
 fi
 
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --config)
-            config="--config=$1"
-            shift 2
-        ;;
-        --file)
-            files="$1"
-            shift 2
-        ;;
-        --git)
-            files=`git status | grep -E "modified" | grep ".py$" | cut -d":" -f2 | xargs`
-            shift 2
-        ;;
-    esac
-done
+if [ -z ${files} ]; then
+    files=/app/**/*.py
+else
+    files=`echo $files | cut -d ' '`
+fi
 
 ${cmd} ${config} $files
 >>>>>>> d98b6dc (test update)
