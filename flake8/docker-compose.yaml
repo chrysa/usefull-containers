@@ -15,10 +15,8 @@ services:
                 departement: QA
                 description: guideline checker for python projects
                 version: ${FLAKE8_CONTAINER_VERSION}
-        command: --git
+
         container_name: flake8
         image: ${DOCKER_REPO:-local}/flake8:${FLAKE8_CONTAINER_VERSION}
         tty: true
-        volumes:
-            - .:/app
         working_dir: /app

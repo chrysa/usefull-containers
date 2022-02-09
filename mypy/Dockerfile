@@ -25,4 +25,4 @@ RUN set -x \
 
 WORKDIR  /app
 
-CMD ["/opt/docker-cmd.sh"]
+CMD ["/opt/docker-cmd.sh",  "--git"]

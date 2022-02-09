@@ -29,4 +29,4 @@ RUN set -x \
  && pip install --quiet --no-cache-dir pytest-html==3.1.1 \
  && pip install --quiet --no-cache-dir pytest-mock==3.7.0
 
-CMD ["/opt/docker-cmd.sh"]
+CMD ["/opt/docker-cmd.sh",  "--git"]

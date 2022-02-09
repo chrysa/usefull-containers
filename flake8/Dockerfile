@@ -7,7 +7,7 @@ COPY docker-cmd.sh /opt/docker-cmd.sh
 ENV PATH=$PATH:/home/flake8/.local/bin
 
 RUN set -x \
- && apk add --quiet --no-cache build-base bash \
+ && apk add --quiet --no-cache build-base bash git \
  && rm -rf /var/cache/apk/* \
  && addgroup -S flake8 \
  && adduser -D --system --shell /usr/bin/bash flake8 flake8 \
@@ -24,4 +24,4 @@ RUN set -x \
   && pip install --quiet --no-cache-dir flake8-junit-report==2.1.0 \
   && pip install --quiet --no-cache-dir flake8-mypy==17.8.0
 
-CMD ["/opt/docker-cmd.sh"]
+CMD ["/opt/docker-cmd.sh",  "--git"]

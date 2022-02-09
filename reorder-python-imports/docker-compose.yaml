@@ -15,10 +15,8 @@ services:
                 commit_id: ${CI_COMMIT_SHA:-}
                 vcs-url: ${CI_REPOSITORY_URL:-}
                 vcs-ref: ${CI_COMMIT_SHA:-}
-        command: --git
+
         container_name: reorder-python-imports
         image: ${DOCKER_REPO:-local}/reorder-python-imports:${REORDER_PYTHON_IMPORTS_CONTAINER_VERSION}
         tty: true
-        volumes:
-            - .:/app
         working_dir: /app
