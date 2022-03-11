@@ -42,7 +42,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo "Usage:
-                [ -c | --config] define config flags
+                [ -c | --config] relative config path
                 [ -f | --file] relative file(s) path to format
                 [ -g | --git] detect file from git status
                 [ -h | --help]"
@@ -51,9 +51,21 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if [ -z ${config} ]; then
+    if [ -f "/app/black.toml" ]; then
+        config="--config=/app/black.toml"
+    elif [ -f "/app/pyproject.toml" ]; then
+        config="--config=/app/pyproject.toml"
+    else
+        config="--config=/opt/black-default.toml"
+    fi
+fi
+
 if [[ -z ${files} ]]; then
     files=/app/**/*.py
 fi
 
 set -x
+env 
+ls -la /app
 ${cmd} ${config} ${files}

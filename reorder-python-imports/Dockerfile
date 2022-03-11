@@ -11,7 +11,8 @@ RUN set -x \
   && python -m pip install --quiet --no-cache-dir --upgrade pip \
   && pip install --quiet --no-cache-dir reorder-python-imports==2.7.1
 
-COPY docker-cmd.sh /opt/docker-cmd.sh
+ENTRYPOINT ["/opt/docker-cmd.sh"]
+CMD ["--git"]
 
 RUN set -x \
   && chmod +x /opt/docker-cmd.sh
