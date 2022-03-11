@@ -9,6 +9,7 @@ include:
     - pre-commit/ci.yaml
     - pytest/ci.yaml
     - pylint/ci.yaml
+    - reorder-python-imports/ci.yaml
     - sphinx/ci.yaml
 
 services:
@@ -22,5 +23,5 @@ stages:
 
 variables:
     DOCKER_DRIVER: overlay
+    COMPOSE_DOCKER_CLI_BUILD: 1
     HADOLINT_IMAGE: hadolint/hadolint:latest-debian
-    STAGGING_BRANCH: develop
