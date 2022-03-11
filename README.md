@@ -30,7 +30,7 @@
 ## Black
 
 ```
-alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest $@"
+alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest"
 ```
 
 ### Packages
@@ -148,7 +148,7 @@ alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD
 ```
 $ make help
 Variables:
-	- "service_name" is a docker-compose service name or a list of services separate by space as string ()
+ - "service_name" is a docker-compose service name or a list of services separate by space as string ()
 
 
 target                                             help                                                                             usage

@@ -11,7 +11,7 @@ repos:
     #       - id: check-useless-excludes
     #        stages: [manual]
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
-      rev: 5a0378fee52112639128d326d41b76bf7bfc6bea
+      rev: v2.1.0
       hooks:
           - id: docker-compose-check
             stages: [manual]
@@ -27,7 +27,7 @@ repos:
             args: [--indent, '    ', -i]
             stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: 8b1d31d423f1c481b04419e0e36c63d78a372957
+      rev: 2a1a122656549317f4e92dc8ccc7e27e8b6d259b
       hooks:
           - id: markdownlint
             args: [--fix, --config=.markdownlint.yml]
@@ -54,7 +54,7 @@ repos:
             args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
             stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 40cc31b02ceb72045509576e51d9c82503751422
+      rev: 69b4df5589d96e10e45819360d12f87d1b6f7274
       hooks:
           # - id: check-toml
           #   files: .toml$
