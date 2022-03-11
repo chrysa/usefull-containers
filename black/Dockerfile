@@ -1,24 +1,27 @@
-FROM  python:3.9-alpine
+FROM  pyfound/black:22.1.0
 
 WORKDIR  /app
 
+ENV PATH=$PATH:/home/black/.local/bin GIT_DISCOVERY_ACROSS_FILESYSTEM=true
+
+RUN set -x \
+  && apt-get update \
+  && apt-get install -qq --no-install-recommends git  \
+  && apt-get autoremove --purge -qq -y \
+  && apt-get clean -qq -y \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    
 COPY docker-cmd.sh /opt/docker-cmd.sh
 
-ENV PATH=$PATH:/home/black/.local/bin
-
 RUN set -x \
- && apk add --quiet --no-cache build-base bash git \
- && rm -rf /var/cache/apk/* \
- && addgroup -S black \
- && adduser --system -u 1001 black black \
- && chown -R black:black /app \
  && chmod +x /opt/docker-cmd.sh
 
-USER black
+COPY black-default.toml /opt/black-default.toml
 
-RUN set -x \
-  && python -m pip install --quiet --no-cache-dir --upgrade pip \
-  && pip install --quiet --no-cache-dir black==22.1.0
+SHELL ["/bin/bash"]
+
+WORKDIR /app
 
 ENTRYPOINT ["/opt/docker-cmd.sh"]
+
 CMD ["--git"]
