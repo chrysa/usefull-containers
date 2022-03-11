@@ -3,8 +3,6 @@
 set -e 
 cmd="reorder-python-imports"
 
-config="--py3-plus --application-directories=."
-
 opts=$(getopt \
     --longoptions "config,file,git,help" \
     --name "$(basename "$0")" \
@@ -15,6 +13,7 @@ opts=$(getopt \
 eval set --$opts
 
 while [[ $# -gt 0 ]]; do
+    echo $1
     case "$1" in
         --config)
             config="${config} $1"
@@ -35,7 +34,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo "Usage:
-                [ -c | --config] define config flags
+                [ -c | --config] relative config path
                 [ -f | --file] relative file(s) path to format
                 [ -g | --git] detect file from git status
                 [ -h | --help]"
