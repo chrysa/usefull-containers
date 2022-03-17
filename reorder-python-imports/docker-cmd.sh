@@ -15,16 +15,17 @@ opts=$(getopt \
 eval set --$opts
 
 while [[ $# -gt 0 ]]; do
+    echo $1
     case "$1" in
-        --config)
+        -c|--config)
             config="${config} $1"
             shift 2
         ;;
-        --file)
+        -f|--file)
             files="$1"
             shift 2
         ;;
-        --git)
+        -g|--git)
             echo "get files from git status"
             files=`git status | grep -v "deleted" | grep ".py$" | cut -d ":" -f2 | sort -u | xargs`
             shift 2
