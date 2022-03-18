@@ -15,6 +15,7 @@ PRE_COMMIT_CONTAINER_VERSION=$(shell cat .env | grep "PRE_COMMIT_CONTAINER_VERSI
 PYLINT_CONTAINER_VERSION=$(shell cat .env | grep "PYLINT_CONTAINER_VERSION" | cut -d "=" -f2)
 PYTHON_DEV_CONTAINER_VERSION=$(shell cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d "=" -f2)
 PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
+REORDER_PYTHON_IMPORTS_CONTAINER_VERSION=$(shell cat .env | grep "REORDER_PYTHON_IMPORTS_CONTAINER_VERSION" | cut -d "=" -f2)
 SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
 
 tail=10
@@ -99,22 +100,24 @@ tag-latest: ## tag services as latest => make tag-latest
 	$(info Make: tag latest)
 	@echo "=======>> tag black"
 	@docker tag ${DOCKER_REPO}/black:${BLACK_CONTAINER_VERSION} ${DOCKER_REPO}/black:latest
-	@echo "=======>> tag flake8"
-	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
-	@echo "=======>> tag hadolint"
-	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
-	@echo "=======>> tag mypy"
-	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
-	@echo "=======>> tag pre-commit"
-	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
-	@echo "=======>> tag pylint"
-	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
-	@echo "=======>> tag python-dev"
-	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
-	@echo "=======>> tag pytest"
-	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
-	@echo "=======>> tag sphinx"
-	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
+# 	@echo "=======>> tag flake8"
+# 	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
+# 	@echo "=======>> tag hadolint"
+# 	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
+# 	@echo "=======>> tag mypy"
+# 	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
+# 	@echo "=======>> tag pre-commit"
+# 	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
+# 	@echo "=======>> tag pylint"
+# 	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
+# 	@echo "=======>> tag python-dev"
+# 	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
+# 	@echo "=======>> tag pytest"
+# 	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
+	@echo "=======>> tag reorder-python-imports"
+	@docker tag ${DOCKER_REPO}/reorder-python-imports:${REORDER_PYTHON_IMPORTS_CONTAINER_VERSION} ${DOCKER_REPO}/reorder-python-imports:latest
+# 	@echo "=======>> tag sphinx"
+# 	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker-compose up ${service_name}
