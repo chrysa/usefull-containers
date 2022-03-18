@@ -54,7 +54,7 @@ repos:
             args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
             stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 69b4df5589d96e10e45819360d12f87d1b6f7274
+      rev: 85db7df3110ff1c3bad37caf79e0f465ba1570ee
       hooks:
           # - id: check-toml
           #   files: .toml$
