@@ -7,6 +7,7 @@ cmd="reorder-python-imports"
 config="--py3-plus --application-directories=."
 
 files=/app/**/*.py
+
 opts=$(getopt \
     --longoptions "config,file,git,help" \
     --name "$(basename "$0")" \

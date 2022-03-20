@@ -1,49 +1,22 @@
 <<<<<<< HEAD
-#!/bin/sh
-
-cmd="pytest"
-if [ -f "/app/setup.cfg" ]; then
-    cmd="${cmd} --rcfile=/app/setup.cfg"
-elif [ -f "/app/pytest.ini" ]; then
-    cmd="${cmd} --rcfile=/app/pytest.ini"
-elif [ -f "/app/pyproject.toml" ]; then
-    cmd="${cmd} --rcfile=/app/pyproject.toml"
-elif [ -f "/app/tox.ini" ]; then
-    cmd="${cmd} --rcfile=/app/tox.ini"
-fi
-
-${cmd}
+#!/bin/sh
+
+cmd="pytest"
+if [ -f "/app/setup.cfg" ]; then
+    cmd="${cmd} --rcfile=/app/setup.cfg"
+elif [ -f "/app/pytest.ini" ]; then
+    cmd="${cmd} --rcfile=/app/pytest.ini"
+elif [ -f "/app/pyproject.toml" ]; then
+    cmd="${cmd} --rcfile=/app/pyproject.toml"
+elif [ -f "/app/tox.ini" ]; then
+    cmd="${cmd} --rcfile=/app/tox.ini"
+fi
+
+${cmd}
 =======
 #!/bin/sh
 
 cmd="pytest"
-
-
-opts=$(getopt \
-    --longoptions "config,file,git" \
-    --name "$(basename "$0")" \
-    --options "c,f,g" \
-    -- "$@"
-)
-
-eval set --$opts
-
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        -c|--config)
-            config="--config=$1"
-            shift 2
-        ;;
-        -f|--file)
-            files="$1"
-            shift 2
-        ;;
-        -g|--git)
-            files=`git status | grep -E "modified" | grep ".py$" | sort -u | xargs`
-            shift 2
-        ;;
-    esac
-done
 
 if [ -f "/app/setup.cfg" ]; then
     config="--rcfile=/app/setup.cfg"
@@ -55,11 +28,48 @@ elif [ -f "/app/tox.ini" ]; then
     config="--rcfile=/app/tox.ini"
 fi
 
-if [ -z ${files} ]; then
-    files=/app/**/*.py
-else
-    files=`echo $files | cut -d ' '`
-fi
+files=/app/**/*.py
 
-${cmd} ${config} $files
->>>>>>> d98b6dc (test update)
+opts=$(getopt \
+    --longoptions "config,file,git,help" \
+    --name "$(basename "$0")" \
+    --options "c,f,g,h" \
+    -- "$@"
+)
+
+eval set --$opts
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c|--config)
+            config="${config} $2"
+            shift 2
+        ;;
+        -f|--file)
+            echo "files $2"
+            files="$2"
+            shift 2
+        ;;
+        -g|--git)
+            echo "get files from git status"
+            files=$(git status | grep -v "deleted" | grep ".py$" | cut -d ":" -f2 | sort -u | xargs)
+            shift 2
+        ;;
+        --)
+            shift;
+            break
+            ;;
+        -h)
+            echo "Usage reorder python import :
+                [ -c | --config] define config flags
+                [ -f | --file] relative file(s) path to format
+                [ -g | --git] detect file from git status
+                [ -h | --help]"
+            exit 2
+        ;;
+    esac
+done
+
+set -x
+${cmd} ${config} ${files}
+
