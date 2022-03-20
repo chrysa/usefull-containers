@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-#
 if [ ! -f "/app/.pre-commit-config.yaml" ]; then
     mv /sample/.pre-commit-config.yaml /app/.pre-commit-config.yaml
 fi
