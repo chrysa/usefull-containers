@@ -21,7 +21,7 @@ repos:
             files: (\.dockerfile|\.Dockerfile|Dockerfile)$
             stages: [manual]
     - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-      rev: v1.1.1
+      rev: 17b6d1aa2bdb23297b829bdb881665f42a425e58
       hooks:
           - id: markdown-toc
             args: [--indent, '    ', -i]
@@ -32,7 +32,7 @@ repos:
           - id: markdownlint
             args: [--fix, --config=.markdownlint.yml]
     - repo: https://github.com/adrienverge/yamllint.git
-      rev: 4f1bbc33dcb550b27a77e10c9831b9ff732bc5a8
+      rev: f58448cb21a5f75d5cb29aa2f93c8250f949554c
       hooks:
           - id: yamllint
             args: [--config-file=.yamllint.yaml, --format, parsable, --strict]

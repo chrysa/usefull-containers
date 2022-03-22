@@ -14,8 +14,11 @@ pytest:build:
           optional: true
     rules:
         - changes:
-              - pytest/docker-compose.yaml
-              - pytest/Dockerfile
+              - pytest/*
+          when: always
+        - changes:
+              - pytest/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: pytest
@@ -27,10 +30,14 @@ pytest:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pytest/docker-compose.yaml
-              - pytest/Dockerfile
+              - pytest/*
           variables:
               service_name: pytest
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pytest/ci.yaml
+          when: never
 
 pytest:latest:
     extends: .publish_latest
@@ -39,7 +46,11 @@ pytest:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pytest/docker-compose.yaml
-              - pytest/Dockerfile
+              - pytest/*
           variables:
               service_name: pytest
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pytest/ci.yaml
+          when: never

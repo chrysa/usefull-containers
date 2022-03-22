@@ -14,8 +14,12 @@ mypy:build:
           optional: true
     rules:
         - changes:
-              - mypy/docker-compose.yaml
-              - mypy/Dockerfile
+              - mypy/*
+          when: always
+        - changes:
+              - mypy/setup-default.cfg
+              - mypy/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: mypy
@@ -27,10 +31,15 @@ mypy:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - mypy/docker-compose.yaml
-              - mypy/Dockerfile
+              - mypy/*
           variables:
               service_name: mypy
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - mypy/setup-default.cfg
+              - mypy/ci.yaml
+          when: never
 
 mypy:latest:
     extends: .publish_latest
@@ -39,7 +48,12 @@ mypy:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - mypy/docker-compose.yaml
-              - mypy/Dockerfile
+              - mypy/*
           variables:
               service_name: mypy
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - mypy/setup-default.cfg
+              - mypy/ci.yaml
+          when: never
