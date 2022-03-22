@@ -1,5 +1,5 @@
 [tool.black]
-color = tue
+color = true
 exclude = '''
 (
   /(
