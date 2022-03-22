@@ -18,7 +18,6 @@ opts=$(getopt \
 eval set -- $opts
 
 while [[ $# -gt 0 ]]; do
-    echo $1
     case "$1" in
         -c|--config)
             config="${config} $2"
