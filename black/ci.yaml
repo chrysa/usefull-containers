@@ -14,8 +14,12 @@ black:build:
           optional: true
     rules:
         - changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
+              - black/*
+          when: always
+        - changes:
+              - black/black-default.toml
+              - black/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: black
@@ -27,10 +31,15 @@ black:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
+              - black/*
           variables:
               service_name: black
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - black/black-default.toml
+              - black/ci.yaml
+          when: never
 
 black:latest:
     extends: .publish_latest
@@ -39,7 +48,12 @@ black:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - black/docker-compose.yaml
-              - black/Dockerfile
+              - black/*
           variables:
               service_name: black
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - black/black-default.toml
+              - black/ci.yaml
+          when: never

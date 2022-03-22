@@ -14,8 +14,11 @@ pylint:build:
           optional: true
     rules:
         - changes:
-              - pylint/docker-compose.yaml
-              - pylint/Dockerfile
+              - pylint/*
+          when: always
+        - changes:
+              - pylint/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: pylint
@@ -27,10 +30,14 @@ pylint:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pylint/docker-compose.yaml
-              - pylint/Dockerfile
+              - pylint/*
           variables:
               service_name: pylint
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pylint/ci.yaml
+          when: never
 
 pylint:latest:
     extends: .publish_latest
@@ -39,7 +46,11 @@ pylint:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pylint/docker-compose.yaml
-              - pylint/Dockerfile
+              - pylint/*
           variables:
               service_name: pylint
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pylint/ci.yaml
+          when: never

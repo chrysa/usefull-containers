@@ -28,11 +28,14 @@ hadolint:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - hadolint/docker-compose.yaml
-              - hadolint/Dockerfile
-              - hadolint/.hadolint.yaml
+              - hadolint/*
           variables:
               service_name: hadolint
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - hadolint/.hadolint.yaml
+          when: never
 
 hadolint:latest:
     extends: .publish_latest
@@ -41,8 +44,11 @@ hadolint:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - hadolint/docker-compose.yaml
-              - hadolint/Dockerfile
-              - hadolint/.hadolint.yaml
+              - hadolint/*
           variables:
               service_name: hadolint
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - hadolint/.hadolint.yaml
+          when: never

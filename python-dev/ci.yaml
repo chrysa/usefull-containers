@@ -14,8 +14,11 @@ python-dev:build:
           optional: true
     rules:
         - changes:
-              - python-dev/docker-compose.yaml
-              - python-dev/Dockerfile
+              - python-dev/*
+          when: always
+        - changes:
+              - python-dev/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: python-dev
@@ -27,10 +30,14 @@ python-dev:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - python-dev/docker-compose.yaml
-              - python-dev/Dockerfile
+              - python-dev/*
           variables:
               service_name: python-dev
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - python-dev/ci.yaml
+          when: never
 
 python-dev:latest:
     extends: .publish_latest
@@ -39,7 +46,11 @@ python-dev:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - python-dev/docker-compose.yaml
-              - python-dev/Dockerfile
+              - python-dev/*
           variables:
               service_name: python-dev
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - python-dev/ci.yaml
+          when: never

@@ -100,24 +100,24 @@ tag-latest: ## tag services as latest => make tag-latest
 	$(info Make: tag latest)
 	@echo "=======>> tag black"
 	@docker tag ${DOCKER_REPO}/black:${BLACK_CONTAINER_VERSION} ${DOCKER_REPO}/black:latest
-# 	@echo "=======>> tag flake8"
-# 	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
-# 	@echo "=======>> tag hadolint"
-# 	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
-# 	@echo "=======>> tag mypy"
-# 	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
-# 	@echo "=======>> tag pre-commit"
-# 	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
-# 	@echo "=======>> tag pylint"
-# 	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
-# 	@echo "=======>> tag python-dev"
-# 	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
-# 	@echo "=======>> tag pytest"
-# 	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
+	@echo "=======>> tag flake8"
+	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
+	@echo "=======>> tag hadolint"
+	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
+	@echo "=======>> tag mypy"
+	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
+	@echo "=======>> tag pre-commit"
+	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
+	@echo "=======>> tag pylint"
+	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
+	@echo "=======>> tag python-dev"
+	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
+	@echo "=======>> tag pytest"
+	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
 	@echo "=======>> tag reorder-python-imports"
 	@docker tag ${DOCKER_REPO}/reorder-python-imports:${REORDER_PYTHON_IMPORTS_CONTAINER_VERSION} ${DOCKER_REPO}/reorder-python-imports:latest
-# 	@echo "=======>> tag sphinx"
-# 	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
+	@echo "=======>> tag sphinx"
+	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker-compose up ${service_name}
@@ -126,20 +126,20 @@ up-detach: ## Up project containers =>  [service_name={service_name}]
 	@docker-compose up --detach ${service_name}
 upgradable-packages: ## list outdated package in service
 	@echo "=======>> upgradable package for black"
-	@docker-compose run --rm black sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm black bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for flake8"
-	@docker-compose run --rm flake8 sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm flake8 bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for mypy"
-	@docker-compose run --rm mypy sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm mypy bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for pre-commit"
 	@docker-compose run --rm pre-commit bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for pylint"
-	@docker-compose run --rm pylint sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm pylint bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for pytest"
-	@docker-compose run --rm pytest sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm pytest bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for python-dev"
-	@docker-compose run --rm python-dev sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm python-dev bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for reorder-python-imports"
-	@docker-compose run --rm reorder-python-imports sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm reorder-python-imports bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for sphinx"
-	@docker-compose run --rm sphinx sh -c "pip list --outdated --format columns" || true
+	@docker-compose run --rm sphinx bash -c "pip list --outdated --format columns" || true

@@ -14,9 +14,12 @@ pre-commit:build:
           optional: true
     rules:
         - changes:
+              - pre-commit/*
+          when: always
+        - changes:
               - pre-commit/.pre-commit-config.yaml
-              - pre-commit/docker-compose.yaml
-              - pre-commit/Dockerfile
+              - pre-commit/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: pre-commit
@@ -28,11 +31,15 @@ pre-commit:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pre-commit/.pre-commit-config.yaml
-              - pre-commit/docker-compose.yaml
-              - pre-commit/Dockerfile
+              - pre-commit/*
           variables:
               service_name: pre-commit
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pre-commit/.pre-commit-config.yaml
+              - pre-commit/ci.yaml
+          when: never
 
 pre-commit:latest:
     extends: .publish_latest
@@ -41,8 +48,12 @@ pre-commit:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - pre-commit/.pre-commit-config.yaml
-              - pre-commit/docker-compose.yaml
-              - pre-commit/Dockerfile
+              - pre-commit/*
           variables:
               service_name: pre-commit
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - pre-commit/.pre-commit-config.yaml
+              - pre-commit/ci.yaml
+          when: never

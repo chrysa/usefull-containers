@@ -1,7 +1,5 @@
 [tool.black]
-line-length = 120
-target-version = ['py37','py38','py39','py310']
-include = '\.py?$'
+color = tue
 exclude = '''
 (
   /(
@@ -15,3 +13,8 @@ exclude = '''
   )/
 )
 '''
+include = '\.py?$'
+line-length = 120
+preview = true
+target-version = ['py37','py38','py39','py310']
+verbose = true

@@ -14,8 +14,11 @@ flake8:build:
           optional: true
     rules:
         - changes:
-              - flake8/docker-compose.yaml
-              - flake8/Dockerfile
+              - flake8/*
+          when: always
+        - changes:
+              - flake8/ci.yaml
+          when: never
     variables:
         DOCKER_REPO: ${CI_REGISTRY_IMAGE}
         service_name: flake8
@@ -27,10 +30,14 @@ flake8:version:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - flake8/docker-compose.yaml
-              - flake8/Dockerfile
+              - flake8/*
           variables:
               service_name: flake8
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flake8/ci.yaml
+          when: never
 
 flake8:latest:
     extends: .publish_latest
@@ -39,7 +46,11 @@ flake8:latest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
           changes:
-              - flake8/docker-compose.yaml
-              - flake8/Dockerfile
+              - flake8/*
           variables:
               service_name: flake8
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flake8/ci.yaml
+          when: never
