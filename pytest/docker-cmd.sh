@@ -72,4 +72,3 @@ done
 
 set -x
 ${cmd} ${config} ${files}
-

@@ -2,6 +2,11 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")
 endif
 
+
+ifndef remove_remote
+	override remove_remote=false
+endif
+
 .DEFAULT_GOAL := help
 
 .PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
@@ -17,6 +22,10 @@ PYTHON_DEV_CONTAINER_VERSION=$(shell cat .env | grep "PYTHON_DEV_CONTAINER_VERSI
 PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
 REORDER_PYTHON_IMPORTS_CONTAINER_VERSION=$(shell cat .env | grep "REORDER_PYTHON_IMPORTS_CONTAINER_VERSION" | cut -d "=" -f2)
 SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
+
+__project_directory=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+__remote_folder=projects/$(shell basename $(CURDIR))
 
 tail=10
 
@@ -35,14 +44,13 @@ __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(va
 build: ## Build project => build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 	@docker-compose build --compress --force-rm ${service_name}
-build-parallel: ## build service in parallel
-	$(info Make: Building ${service_name})
-	@docker-compose build --compress --force-rm --parallel --quiet ${service_name}
 config:
 	@docker-compose config
 down: ## Down project containers => down
 	$(info Make: Down)
 	@docker-compose down --remove-orphans
+get-from-remote: ## get source from ducal server
+	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder} "${__project_directory}"
 hadolint: ## lint dockerfiles => hadolint
 	$(info Make: hadolint)
 	@for f in $(shell find . -name "Dockerfile"); do \
@@ -77,6 +85,8 @@ prune: down ## remove service on the host and prune volume image and network unu
 	@docker rm `docker-compose ps --filter status=created --filter status=exited -q` || true
 	@docker rmi `docker-compose images ls -q` || true
 	@docker rmi `docker images -f "dangling=true" -q` || true
+send-to-remote: ## send source to ducal server
+	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' "${__project_directory}" chrysa@ssh.ducal.me:${__remote_folder}
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
 	docker-compose start ${service_name} || make --quiet -s up service_name=${service_name}
@@ -143,3 +153,14 @@ upgradable-packages: ## list outdated package in service
 	@docker-compose run --rm reorder-python-imports bash -c "pip list --outdated --format columns" || true
 	@echo "=======>> upgradable package for sphinx"
 	@docker-compose run --rm sphinx bash -c "pip list --outdated --format columns" || true
+
+
+remote-connect: ## connect to ducal server
+	@ssh -p 6942 chrysa@ssh.ducal.me bash
+remote-get: ## get source from ducal server
+	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder}/* "${__project_directory}/."
+remote-send: ## send source to ducal server
+ifeq ($(remove_remote), true)
+	@ssh -p 6942 chrysa@ssh.ducal.me rm -rf ${__remote_folder}
+endif
+	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' "${__project_directory}" chrysa@ssh.ducal.me:${__remote_folder}
