@@ -11,7 +11,7 @@ repos:
     #       - id: check-useless-excludes
     #        stages: [manual]
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
-      rev: v2.1.0
+      rev: v2.1.1
       hooks:
           - id: docker-compose-check
             stages: [manual]
@@ -27,12 +27,12 @@ repos:
             args: [--indent, '    ', -i]
             stages: [manual]
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: 2a1a122656549317f4e92dc8ccc7e27e8b6d259b
+      rev: 4e6fb32635431ba651a7ebd035726028974aea28
       hooks:
           - id: markdownlint
             args: [--fix, --config=.markdownlint.yml]
     - repo: https://github.com/adrienverge/yamllint.git
-      rev: f58448cb21a5f75d5cb29aa2f93c8250f949554c
+      rev: 6bfd6756e2414e0a16a256eaf6575e922d7e2ac9
       hooks:
           - id: yamllint
             args: [--config-file=.yamllint.yaml, --format, parsable, --strict]
@@ -43,21 +43,14 @@ repos:
           - id: makefile-doc
             stages: [manual]
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-      rev: 0.1.0
+      rev: 0.2.2
       hooks:
           - id: yamlfmt
-    - repo: https://github.com/pre-commit/mirrors-pylint
-      rev: 5e9df3b5d9e5c5819190217d0ef3f2dd2c521c33
-      hooks:
-          - id: pylint
-            files: ^\W+/\W+.*.py$
-            args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=yes]
-            stages: [manual]
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 85db7df3110ff1c3bad37caf79e0f465ba1570ee
+      rev: b0f11fe246ae49c7a3791009753d2148b97cb677
       hooks:
-          # - id: check-toml
-          #   files: .toml$
+          - id: check-toml
+            files: .toml$
           - id: end-of-file-fixer
           - id: mixed-line-ending
             args: [--fix=lf]

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e 
+set -e
 echo "====>> run black"
 cmd="black"
 

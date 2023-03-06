@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e 
+set -e
 echo "====>> run reorder python imports"
 cmd="reorder-python-imports"
 

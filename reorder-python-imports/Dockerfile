@@ -1,20 +1,20 @@
-FROM  python:3.9-alpine
+FROM  python:3.11-alpine
 
 ENV PATH=$PATH:/home/reorder-python-imports/.local/bin GIT_DISCOVERY_ACROSS_FILESYSTEM=true
 
 
 RUN set -x \
-  && apk add --quiet --no-cache build-base bash git \
-  && rm -rf /var/cache/apk/*
+    && apk add --quiet --no-cache build-base bash git \
+    && rm -rf /var/cache/apk/*
 
 RUN set -x \
-  && python -m pip install --quiet --no-cache-dir --upgrade pip \
-  && pip install --quiet --no-cache-dir reorder-python-imports==2.7.1
+    && python -m pip install --quiet --no-cache-dir --upgrade pip \
+    && pip install --quiet --no-cache-dir reorder-python-imports==3.9.0
 
 COPY docker-cmd.sh /opt/docker-cmd.sh
 
 RUN set -x \
-  && chmod +x /opt/docker-cmd.sh
+    && chmod +x /opt/docker-cmd.sh
 
 SHELL ["/bin/bash"]
 
