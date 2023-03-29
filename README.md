@@ -1,71 +1,30 @@
+<!--TOC-->
 
-<!-- toc -->
-
-    * [Black](#black)
-        + [Alias](#alias)
-        + [Base image](#base-image)
-    * [Flake8](#flake8)
-        + [Alias](#alias-1)
-        + [Base image](#base-image-1)
-        + [Packages](#packages)
-    * [Hadolint](#hadolint)
-        + [Alias](#alias-2)
-        + [Base image](#base-image-2)
-    * [Mypy](#mypy)
-        + [Alias](#alias-3)
-        + [Base image](#base-image-3)
-        + [Packages](#packages-1)
-    * [Pre-commit](#pre-commit)
-        + [Alias](#alias-4)
-        + [Base image](#base-image-4)
-        + [Packages](#packages-2)
-    * [Pylint](#pylint)
-        + [Alias](#alias-5)
-        + [Base image](#base-image-5)
-        + [Packages](#packages-3)
-    * [Pytest](#pytest)
-        + [Alias](#alias-6)
-        + [Base image](#base-image-6)
-        + [Packages](#packages-4)
-    * [Python Dev](#python-dev)
-        + [Base image](#base-image-7)
-        + [Packages](#packages-5)
-    * [Reorder Python Imports](#reorder-python-imports)
-        + [Alias](#alias-7)
-        + [Base image](#base-image-8)
-        + [Packages](#packages-6)
-    * [Sphinx](#sphinx)
-        + [Alias](#alias-8)
-        + [Base image](#base-image-9)
-        + [Packages](#packages-7)
-
-- [Makefile rules](#makefile-rules)
-
-<!-- tocstop -->
+<!--TOC-->
 
 ## Black
 
 ### Alias
 
 ```
-alias my_black="docker run --rm -ti --name=black --workdir=/app --volume ${PWD}:/app chrys4/black:latest"
+alias my_black="docker run --rm -ti --name=black --volume ${PWD}:/app chrys4/black:latest"
 ```
 
 ### Base image
 
-pyfound/black:23.1.0
+pyfound/black:23.3.0
 
 ## Flake8
 
 ### Alias
 
 ```
-alias my_flake8="docker run --rm -ti --name=flake8 --workdir=/app --volume ${PWD}:/app chrys4/flake8:latest $@"
+alias my_flake8="docker run --rm -ti --name=flake8 --volume ${PWD}:/app chrys4/flake8:latest"
 ```
 
 ### Base image
 
-  python:3.11-alpine
+python:3.11-alpine
 
 ### Packages
 
@@ -80,24 +39,24 @@ alias my_flake8="docker run --rm -ti --name=flake8 --workdir=/app --volume ${PWD
 ### Alias
 
 ```
-alias my_hadolint="docker run --rm -ti --name=hadolint --workdir=/app --volume ${PWD}: chrys4/hadolint:latest bash -c '\`find . -name '*.[D-d]ockerfile' -name 'Dockerfile'\`'"
+alias my_hadolint="docker run --rm -ti --name=hadolint --volume ${PWD}: chrys4/hadolint:latest bash -c '\`find . -name '*.[D-d]ockerfile' -name 'Dockerfile'\`'"
 ```
 
 ### Base image
 
-  hadolint/hadolint:latest-debian
+hadolint/hadolint:latest-debian
 
 ## Mypy
 
 ### Alias
 
 ```
-alias my_mypy="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/mypy:latest $@"
+alias my_mypy="docker run --rm -ti --name=mypy --volume ${PWD}:/app chrys4/mypy:latest $@"
 ```
 
 ### Base image
 
-  python:3.11-alpine
+python:3.11-alpine
 
 ### Packages
 
@@ -109,12 +68,12 @@ alias my_mypy="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/a
 ### Alias
 
 ```
-alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${PWD}:/app chrys4/pre-commit:latest $@"
+alias my_pre_commit="docker run --rm -ti --name=mypy --volume ${PWD}:/app chrys4/pre-commit:latest $@"
 ```
 
 ### Base image
 
-  python:3.11-slim
+python:3.11-slim
 
 ### Packages
 
@@ -125,12 +84,12 @@ alias my_pre_commit="docker run --rm -ti --name=mypy --workdir=/app --volume ${P
 ### Alias
 
 ```
-alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD}:/app chrys4/pylint:latest $@"
+alias my_pylint="docker run --rm -ti --name=pylint --volume ${PWD}:/app chrys4/pylint:latest $@"
 ```
 
 ### Base image
 
-  python:3.11-alpine
+python:3.11-alpine
 
 ### Packages
 
@@ -143,12 +102,12 @@ alias my_pylint="docker run --rm -ti --name=pylint --workdir=/app --volume ${PWD
 ### Alias
 
 ```
-alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD}:/app chrys4/pytest:latest pytest --rcfile=./setup.cfg $@"
+alias my_pytest="docker run --rm -ti --name=pytest --volume ${PWD}:/app chrys4/pytest:latest pytest --rcfile=./setup.cfg $@"
 ```
 
 ### Base image
 
-  python:3.11-alpine
+python:3.11-alpine
 
 ### Packages
 
@@ -166,7 +125,7 @@ alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD
 
 ### Base image
 
-  python:3.11-slim
+python:3.11-slim
 
 ### Packages
 
@@ -179,12 +138,12 @@ alias my_pytest="docker run --rm -ti --name=pytest --workdir=/app --volume ${PWD
 ### Alias
 
 ```
-alias my_reorder="docker run --rm -ti --name=reorder-python-imports --workdir=/app --volume ${PWD}:/app chrys4/reorder-python-imports:latest reorder-python-imports $@"
+alias my_reorder="docker run --rm -ti --name=reorder-python-imports --volume ${PWD}:/app chrys4/reorder-python-imports:latest reorder-python-imports $@"
 ```
 
 ### Base image
 
-  python:3.11-alpine
+python:3.11-alpine
 
 ### Packages
 
@@ -195,12 +154,12 @@ alias my_reorder="docker run --rm -ti --name=reorder-python-imports --workdir=/a
 ### Alias
 
 ```
-alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD}:/app chrys4/sphinx:latest bash $@"
+alias my_sphinx="docker run --rm -ti --name=sphinx --volume ${PWD}:/app chrys4/sphinx:latest bash $@"
 ```
 
 ### Base image
 
-  python:3.11-alpine
+python:3.11-alpine
 
 ### Packages
 
@@ -212,34 +171,36 @@ alias my_sphinx="docker run --rm -ti --name=sphinx --workdir=/app --volume ${PWD
 # Makefile rules
 
 <!-- START makefile-doc -->
+
 ```
-$ make help
+$ make help 
 Variables:
-	- "service_name" is a docker-compose service name or a list of services separate by space as string ()
+ - "service_name" is a docker-compose service name or a list of services separate by space as string ()
 
 
-target                                             help                                                                             usage
-------                                             ----                                                                             ----
-build                                               Build project                                                                    build [service_name#{service_name}]
-down                                                Down project containers                                                          down
-get-from-remote                                     get source from ducal server
-hadolint                                            lint dockerfiles                                                                 hadolint
-help                                                This help dialog.                                                                make help
-logs                                                display logs
-logs-f                                              display logs with follow
-logs-tail                                           display logs tail                                                                [tail#`echo ${tail}`]
-pre-commit                                          run localy precommit
-prune                                               remove service on the host and prune volume image and network unused
-remote-connect                                      connect to ducal server
-remote-get                                          get source from ducal server
-remote-send                                         send source to ducal server
-send-to-remote                                      send source to ducal server
-start                                               Start project containers                                                         [service_name#{service_name}]
-status                                              display status of all service
-stop                                                Start project containers                                                         [service_name#{service_name}]
-tag-latest                                          tag services as latest                                                           make tag-latest
-up-detach                                           Up project containers                                                             [service_name#{service_name}]
-upgradable-packages                                 list outdated package in service
-up                                                  Up project containers                                                            [service_name#{service_name}]
+target                                             help                                                                             usage                                                       
+------                                             ----                                                                             ----                                                        
+build                                               Build project                                                                    build [service_name#{service_name}]                        
+down                                                Down project containers                                                          down                                                       
+get-from-remote                                     get source from ducal server                                                                                                                
+hadolint                                            lint dockerfiles                                                                 hadolint                                                   
+help                                                This help dialog.                                                                make help                                                  
+logs                                                display logs                                                                                                                                
+logs-f                                              display logs with follow                                                                                                                    
+logs-tail                                           display logs tail                                                                [tail#`echo ${tail}`]                                      
+pre-commit                                          run localy precommit                                                                                                                        
+prune                                               remove service on the host and prune volume image and network unused                                                                        
+remote-connect                                      connect to ducal server                                                                                                                     
+remote-get                                          get source from ducal server                                                                                                                
+remote-send                                         send source to ducal server                                                                                                                 
+send-to-remote                                      send source to ducal server                                                                                                                 
+start                                               Start project containers                                                         [service_name#{service_name}]                              
+status                                              display status of all service                                                                                                               
+stop                                                Start project containers                                                         [service_name#{service_name}]                              
+tag-latest                                          tag services as latest                                                           make tag-latest                                            
+up-detach                                           Up project containers                                                             [service_name#{service_name}]                             
+upgradable-packages                                 list outdated package in service                                                                                                            
+up                                                  Up project containers                                                            [service_name#{service_name}]                               
 ```
+
 <!-- END makefile-doc -->
