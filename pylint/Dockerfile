@@ -1,6 +1,6 @@
 FROM  python:3.11-alpine
 
-COPY docker-cmd.sh /opt/docker-cmd.sh
+COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
 
 ENV PYTHONPATH=/app \
     PATH=$PATH:/home/pylint/.local/bin
@@ -13,14 +13,14 @@ RUN set -x \
     && adduser -D --system --shell /usr/bin/bash pylint pylint \
     && rm -rf /var/cache/apk/* \
     && chown -R pylint:pylint /app \
-    && chmod +x /opt/docker-cmd.sh
+    && chmod +x /opt/docker-entrypoint.sh
 
 USER pylint
 
 RUN set -x \
-    && python -m pip install --quiet --no-cache-dir --upgrade pip \
-    && pip install --quiet --no-cache-dir pylint==2.16.2 \
-    && pip install --quiet --no-cache-dir pylint-junit==0.3.2 \
-    && pip install --quiet --no-cache-dir pylint-report==2.4.0
+    && python -m pip install --prefer-binary --quiet --no-cache-dir --upgrade pip \
+    && pip install --prefer-binary --quiet --no-cache-dir pylint==2.16.2 \
+    && pip install --prefer-binary --quiet --no-cache-dir pylint-junit==0.3.2 \
+    && pip install --prefer-binary --quiet --no-cache-dir pylint-report==2.4.0
 
-CMD ["/opt/docker-cmd.sh",  "--git"]
+ENTRYPOINT ["/opt/docker-entrypoint.sh"]
