@@ -21,16 +21,3 @@ SHELL ["/bin/bash"]
 WORKDIR /app
 
 ENTRYPOINT ["/opt/docker-cmd.sh"]
-
-CMD ["--git"]
-
-RUN set -x \
-  && chmod +x /opt/docker-cmd.sh
-
-SHELL ["/bin/bash"]
-
-WORKDIR /app
-
-ENTRYPOINT ["/opt/docker-cmd.sh"]
-
-CMD ["--git"]
