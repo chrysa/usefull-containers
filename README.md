@@ -68,7 +68,7 @@ python:3.11-alpine
 ### Alias
 
 ```
-alias my_pre_commit="docker run --rm -ti --name=mypy --volume ${PWD}:/app chrys4/pre-commit:latest $@"
+alias my_pre_commit="docker run --rm -ti --name=mypy --volume /var/run/docker.sock:/var/run/docker.sock --volume ${PWD}:/app chrys4/pre-commit:latest $@"
 ```
 
 ### Base image
