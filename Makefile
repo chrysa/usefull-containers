@@ -43,12 +43,12 @@ __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(va
 
 build: ## Build project => build [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
-	@docker-compose build --compress --force-rm ${service_name}
+	@docker compose build --compress --force-rm ${service_name}
 config:
-	@docker-compose config
+	@docker compose config
 down: ## Down project containers => down
 	$(info Make: Down)
-	@docker-compose down --remove-orphans
+	@docker compose down --remove-orphans
 get-from-remote: ## get source from ducal server
 	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder} "${__project_directory}"
 hadolint: ## lint dockerfiles => hadolint
@@ -59,7 +59,7 @@ hadolint: ## lint dockerfiles => hadolint
 	done
 help: ## This help dialog. => make help
 	@echo "Variables:"
-	@echo "\t- \"service_name\" is a docker-compose service name or a list of services separate by space as string ($(shell ${__docker_compose_cmd} ps --services | tr '\n' ' '))"
+	@echo "\t- \"service_name\" is a docker compose service name or a list of services separate by space as string ($(shell ${__docker_compose_cmd} ps --services | tr '\n' ' '))"
 	@echo "\n"
 	@IFS=$$'\n'
 	@printf "%-50s %-80s %-60s\n" "target" "help" "usage"
@@ -67,13 +67,13 @@ help: ## This help dialog. => make help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-50s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
 logs: check-defined-service_name ## display logs
 	$(info Make: Logs ${service_name})
-	@docker-compose logs ${service_name}
+	@docker compose logs ${service_name}
 logs-f: check-defined-service_name ## display logs with follow
 	$(info Make: Follow logs ${service_name})
-	@docker-compose logs -f ${service_name}
+	@docker compose logs -f ${service_name}
 logs-tail: check-defined-service_name ## display logs tail => [tail=`echo ${tail}`]
 	$(info Make: Logs tail ${service_name})
-	@docker-compose logs --tail=${tail} ${service_name}
+	@docker compose logs --tail=${tail} ${service_name}
 pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
 	@pip install --quiet --no-cache-dir pre-commit
@@ -81,17 +81,17 @@ pre-commit: ## run localy precommit
 	@pre-commit run --all-files --verbose --hook-stage manual || true
 prune: down ## remove service on the host and prune volume image and network unused
 	$(info Make: Prune)
-	@docker-compose rm
-	@docker rm `docker-compose ps --filter status=created --filter status=exited -q` || true
-	@docker rmi `docker-compose images ls -q` || true
+	@docker compose rm
+	@docker rm `docker compose ps --filter status=created --filter status=exited -q` || true
+	@docker rmi `docker compose images ls -q` || true
 	@docker rmi `docker images -f "dangling=true" -q` || true
 send-to-remote: ## send source to ducal server
 	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' "${__project_directory}" chrysa@ssh.ducal.me:${__remote_folder}
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
-	docker-compose start ${service_name} || make --quiet -s up service_name=${service_name}
+	docker compose start ${service_name} || make --quiet -s up service_name=${service_name}
 status: ## display status of all service
-	@docker-compose ps --services | sort | while read service; do \
+	@docker compose ps --services | sort | while read service; do \
 		status=`docker inspect --format='{{.State.Status}}' $$service`; \
 		echo "$$service $$status\n" ;\
 		if [ "$$status" = "starting" ] || [ "$$status" = "restarting" ] ; then \
@@ -105,7 +105,7 @@ status: ## display status of all service
 	done
 stop: ## Start project containers => [service_name={service_name}]
 	$(info Make: stop  ${service_name})
-	@docker-compose stop ${service_name}
+	@docker compose stop ${service_name}
 tag-latest: ## tag services as latest => make tag-latest
 	$(info Make: tag latest)
 	@echo "=======>> tag black"
@@ -130,29 +130,29 @@ tag-latest: ## tag services as latest => make tag-latest
 	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
-	@docker-compose up ${service_name}
+	@docker compose up ${service_name}
 up-detach: ## Up project containers =>  [service_name={service_name}]
 	$(info Make: Up ${service_name})
-	@docker-compose up --detach ${service_name}
+	@docker compose up --detach ${service_name}
 upgradable-packages: ## list outdated package in service
 	@echo "=======>> upgradable package for black"
-	@docker-compose run --rm black bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" black 
 	@echo "=======>> upgradable package for flake8"
-	@docker-compose run --rm flake8 bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" flake8
 	@echo "=======>> upgradable package for mypy"
-	@docker-compose run --rm mypy bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" mypy
 	@echo "=======>> upgradable package for pre-commit"
-	@docker-compose run --rm pre-commit bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pre-commit
 	@echo "=======>> upgradable package for pylint"
-	@docker-compose run --rm pylint bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pylint
 	@echo "=======>> upgradable package for pytest"
-	@docker-compose run --rm pytest bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pytest
 	@echo "=======>> upgradable package for python-dev"
-	@docker-compose run --rm python-dev bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" python-dev
 	@echo "=======>> upgradable package for reorder-python-imports"
-	@docker-compose run --rm reorder-python-imports bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" reorder-python-imports
 	@echo "=======>> upgradable package for sphinx"
-	@docker-compose run --rm sphinx bash -c "pip list --outdated --format columns" || true
+	@docker compose run --rm --entrypoint "pip list --outdated --format columns" sphinx
 
 
 remote-connect: ## connect to ducal server
