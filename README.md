@@ -175,7 +175,7 @@ python:3.11-alpine
 ```
 $ make help 
 Variables:
- - "service_name" is a docker-compose service name or a list of services separate by space as string ()
+ - "service_name" is a docker compose service name or a list of services separate by space as string ()
 
 
 target                                             help                                                                             usage                                                       

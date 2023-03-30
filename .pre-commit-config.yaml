@@ -1,6 +1,8 @@
 ---
+default_language_version:
+    python: python3.9
 fail_fast: false
-minimum_pre_commit_version: 2.7.0
+minimum_pre_commit_version: 3.0.4
 repos:
     # - repo: meta
     #   hooks:
@@ -10,50 +12,57 @@ repos:
     #         stages: [manual]
     #       - id: check-useless-excludes
     #        stages: [manual]
+    - repo: https://github.com/asottile/setup-cfg-fmt
+      rev: ccfe420a1f8a857343bed59c3b82897001926c5b
+      hooks:
+          - id: setup-cfg-fmt
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
       rev: v2.1.1
       hooks:
           - id: docker-compose-check
             stages: [manual]
-            files: docker-compose.[a-zZ-Z\-_]+.y[a]{0,1}ml$
           - id: hadolint
-            args: [--config=.hadolint.yaml]
-            files: (\.dockerfile|\.Dockerfile|Dockerfile)$
             stages: [manual]
-    - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-      rev: 17b6d1aa2bdb23297b829bdb881665f42a425e58
+    - repo: https://github.com/cheshirekow/cmake-format-precommit
+      rev: v0.6.13
       hooks:
-          - id: markdown-toc
-            args: [--indent, '    ', -i]
-            stages: [manual]
-    - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: 4e6fb32635431ba651a7ebd035726028974aea28
+          - id: cmake-format
+            files: Makefile
+          - id: cmake-lint
+            files: Makefile
+    - repo: https://github.com/frnmst/md-toc
+      rev: 8.1.9
       hooks:
-          - id: markdownlint
-            args: [--fix, --config=.markdownlint.yml]
-    - repo: https://github.com/adrienverge/yamllint.git
-      rev: 6bfd6756e2414e0a16a256eaf6575e922d7e2ac9
-      hooks:
-          - id: yamllint
-            args: [--config-file=.yamllint.yaml, --format, parsable, --strict]
-            stages: [manual]
+          - id: md-toc
+            stages:
+                - manual
     - repo: https://github.com/smian/pre-commit-makefile.git
       rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
       hooks:
           - id: makefile-doc
-            stages: [manual]
-    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-      rev: 0.2.2
+            stages:
+                - manual
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: 2d95a131630c8a113dc057e678eb7c241c0555dc
       hooks:
-          - id: yamlfmt
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: b0f11fe246ae49c7a3791009753d2148b97cb677
+          - id: markdownlint
+            args: [--fix,]
+    - repo: https://github.com/executablebooks/mdformat
+      rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
       hooks:
-          - id: check-toml
-            files: .toml$
-          - id: end-of-file-fixer
-          - id: mixed-line-ending
-            args: [--fix=lf]
-          - id: trailing-whitespace
-          - id: check-merge-conflict
-            stages: [merge-commit]
+          - id: mdformat
+        # Optionally add plugins
+            additional_dependencies:
+                - mdformat-gfm
+                - mdformat-black
+    - repo: https://github.com/lovesegfault/beautysh.git
+      rev: d616eb8d9d05ee4fb33de9c5521d99c3f0695d52
+      hooks:
+          - id: beautysh
+            args: [--indent-size, '4']
+    - repo: https://github.com/openstack/bashate.git
+      rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+      hooks:
+          - id: bashate
+            args:
+                - --ignore=E006,E020

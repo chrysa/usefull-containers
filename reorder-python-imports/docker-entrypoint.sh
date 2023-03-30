@@ -9,7 +9,7 @@ config="--py3-plus --application-directories=."
 
 if [ -z "$@" ]; then
     files=$(find /app -name "*.py")
-else 
+else
     files="$@"
 fi
 
