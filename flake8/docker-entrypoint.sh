@@ -15,7 +15,7 @@ fi
 
 if [ -z "$@" ]; then
     files=$(find /app -name "*.py")
-else 
+else
     files="$@"
 fi
 
