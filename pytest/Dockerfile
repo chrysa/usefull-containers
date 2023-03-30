@@ -1,6 +1,6 @@
 FROM  python:3.11-alpine
 
-COPY docker-cmd.sh /opt/docker-cmd.sh
+COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
 
 ENV PYTHONPATH=/app \
     PATH=$PATH:/home/pytest/.local/bin
@@ -13,7 +13,7 @@ RUN set -x \
     && adduser -D --system --shell /usr/bin/bash pytest pytest \
     && rm -rf /var/cache/apk/* \
     && chown -R pytest:pytest /app \
-    && chmod +x /opt/docker-cmd.sh
+    && chmod +x /opt/docker-entrypoint.sh
 
 USER pytest
 
@@ -29,4 +29,4 @@ RUN set -x \
     && pip install --quiet --no-cache-dir pytest-html==3.2.0 \
     && pip install --quiet --no-cache-dir pytest-mock==3.10.0
 
-CMD ["/opt/docker-cmd.sh",  "--git"]
+ENTRYPOINT ["/opt/docker-entrypoint.sh"]
