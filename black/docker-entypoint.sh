@@ -12,5 +12,11 @@ else
     config="--config=/opt/black-default.toml"
 fi
 
+if [ -z "$@" ]; then
+    files=$(find /app -name "*.py")
+else 
+    files="$@"
+fi
+
 set -x
-${cmd} ${config} $(find /app -name "*.py")
+${cmd} ${config} ${files}
