@@ -20,7 +20,7 @@ USER mypy
 
 RUN set -x \
     && python -m pip install --quiet --no-cache-dir --upgrade pip \
-    && pip install --quiet --no-cache-dir mypy==1.0.1 \
+    && pip install --quiet --no-cache-dir mypy==1.1.1 \
     && pip install --quiet --no-cache-dir junit-xml==1.9
 
 WORKDIR /app

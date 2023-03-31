@@ -17,7 +17,7 @@ USER sphinx
 
 RUN set -x  \
    && python -m pip install --quiet --no-cache-dir --upgrade pip \
-   && pip install --quiet --no-cache-dir graphviz==0.20.1 \
+   && pip install --quiet --no-cache-dir graphviz==0.20.1s" \
    && pip install --quiet --no-cache-dir recommonmark==0.7.1 \
    && pip install --quiet --no-cache-dir sphinx==6.1.3 \
    && pip install --quiet --no-cache-dir sphinx-rtd-theme==1.2.0

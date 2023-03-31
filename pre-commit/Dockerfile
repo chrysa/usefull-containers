@@ -21,7 +21,7 @@ USER pre-commit
 
 RUN set -x \
     && python -m pip install --quiet --no-cache-dir --upgrade pip \
-    && pip install --quiet --no-cache-dir docker-compose pre-commit==3.0.4 \
+    && pip install --quiet --no-cache-dir docker-compose pre-commit==3.2.1 \
     && git config --global core.filemode false
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
