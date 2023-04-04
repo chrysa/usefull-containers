@@ -2,6 +2,7 @@ ifneq (,)
 	$(error "This Makefile requires GNU Make")
 endif
 
+include $(shell find . -mindepth 2 -type f -name Makefile -exec echo " {}" \;)
 
 ifndef remove_remote
 	override remove_remote=false
@@ -11,17 +12,7 @@ endif
 
 .PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
 
-BLACK_CONTAINER_VERSION=$(shell cat .env | grep "BLACK_CONTAINER_VERSION" | cut -d "=" -f2)
 DOCKER_REPO=$(shell cat .env | grep "DOCKER_REPO" | cut -d "=" -f2)
-FLAKE8_CONTAINER_VERSION=$(shell cat .env | grep "FLAKE8_CONTAINER_VERSION" | cut -d "=" -f2)
-HADOLINT_CONTAINER_VERSION=$(shell cat .env | grep "HADOLINT_CONTAINER_VERSION" | cut -d "=" -f2)
-MYPY_CONTAINER_VERSION=$(shell cat .env | grep "MYPY_CONTAINER_VERSION" | cut -d "=" -f2)
-PRE_COMMIT_CONTAINER_VERSION=$(shell cat .env | grep "PRE_COMMIT_CONTAINER_VERSION" | cut -d "=" -f2)
-PYLINT_CONTAINER_VERSION=$(shell cat .env | grep "PYLINT_CONTAINER_VERSION" | cut -d "=" -f2)
-PYTHON_DEV_CONTAINER_VERSION=$(shell cat .env | grep "PYTHON_DEV_CONTAINER_VERSION" | cut -d "=" -f2)
-PYTEST_CONTAINER_VERSION=$(shell cat .env | grep "PYTEST_CONTAINER_VERSION" | cut -d "=" -f2)
-REORDER_PYTHON_IMPORTS_CONTAINER_VERSION=$(shell cat .env | grep "REORDER_PYTHON_IMPORTS_CONTAINER_VERSION" | cut -d "=" -f2)
-SPHINX_CONTAINER_VERSION=$(shell cat .env | grep "SPHINX_CONTAINER_VERSION" | cut -d "=" -f2)
 
 __project_directory=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -41,55 +32,93 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value @), required by target $@)))
 
-build: ## Build project => build [service_name={service_name}]
+build: ## Build project => [service_name={service_name}]
 	$(info Make: Build service  ${service_name})
 	@docker compose build --compress --force-rm ${service_name}
+
 config:
 	@docker compose config
-down: ## Down project containers => down
+
+down: ## Down project containers
 	$(info Make: Down)
 	@docker compose down --remove-orphans
-get-from-remote: ## get source from ducal server
-	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder} "${__project_directory}"
-hadolint: ## lint dockerfiles => hadolint
-	$(info Make: hadolint)
-	@for f in $(shell find . -name "Dockerfile"); do \
-		echo "analyse $${f}"; \
-		docker run --rm --interactive --volume ${PWD}/.hadolint.yaml:/bin/hadolint.yaml -e XDG_CONFIG_HOME=/bin hadolint/hadolint < $${f}; \
+
+help: ## display help
+	@len_col_1=60; len_col_2=60; len_col_3=50; len_col_4=20; \
+	echo -e "Hello to the \`$(shell basename "$$(pwd)")\` Makefile\n \
+	Base command:\n \
+	\t- \`__docker_compose_base_cmd\` is a ${__docker_compose_base_cmd}\n \
+	\t- \`__docker_compose_build_cmd\` is a ${__docker_compose_build_cmd}"\n\n \
+	Variables:\n \
+	\t- \`CI_PROJECT_NAMESPACE\` define NAMESPACE for pull from gitlab registry\n \
+	\t- \`FQDN\` define FQDN to use\n" \
+	\t- \`remove_remote\` remove le remote on make remote-send\n \
+	\t- \`service_name\` is a docker-compose service name or a list of services separate by space default: ''\n\n \
+	Usage:\n \
+	\tmake [target] [args]\n\n"; \
+	printf "| %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "Target"  "$${len_col_2}" "Help" "$${len_col_3}" "Usage" "$${len_col_4}" "Service" ; \
+	printf "+%0-*s  +%0-*s  +%0-*s  +%0-*s  +\n" "$${len_col_1}" "====" "$${len_col_2}" "====" "$${len_col_3}" "====" "$${len_col_4}" "====" ; \
+	for makefile in $(shell echo $(MAKEFILE_LIST) | sort); do \
+		dir_name=$$(dirname $$makefile | rev | cut -d"/" -f1 | rev) ; \
+		if [ "$$dir_name" = "." ]; then dir_name=""; fi; \
+		cat $$makefile | grep -v "^#" | grep ": ##" | while read line; do \
+			if [ "${line:0:1}" = "#" ]; then continue; fi; \
+			name=$$(echo "$$line" | cut -d":" -f1); \
+			if echo "$$line" | grep -q "=>"; then \
+				help=$$(echo "$$line" | perl -n -e '/##\s*(.+?)(\s=>\s(.*))?$$/ && print $$1') ; \
+				usage=$$(echo "$$line" | perl -n -e '/##\s*(.+?)(\s=>\s(.*))?$$/ && print $$3') ; \
+			else \
+				help=$$(echo "$$line" | cut -d":" -f2) ; \
+				usage="" ; \
+			fi; \
+			help=$(shell echo $$help | sed "s; ## ;;g") ; \
+			printf "| %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "$$name" "$${len_col_2}" "$$help" "$${len_col_3}" "$$usage" "$${len_col_4}" "$${dir_name}" ; \
+		done \
 	done
-help: ## This help dialog. => make help
-	@echo "Variables:"
-	@echo "\t- \"service_name\" is a docker compose service name or a list of services separate by space as string ($(shell ${__docker_compose_cmd} ps --services | tr '\n' ' '))"
-	@echo "\n"
-	@IFS=$$'\n'
-	@printf "%-50s %-80s %-60s\n" "target" "help" "usage"
-	@printf "%-50s %-80s %-60s\n" "------" "----" "----"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/:.*##/##/g' | tr ':' ' ' | tr '=>' '##'| awk 'BEGIN {FS = "##"}; {printf "\033[36m%-50s\033[0m %-80s %-60s\n", $$1, $$2, $$3}'
+
 logs: check-defined-service_name ## display logs
 	$(info Make: Logs ${service_name})
 	@docker compose logs ${service_name}
+
 logs-f: check-defined-service_name ## display logs with follow
 	$(info Make: Follow logs ${service_name})
 	@docker compose logs -f ${service_name}
+
 logs-tail: check-defined-service_name ## display logs tail => [tail=`echo ${tail}`]
 	$(info Make: Logs tail ${service_name})
 	@docker compose logs --tail=${tail} ${service_name}
+
+packages-version: black-packages-version flake8-packages-version mypy-packages-version pre-commit-packages-version python-dev-packages-version pylint-packages-version pytest-packages-version reorder-python-import-packages-version sphinx-packages-version ## list outdated package in service
+
 pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
 	@pip install --quiet --no-cache-dir pre-commit
 	@pre-commit autoupdate --bleeding-edge || true
 	@pre-commit run --all-files --verbose --hook-stage manual || true
+
 prune: down ## remove service on the host and prune volume image and network unused
 	$(info Make: Prune)
 	@docker compose rm
 	@docker rm `docker compose ps --filter status=created --filter status=exited -q` || true
 	@docker rmi `docker compose images ls -q` || true
 	@docker rmi `docker images -f "dangling=true" -q` || true
-send-to-remote: ## send source to ducal server
+
+remote-connect: ## connect to ducal server
+	@ssh -p 6942 chrysa@ssh.ducal.me bash
+
+remote-get: ## get source from ducal server
+	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder}/* "${__project_directory}/."
+
+remote-send: ## send source to ducal server
+ifeq ($(remove_remote), true)
+	@ssh -p 6942 chrysa@ssh.ducal.me rm -rf ${__remote_folder}
+endif
 	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' "${__project_directory}" chrysa@ssh.ducal.me:${__remote_folder}
+
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
 	docker compose start ${service_name} || make --quiet -s up service_name=${service_name}
+
 status: ## display status of all service
 	@docker compose ps --services | sort | while read service; do \
 		status=`docker inspect --format='{{.State.Status}}' $$service`; \
@@ -103,64 +132,17 @@ status: ## display status of all service
 		fi; \
 		echo "$$color_status====>${COLOR[WHITE]} $$service: $$color_status $$status ${COLOR[WHITE]}"; \
 	done
+
 stop: ## Start project containers => [service_name={service_name}]
 	$(info Make: stop  ${service_name})
 	@docker compose stop ${service_name}
-tag-latest: ## tag services as latest => make tag-latest
-	$(info Make: tag latest)
-	@echo "=======>> tag black"
-	@docker tag ${DOCKER_REPO}/black:${BLACK_CONTAINER_VERSION} ${DOCKER_REPO}/black:latest
-	@echo "=======>> tag flake8"
-	@docker tag ${DOCKER_REPO}/flake8:${FLAKE8_CONTAINER_VERSION} ${DOCKER_REPO}/flake8:latest
-	@echo "=======>> tag hadolint"
-	@docker tag ${DOCKER_REPO}/hadolint:${HADOLINT_CONTAINER_VERSION} ${DOCKER_REPO}/hadolint:latest
-	@echo "=======>> tag mypy"
-	@docker tag ${DOCKER_REPO}/mypy:${MYPY_CONTAINER_VERSION} ${DOCKER_REPO}/mypy:latest
-	@echo "=======>> tag pre-commit"
-	@docker tag ${DOCKER_REPO}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION} ${DOCKER_REPO}/pre-commit:latest
-	@echo "=======>> tag pylint"
-	@docker tag ${DOCKER_REPO}/pylint:${PYLINT_CONTAINER_VERSION} ${DOCKER_REPO}/pylint:latest
-	@echo "=======>> tag python-dev"
-	@docker tag ${DOCKER_REPO}/python-dev:${PYTHON_DEV_CONTAINER_VERSION} ${DOCKER_REPO}/python-dev:latest
-	@echo "=======>> tag pytest"
-	@docker tag ${DOCKER_REPO}/pytest:${PYTEST_CONTAINER_VERSION} ${DOCKER_REPO}/pytest:latest
-	@echo "=======>> tag reorder-python-imports"
-	@docker tag ${DOCKER_REPO}/reorder-python-imports:${REORDER_PYTHON_IMPORTS_CONTAINER_VERSION} ${DOCKER_REPO}/reorder-python-imports:latest
-	@echo "=======>> tag sphinx"
-	@docker tag ${DOCKER_REPO}/sphinx:${SPHINX_CONTAINER_VERSION} ${DOCKER_REPO}/sphinx:latest
+
+tag-latest: black-tag-latest flake8-tag-latest hadolint-tag-latest mypy-tag-latest pre-commit-tag-latest python-dev-tag-latest pylint-tag-latest pytest-tag-latest reorder-python-import-tag-latest sphinx-tag-latest ## tag services as latest
+
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker compose up ${service_name}
-up-detach: ## Up project containers =>  [service_name={service_name}]
+
+up-detach: ## Up project containers => [service_name={service_name}]~
 	$(info Make: Up ${service_name})
 	@docker compose up --detach ${service_name}
-upgradable-packages: ## list outdated package in service
-	@echo "=======>> upgradable package for black"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" black 
-	@echo "=======>> upgradable package for flake8"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" flake8
-	@echo "=======>> upgradable package for mypy"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" mypy
-	@echo "=======>> upgradable package for pre-commit"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pre-commit
-	@echo "=======>> upgradable package for pylint"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pylint
-	@echo "=======>> upgradable package for pytest"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pytest
-	@echo "=======>> upgradable package for python-dev"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" python-dev
-	@echo "=======>> upgradable package for reorder-python-imports"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" reorder-python-imports
-	@echo "=======>> upgradable package for sphinx"
-	@docker compose run --rm --entrypoint "pip list --outdated --format columns" sphinx
-
-
-remote-connect: ## connect to ducal server
-	@ssh -p 6942 chrysa@ssh.ducal.me bash
-remote-get: ## get source from ducal server
-	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder}/* "${__project_directory}/."
-remote-send: ## send source to ducal server
-ifeq ($(remove_remote), true)
-	@ssh -p 6942 chrysa@ssh.ducal.me rm -rf ${__remote_folder}
-endif
-	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' "${__project_directory}" chrysa@ssh.ducal.me:${__remote_folder}

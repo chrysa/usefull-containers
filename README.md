@@ -174,6 +174,7 @@ python:3.11-alpine
 
 ```
 $ make help 
+make[1]: Entering directory '/mnt/d/drive/dev/repos/-perso-/usefull-containers'
 Variables:
  - "service_name" is a docker compose service name or a list of services separate by space as string ()
 
@@ -200,7 +201,8 @@ stop                                                Start project containers    
 tag-latest                                          tag services as latest                                                           make tag-latest                                            
 up-detach                                           Up project containers                                                             [service_name#{service_name}]                             
 upgradable-packages                                 list outdated package in service                                                                                                            
-up                                                  Up project containers                                                            [service_name#{service_name}]                               
+up                                                  Up project containers                                                            [service_name#{service_name}]                              
+make[1]: Leaving directory '/mnt/d/drive/dev/repos/-perso-/usefull-containers' 
 ```
 
 <!-- END makefile-doc -->

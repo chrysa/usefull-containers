@@ -1,0 +1,56 @@
+---
+dango-drf:dockerfile:
+    extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - dango-drf/Dockerfile
+    variables:
+        service_name: dango-drf
+
+dango-drf:build:
+    extends: .build_service
+    needs:
+        - job: dango-drf:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - dango-drf/*
+          when: always
+        - changes:
+              - dango-drf/ci.yaml
+          when: never
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: dango-drf
+
+dango-drf:version:
+    extends: .publish_version_master
+    needs:
+        - dango-drf:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - dango-drf/*
+          variables:
+              service_name: dango-drf
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - dango-drf/ci.yaml
+          when: never
+
+dango-drf:latest:
+    extends: .publish_latest
+    needs:
+        - dango-drf:version
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - dango-drf/*
+          variables:
+              service_name: dango-drf
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - dango-drf/ci.yaml
+          when: never
