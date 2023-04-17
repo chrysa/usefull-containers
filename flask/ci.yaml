@@ -1,0 +1,56 @@
+---
+flask:dockerfile:
+    extends: .analyse_dockerfile
+    rules:
+        - changes:
+              - flask/Dockerfile
+    variables:
+        service_name: flask
+
+flask:build:
+    extends: .build_service
+    needs:
+        - job: flask:dockerfile
+          optional: true
+    rules:
+        - changes:
+              - flask/*
+          when: always
+        - changes:
+              - flask/ci.yaml
+          when: never
+    variables:
+        DOCKER_REPO: ${CI_REGISTRY_IMAGE}
+        service_name: flask
+
+flask:version:
+    extends: .publish_version_master
+    needs:
+        - flask:build
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flask/*
+          variables:
+              service_name: flask
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flask/ci.yaml
+          when: never
+
+flask:latest:
+    extends: .publish_latest
+    needs:
+        - flask:version
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flask/*
+          variables:
+              service_name: flask
+          when: always
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_BUILD_REF_NAME == $CI_DEFAULT_BRANCH
+          changes:
+              - flask/ci.yaml
+          when: never

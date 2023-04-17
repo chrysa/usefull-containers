@@ -2,7 +2,7 @@
 version: '3.9'
 
 services:
-    dango-drf:
+    django-drf:
         build:
             context: .
             dockerfile: Dockerfile
@@ -26,7 +26,7 @@ services:
             - type: volume
               source: sockets
               target: /socket
-    dango-drf-dev:
+    django-drf-dev:
         command: python manage.py runserver --verbosity 3 0.0.0.0:8080
         container_name: dango_drf-dev
         environment:
@@ -45,5 +45,3 @@ services:
               source: sockets
               target: /socket
         working_dir: /app
-volumes :
-    sockets:

@@ -1,0 +1,18 @@
+---
+version: '3.9'
+
+services:
+    flask-db-migrations:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            labels:
+                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+                build_date: ${BUILD_DATE:-}
+                commit_id: ${CI_COMMIT_SHA:-}
+                vcs-url: ${CI_REPOSITORY_URL:-}
+                vcs-ref: ${CI_COMMIT_SHA:-}
+        container_name: flask-db-migrations
+        image: ${DOCKER_REPO:-local}/flask-db-migrations:${FLASK_DB_MIGRATIONS_CONTAINER_VERSION}
+        tty: true
+        working_dir: /app
