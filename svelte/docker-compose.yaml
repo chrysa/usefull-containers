@@ -1,0 +1,41 @@
+---
+version : '3.9'
+
+services:
+    svelte:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+            labels:
+                maintainer: ${MAINTAINER_NAME} <${MAINTAINER_MAIL}>
+                build_date: ${BUILD_DATE:-}
+                commit_id: ${CI_COMMIT_SHA:-}
+                vcs-url: ${CI_PROJECT_URL:-}
+                vcs-ref: ${CI_COMMIT_SHA:-}
+        expose:
+            - 3000
+        image: ${DOCKER_REPO:-local}/svelte-app:${SVELTE_CONTAINER_VERSION}
+        tty: true
+        working_dir: /app
+    svelte-dev:
+        command: npm run dev
+        environment:
+            - NODE_ENV=development
+        image: ${DOCKER_REPO:-local}/svelte-app:${SVELTE_CONTAINER_VERSION}
+        ports:
+            - 5000:5000
+        stdin_open: true
+        tty: true
+        user: node
+        volumes:
+            - type: bind
+              source: ./code/
+              target: /app/
+            - type: volume
+              source: svelte_dev_node_modules
+              target: /app/node_modules
+            - type: volume
+              source: svelte_dev_svelte_kit
+              target: /app/.svelte-kit
+        working_dir: /app
+

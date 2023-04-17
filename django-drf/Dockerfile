@@ -1,11 +1,9 @@
 FROM python:3.11-alpine
 
 ARG TARGET_FOLDER=/app
-COPY scripts/ /scripts
+
+COPY cmd.sh /scripts/cmd.sh
 COPY setup.cfg /conf/setup.cfg
-
-
-COPY src/ ${TARGET_FOLDER}
 
 ENV PATH=${PATH}:/usr/bin/python:${TARGET_FOLDER} \
     PYTHONBREAKPOINT=ipdb.set_trace
@@ -27,4 +25,4 @@ EXPOSE 8000
 CMD ["/scripts/cmd.sh"]
 
 HEALTHCHECK --interval=30s --timeout=30s --retries=10 --start-period=10s \
-  CMD -f /socket/drf-app.socket || exit 1
+    CMD -f /socket/drf-app.socket || exit 1

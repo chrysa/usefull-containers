@@ -4,10 +4,6 @@ endif
 
 include $(shell find . -mindepth 2 -type f -name Makefile -exec echo " {}" \;)
 
-ifndef remove_remote
-	override remove_remote=false
-endif
-
 .DEFAULT_GOAL := help
 
 .PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ")
@@ -46,15 +42,6 @@ down: ## Down project containers
 help: ## display help
 	@len_col_1=60; len_col_2=60; len_col_3=50; len_col_4=20; \
 	echo -e "Hello to the \`$(shell basename "$$(pwd)")\` Makefile\n \
-	Base command:\n \
-	\t- \`__docker_compose_base_cmd\` is a ${__docker_compose_base_cmd}\n \
-	\t- \`__docker_compose_build_cmd\` is a ${__docker_compose_build_cmd}"\n\n \
-	Variables:\n \
-	\t- \`CI_PROJECT_NAMESPACE\` define NAMESPACE for pull from gitlab registry\n \
-	\t- \`FQDN\` define FQDN to use\n" \
-	\t- \`remove_remote\` remove le remote on make remote-send\n \
-	\t- \`service_name\` is a docker-compose service name or a list of services separate by space default: ''\n\n \
-	Usage:\n \
 	\tmake [target] [args]\n\n"; \
 	printf "| %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "Target"  "$${len_col_2}" "Help" "$${len_col_3}" "Usage" "$${len_col_4}" "Service" ; \
 	printf "+%0-*s  +%0-*s  +%0-*s  +%0-*s  +\n" "$${len_col_1}" "====" "$${len_col_2}" "====" "$${len_col_3}" "====" "$${len_col_4}" "====" ; \
@@ -102,22 +89,13 @@ prune: down ## remove service on the host and prune volume image and network unu
 	@docker rm `docker compose ps --filter status=created --filter status=exited -q` || true
 	@docker rmi `docker compose images ls -q` || true
 	@docker rmi `docker images -f "dangling=true" -q` || true
-
-remote-connect: ## connect to ducal server
-	@ssh -p 6942 chrysa@ssh.ducal.me bash
-
-remote-get: ## get source from ducal server
-	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' chrysa@ssh.ducal.me:${__remote_folder}/* "${__project_directory}/."
-
-remote-send: ## send source to ducal server
-ifeq ($(remove_remote), true)
-	@ssh -p 6942 chrysa@ssh.ducal.me rm -rf ${__remote_folder}
-endif
-	@rsync --progress --recursive --update --times --compress  -e 'ssh -p 6942' "${__project_directory}" chrysa@ssh.ducal.me:${__remote_folder}
-
+run-local-ci: ## run ci pipeline locally
+	$(info Make: run CI localy)
+	@pip install --quiet --upgrade gitlabci-local ipython
+	gitlabci-local -h
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
-	docker compose start ${service_name} || make --quiet -s up service_name=${service_name}
+	@docker compose start ${service_name} || make --quiet -s up service_name=${service_name}
 
 status: ## display status of all service
 	@docker compose ps --services | sort | while read service; do \
@@ -137,7 +115,7 @@ stop: ## Start project containers => [service_name={service_name}]
 	$(info Make: stop  ${service_name})
 	@docker compose stop ${service_name}
 
-tag-latest: black-tag-latest flake8-tag-latest hadolint-tag-latest mypy-tag-latest pre-commit-tag-latest python-dev-tag-latest pylint-tag-latest pytest-tag-latest reorder-python-import-tag-latest sphinx-tag-latest ## tag services as latest
+tag-latest: $(shell grep -E '^[a-zA-Z_-]+-tag-latest:.*?## .*$$' $(MAKEFILE_LIST) | sort | cut -d":" -f1 | tr "\n" " ") ## tag services as latest
 
 up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})

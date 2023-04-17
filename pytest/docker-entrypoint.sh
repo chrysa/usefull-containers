@@ -12,6 +12,9 @@ elif [ -f "/app/tox.ini" ]; then
     config="--rcfile=/app/tox.ini"
 fi
 
+pip install --quiet --prefer-binary --no-cache-dir .
+pip install --quiet --prefer-binary --no-cache-dir .[pytest]
+
 if [ -z "$@" ]; then
     files=$(find /app -name "*.py")
 else
