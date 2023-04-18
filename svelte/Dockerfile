@@ -12,15 +12,15 @@ ENV APP_FOLDER=$APP_FOLDER \
     PATH=${APP_FOLDER}/node_modules/.bin:$PATH \
     TZ=${TZ}
 
-COPY --chown=node:root package.json /conf
-COPY --chown=node:root svelte.config.js /conf
+COPY --chown=node:root default-code/ /default-app
+COPY ./scripts/ /scripts/
 
 RUN set -ex \
     && apk add --quiet --update --no-cache bash
 
 SHELL ["/bin/bash",  "-c"]
 
-WORKDIR /conf
+WORKDIR /default-app
 
 RUN set -heoux pipefail \
     && set +x \
@@ -33,7 +33,11 @@ RUN set -heoux pipefail \
     && set +x \
     && echo -e "=====================================\n========== install Production packages ==========\n=====================================" \
     && set -x \
-    && npm install \
+    && npm install --omit=dev\
+    && set +x \
+    && echo -e "===========================================\n========== configure SCRIPTS ==========\n===========================================" \
+    && set -x \
+    && find /scripts -name "*.sh" -print -exec chmod +x {} \; \
     && set +x \
     && echo -e "===========================================\n========== configure HEALTHCHECK ==========\n===========================================" \
     && set -x \
@@ -43,6 +47,7 @@ WORKDIR ${APP_FOLDER}
 
 EXPOSE 3000
 
+ENTRYPOINT ["/scripts/entrypoint.sh"]
 CMD ["npm", "start"]
 
 USER node
