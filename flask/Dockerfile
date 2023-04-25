@@ -11,8 +11,7 @@ RUN set -x \
     && rm -rf /var/cache/apk/* \
     && addgroup -S flask \
     && adduser -D --system --shell /usr/bin/bash flask flask \
-    && chown -R flask:flask /app \
-    && chmod +x /opt/docker-entrypoint.sh
+    && chown -R flask:flask /app
 
 USER flask
 

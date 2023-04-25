@@ -14,14 +14,14 @@ services:
         extends:
             file: flake8/docker-compose.yaml
             service: flake8
-    flask:
-        extends:
-            file: flask/docker-compose.yaml
-            service: flask
-    flask-db-migrations:
-        extends:
-            file: flask-db-migrations/docker-compose.yaml
-            service: flask-db-migrations
+    # flask:
+    #     extends:
+    #         file: flask/docker-compose.yaml
+    #         service: flask
+    # flask-db-migrations:
+    #     extends:
+    #         file: flask-db-migrations/docker-compose.yaml
+    #         service: flask-db-migrations
     hadolint:
         extends:
             file: hadolint/docker-compose.yaml
@@ -54,12 +54,5 @@ services:
         extends:
             file: sphinx/docker-compose.yaml
             service: sphinx
-    svelte:
-        extends:
-            file: svelte/docker-compose.yaml
-            service: svelte
-
 volumes :
     sockets:
-    svelte_dev_node_modules:
-    svelte_dev_svelte_kit:

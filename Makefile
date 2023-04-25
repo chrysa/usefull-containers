@@ -12,8 +12,6 @@ DOCKER_REPO=$(shell cat .env | grep "DOCKER_REPO" | cut -d "=" -f2)
 
 __project_directory=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-__remote_folder=projects/$(shell basename $(CURDIR))
-
 tail=10
 
 COLOR[GREEN]=\e[1;92m
@@ -40,26 +38,41 @@ down: ## Down project containers
 	@docker compose down --remove-orphans
 
 help: ## display help
-	@len_col_1=60; len_col_2=60; len_col_3=50; len_col_4=20; \
+	@len_col_1=50; len_col_2=60; len_col_3=50; len_col_4=60; len_col_5=30; \
 	echo -e "Hello to the \`$(shell basename "$$(pwd)")\` Makefile\n \
+	Base command:\n \
+	\t- \`__docker_compose_base_cmd\` is a ${__docker_compose_base_cmd}\n\n \
+	Variables:\n \
+	\t- \`__docker_compose_build_args\` list les argument de build des services as ${__docker_compose_build_args} \n \
+	\t- \`CI_PROJECT_NAMESPACE\` define NAMESPACE for pull from gitlab registry\n \
+	\t- \`FQDN\` define FQDN to use\n" \
+	\t- \`profiles\` docker compose profile to launche default `$(shell cat .env | grep 'COMPOSE_PROFILES' | cut -d'-' -f1)`\n \
+	\t- \`remove_remote\` remove le remote on make remote-send\n \
+	\t- \`service_name\` is a docker-compose service name or a list of services separate by space default: ''\n\n" \
+	Usage:\n \
 	\tmake [target] [args]\n\n"; \
-	printf "| %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "Target"  "$${len_col_2}" "Help" "$${len_col_3}" "Usage" "$${len_col_4}" "Service" ; \
-	printf "+%0-*s  +%0-*s  +%0-*s  +%0-*s  +\n" "$${len_col_1}" "====" "$${len_col_2}" "====" "$${len_col_3}" "====" "$${len_col_4}" "====" ; \
+	printf "| %0-*s | %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "Rule"  "$${len_col_2}" "Help" "$${len_col_3}" "Usage" "$${len_col_4}" "dependencies" "$${len_col_5}" "Service" ; \
+	printf "+%0-*s  +%0-*s  +%0-*s  +%0-*s  +%0-*s  +\n" "$${len_col_1}" "====" "$${len_col_2}" "====" "$${len_col_3}" "====" "$${len_col_4}" "====" "$${len_col_5}" "====" ; \
 	for makefile in $(shell echo $(MAKEFILE_LIST) | sort); do \
 		dir_name=$$(dirname $$makefile | rev | cut -d"/" -f1 | rev) ; \
-		if [ "$$dir_name" = "." ]; then dir_name=""; fi; \
-		cat $$makefile | grep -v "^#" | grep ": ##" | while read line; do \
-			if [ "${line:0:1}" = "#" ]; then continue; fi; \
-			name=$$(echo "$$line" | cut -d":" -f1); \
-			if echo "$$line" | grep -q "=>"; then \
-				help=$$(echo "$$line" | perl -n -e '/##\s*(.+?)(\s=>\s(.*))?$$/ && print $$1') ; \
-				usage=$$(echo "$$line" | perl -n -e '/##\s*(.+?)(\s=>\s(.*))?$$/ && print $$3') ; \
+		if [ "$$dir_name" = "." ] || [ "$$dir_name" = "makefiles" ]; then dir_name=""; fi; \
+		cat $$makefile | grep -v "^#" | grep -E "^[a-zA-Z_-]+:.*?## .*$$|^[a-zA-Z_-]+:.*?$$|^\s+=> .*$$" | while read line; do \
+			name=$$(echo $$line | awk  -F ':' '{print $$1}'); \
+			if echo "$$line" | grep -q "=>" ; then \
+				help=$$(echo "$$line" | awk -F '##' '{print $$2}' | awk -F '=>' '{print $$1}' | sed -e 's/^[[:space:]]*//'); \
+				usage=$$(echo "$$line" | awk -F '=>' '{print $$2}' | sed -e 's/^[[:space:]]*//'); \
 			else \
-				help=$$(echo "$$line" | cut -d":" -f2) ; \
-				usage="" ; \
-			fi; \
-			help=$(shell echo $$help | sed "s; ## ;;g") ; \
-			printf "| %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "$$name" "$${len_col_2}" "$$help" "$${len_col_3}" "$$usage" "$${len_col_4}" "$${dir_name}" ; \
+				help=$$(echo "$$line" | awk -F '##' '{print $$2}' | sed -e 's/^[[:space:]]*//'); \
+				usage=""; \
+			fi ; \
+			deps="" ;\
+			for dep in `grep -E "^$$name:" $(MAKEFILE_LIST) | awk -F ': ' '{print $$2}' | awk -F '##' '{print $$1}'`; do \
+				if [[ ! "$$dep" = "check-defined-"* ]]; then \
+					deps="$${deps}$${dep}\n"; \
+				fi ; \
+			done ; \
+			dependencies=$$(if [ "$$deps" ]; then echo "$$deps"; else echo ""; fi); \
+			printf "| %0-*s | %0-*s | %0-*s | %0-*s | %0-*s |\n" "$${len_col_1}" "$$name" "$${len_col_2}" "$$help" "$${len_col_3}" "$$usage" "$${len_col_4}" "$$dependencies" "$${len_col_5}" "$${dir_name}" ; \
 		done \
 	done
 
@@ -71,7 +84,7 @@ logs-f: check-defined-service_name ## display logs with follow
 	$(info Make: Follow logs ${service_name})
 	@docker compose logs -f ${service_name}
 
-logs-tail: check-defined-service_name ## display logs tail => [tail=`echo ${tail}`]
+logs-tail: check-defined-service_name ## display logs tail => [tail=$(shell echo ${tail})]
 	$(info Make: Logs tail ${service_name})
 	@docker compose logs --tail=${tail} ${service_name}
 
@@ -79,9 +92,9 @@ packages-version: black-packages-version flake8-packages-version mypy-packages-v
 
 pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
-	@pip install --quiet --no-cache-dir pre-commit
-	@pre-commit autoupdate --bleeding-edge || true
-	@pre-commit run --all-files --verbose --hook-stage manual || true
+	pip install --quiet --no-cache-dir pre-commit
+	pre-commit autoupdate --bleeding-edge
+	pre-commit run --all-files --verbose --hook-stage manual
 
 prune: down ## remove service on the host and prune volume image and network unused
 	$(info Make: Prune)
@@ -92,7 +105,8 @@ prune: down ## remove service on the host and prune volume image and network unu
 run-local-ci: ## run ci pipeline locally
 	$(info Make: run CI localy)
 	@pip install --quiet --upgrade gitlabci-local ipython
-	gitlabci-local -h
+	gitlabci-local --sockets --display --notify --all --debug
+
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
 	@docker compose start ${service_name} || make --quiet -s up service_name=${service_name}
@@ -121,6 +135,6 @@ up: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up detach ${service_name})
 	@docker compose up ${service_name}
 
-up-detach: ## Up project containers => [service_name={service_name}]~
+up-detach: ## Up project containers => [service_name={service_name}]
 	$(info Make: Up ${service_name})
 	@docker compose up --detach ${service_name}
