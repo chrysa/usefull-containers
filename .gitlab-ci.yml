@@ -4,10 +4,10 @@ image: docker/compose:1.29.2
 include:
     - ci-jobs.yaml
     - black/ci.yaml
-    - dango-drf/ci.yaml
+    - django-drf/ci.yaml
     - flake8/ci.yaml
-    - flask/ci.yaml
-    - flask-db-migrations/ci.yaml
+    # - flask/ci.yaml
+    # - flask-db-migrations/ci.yaml
     - hadolint/ci.yaml
     - mypy/ci.yaml
     - pre-commit/ci.yaml
@@ -16,7 +16,6 @@ include:
     - python-dev/ci.yaml
     - reorder-python-imports/ci.yaml
     - sphinx/ci.yaml
-    - svelte/ci.yaml
 
 services:
     - docker:dind

@@ -4,10 +4,10 @@ WORKDIR /app
 
 ENV PATH=$PATH:/home/black/.local/bin GIT_DISCOVERY_ACROSS_FILESYSTEM=true
 
-COPY docker-entypoint.sh /opt/docker-entypoint.sh
+COPY docker-cmd.sh /opt/docker-cmd.sh
 
 RUN set -x \
-    && chmod +x /opt/docker-entypoint.sh
+    && chmod +x /opt/docker-cmd.sh
 
 COPY black-default.toml /opt/black-default.toml
 
@@ -15,4 +15,4 @@ SHELL ["/bin/bash"]
 
 WORKDIR /app
 
-ENTRYPOINT ["/opt/docker-entypoint.sh"]
+CMD ["/opt/docker-cmd.sh"]

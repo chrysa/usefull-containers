@@ -9,8 +9,7 @@ RUN set -x \
     && rm -rf /var/cache/apk/* \
     && addgroup -S flask-db-migration \
     && adduser -D --system --shell /usr/bin/bash flask-db-migration flask-db-migration \
-    && chown -R flask-db-migration:flask-db-migration /app \
-    && chmod +x /opt/docker-entrypoint.sh
+    && chown -R flask-db-migration:flask-db-migration /app
 
 USER flask-db-migration
 
