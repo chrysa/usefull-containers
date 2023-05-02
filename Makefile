@@ -90,7 +90,7 @@ logs-tail: check-defined-service_name ## display logs tail => [tail=$(shell echo
 
 packages-version: black-packages-version flake8-packages-version mypy-packages-version pre-commit-packages-version python-dev-packages-version pylint-packages-version pytest-packages-version reorder-python-import-packages-version sphinx-packages-version ## list outdated package in service
 
-pre-commit: ## run localy precommit
+run-pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
 	pip install --quiet --no-cache-dir pre-commit
 	pre-commit autoupdate --bleeding-edge
@@ -105,7 +105,7 @@ prune: down ## remove service on the host and prune volume image and network unu
 run-local-ci: ## run ci pipeline locally
 	$(info Make: run CI localy)
 	@pip install --quiet --upgrade gitlabci-local ipython
-	gitlabci-local --sockets --display --notify --all --debug
+	@gitlabci-local
 
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
