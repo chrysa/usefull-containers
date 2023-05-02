@@ -11,12 +11,18 @@
     engine: docker,auto
     list: true
     manual: true
+    network: host
     notify: true
     pipeline: false
     pull: true
     real_paths: true
     rmi: true
     sockets: true
+    variables:
+        DH_REGISTRY: docker.io
+        DH_REGISTRY_PASSWORD: ''
+        DH_REGISTRY_USER: ''
+        DH_REPO: ''
 
 image: docker/compose:latest
 
