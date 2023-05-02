@@ -13,7 +13,7 @@ repos:
     #       - id: check-useless-excludes
     #        stages: [manual]
     - repo: https://github.com/asottile/setup-cfg-fmt
-      rev: ccfe420a1f8a857343bed59c3b82897001926c5b
+      rev: 09259c821eda6517244b28758aa69cd1a4929929
       hooks:
           - id: setup-cfg-fmt
     - repo: https://github.com/IamTheFij/docker-pre-commit.git
@@ -43,7 +43,7 @@ repos:
             stages:
                 - manual
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: afd8f0c6aa189558286a1100a15f646ceb385944
+      rev: v0.34.0
       hooks:
           - id: markdownlint
             args: [--fix,]
@@ -67,7 +67,7 @@ repos:
             args:
                 - --ignore=E006,E020
     - repo: https://github.com/pre-commit/mirrors-eslint
-      rev: v8.37.0
+      rev: v8.39.0
       hooks:
           - id: eslint
             args: [--config, svelte/code/.eslintrc.cjs]

@@ -1,24 +1,40 @@
 ---
-image: docker/compose:1.29.2
+#############################################
+### config for gitlabci-local
+#############################################
+.local:
+    after: true
+    all: false
+    before: true
+    display: true
+    dump: true
+    engine: docker,auto
+    list: true
+    manual: true
+    notify: true
+    pipeline: false
+    pull: true
+    real_paths: true
+    rmi: true
+    sockets: true
+
+image: docker/compose:latest
 
 include:
-    - ci-jobs.yaml
-    - black/ci.yaml
-    - django-drf/ci.yaml
-    - flake8/ci.yaml
-    # - flask/ci.yaml
-    # - flask-db-migrations/ci.yaml
-    - hadolint/ci.yaml
-    - mypy/ci.yaml
-    - pre-commit/ci.yaml
-    - pytest/ci.yaml
-    - pylint/ci.yaml
-    - python-dev/ci.yaml
-    - reorder-python-imports/ci.yaml
-    - sphinx/ci.yaml
-
-services:
-    - docker:dind
+    - local: ci-jobs.yaml
+    - local: black/ci.yaml
+    - local: django-drf/ci.yaml
+    - local: flake8/ci.yaml
+    # - local:  flask/ci.yaml
+    # - local: flask-db-migrations/ci.yaml
+    - local: hadolint/ci.yaml
+    - local: mypy/ci.yaml
+    - local: pre-commit/ci.yaml
+    - local: pytest/ci.yaml
+    - local: pylint/ci.yaml
+    - local: python-dev/ci.yaml
+    - local: reorder-python-imports/ci.yaml
+    - local: sphinx/ci.yaml
 
 stages:
     - analyse
@@ -30,3 +46,4 @@ variables:
     DOCKER_DRIVER: overlay
     COMPOSE_DOCKER_CLI_BUILD: 1
     HADOLINT_IMAGE: hadolint/hadolint:latest-debian
+
