@@ -92,9 +92,9 @@ packages-version: black-packages-version flake8-packages-version mypy-packages-v
 
 run-pre-commit: ## run localy precommit
 	$(info Make: pre-commit)
-	pip install --quiet --no-cache-dir pre-commit
-	pre-commit autoupdate --bleeding-edge
-	pre-commit run --all-files --verbose --hook-stage manual
+	@pip install --quiet --no-cache-dir pre-commit
+	@pre-commit autoupdate --bleeding-edge
+	@pre-commit run --all-files --verbose --hook-stage manual
 
 prune: down ## remove service on the host and prune volume image and network unused
 	$(info Make: Prune)
@@ -106,7 +106,6 @@ run-local-ci: ## run ci pipeline locally
 	$(info Make: run CI localy)
 	@pip install --quiet --upgrade gitlabci-local ipython
 	@gitlabci-local
-
 start: check-defined-service_name ## Start project containers => [service_name={service_name}]
 	$(info Make: start ${service_name})
 	@docker compose start ${service_name} || make --quiet -s up service_name=${service_name}

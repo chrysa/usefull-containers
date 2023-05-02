@@ -7,11 +7,6 @@
 
 .build_service:
     stage: build
-    after_script:
-        - docker logout
-    before_script:
-        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - export BUILD_DATE=$(date '+%H-%M_-%d-%m-%Y')
     retry:
         max: 2
         when:
