@@ -29,7 +29,7 @@ image: docker/compose:latest
 include:
     - local: ci-jobs.yaml
     - local: black/ci.yaml
-    - local: django-drf/ci.yaml
+    # - local: django-drf/ci.yaml
     - local: flake8/ci.yaml
     # - local:  flask/ci.yaml
     # - local: flask-db-migrations/ci.yaml
