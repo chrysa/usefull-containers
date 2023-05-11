@@ -20,6 +20,7 @@ USER flake8
 RUN set -x \
     && python -m pip install --quiet --no-cache-dir --upgrade pip \
     && pip install --quiet --no-cache-dir flake8==6.0.0 \
+    && pip install --quiet --no-cache-dir black==23.3.0 \
     && pip install --quiet --no-cache-dir flake8-black==0.3.6 \
     && pip install --quiet --no-cache-dir flake8-html==0.4.3 \
     && pip install --quiet --no-cache-dir flake8-junit-report==2.1.0 \

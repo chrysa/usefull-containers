@@ -6,10 +6,10 @@ services:
         extends:
             file: black/docker-compose.yaml
             service: black
-    django-drf:
-        extends:
-            file: django-drf/docker-compose.yaml
-            service: django-drf
+    # django-drf:
+    #     extends:
+    #         file: django-drf/docker-compose.yaml
+    #         service: django-drf
     flake8:
         extends:
             file: flake8/docker-compose.yaml
