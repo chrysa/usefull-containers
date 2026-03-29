@@ -59,6 +59,12 @@ make status
 | [python-dev](#python-dev) | `python:3.11-slim` | `chrys4/python-dev` | Interactive dev shell (IPython + ipdb) |
 | [reorder-python-imports](#reorder-python-imports) | `python:3.11-alpine` | `chrys4/reorder-python-imports` | Automatic import sorter |
 | [sphinx](#sphinx) | `python:3.11-alpine` | `chrys4/sphinx` | Documentation generator |
+| [ruff](#ruff) | `python:3.13-alpine` | `chrys4/ruff` | Fast Python linter and formatter |
+| [bandit](#bandit) | `python:3.13-alpine` | `chrys4/bandit` | Python security vulnerability scanner |
+| [safety](#safety) | `python:3.13-alpine` | `chrys4/safety` | Python dependency security checker |
+| [trivy](#trivy) | `aquasec/trivy:0.61.0` | `chrys4/trivy` | Container and filesystem vulnerability scanner |
+| [actionlint](#actionlint) | `rhysd/actionlint:latest` | `chrys4/actionlint` | GitHub Actions workflow static checker |
+| [yamllint](#yamllint) | `python:3.13-alpine` | `chrys4/yamllint` | YAML files linter |
 
 ---
 
@@ -208,6 +214,97 @@ alias my_sphinx="docker run --rm -ti \
   --name=sphinx \
   --volume ${PWD}:/app \
   chrys4/sphinx:latest bash"
+```
+
+---
+
+### Ruff
+
+Extremely fast Python linter and formatter written in Rust. Replaces flake8, isort, and partially black.
+
+**Packages:** `ruff==0.9.10`
+
+```bash
+alias my_ruff="docker run --rm -ti \
+  --name=ruff \
+  --volume ${PWD}:/app \
+  chrys4/ruff:latest"
+```
+
+---
+
+### Bandit
+
+Security-oriented static analyser for Python code. Finds common security issues.
+
+**Packages:** `bandit==1.8.3`, `bandit-junit==0.0.6`
+
+```bash
+alias my_bandit="docker run --rm -ti \
+  --name=bandit \
+  --volume ${PWD}:/app \
+  chrys4/bandit:latest"
+```
+
+---
+
+### Safety
+
+Checks Python dependencies for known security vulnerabilities.
+
+**Packages:** `safety==3.3.1`
+
+```bash
+alias my_safety="docker run --rm -ti \
+  --name=safety \
+  --volume ${PWD}:/app \
+  chrys4/safety:latest"
+```
+
+---
+
+### Trivy
+
+Comprehensive vulnerability scanner for containers, filesystems, and git repositories.
+
+**Base:** `aquasec/trivy:0.61.0` (binary upstream)
+
+```bash
+alias my_trivy="docker run --rm -ti \
+  --name=trivy \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  --volume ${PWD}:/app \
+  chrys4/trivy:latest fs --exit-code 1 --severity HIGH,CRITICAL ."
+```
+
+---
+
+### Actionlint
+
+Static checker for GitHub Actions workflow files.
+
+**Base:** `rhysd/actionlint:latest` (binary upstream)
+
+```bash
+alias my_actionlint="docker run --rm -ti \
+  --name=actionlint \
+  --volume ${PWD}:/app \
+  chrys4/actionlint:latest .github/workflows/"
+```
+
+---
+
+### Yamllint
+
+Linter for YAML files with configurable rules.
+
+**Packages:** `yamllint==1.35.1`
+
+```bash
+alias my_yamllint="docker run --rm -ti \
+  --name=yamllint \
+  --volume ${PWD}:/app \
+  chrys4/yamllint:latest"
 ```
 
 ---

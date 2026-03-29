@@ -52,5 +52,29 @@ services:
         extends:
             file: sphinx/docker-compose.yaml
             service: sphinx
+    ruff:
+        extends:
+            file: ruff/docker-compose.yaml
+            service: ruff
+    bandit:
+        extends:
+            file: bandit/docker-compose.yaml
+            service: bandit
+    safety:
+        extends:
+            file: safety/docker-compose.yaml
+            service: safety
+    trivy:
+        extends:
+            file: trivy/docker-compose.yaml
+            service: trivy
+    actionlint:
+        extends:
+            file: actionlint/docker-compose.yaml
+            service: actionlint
+    yamllint:
+        extends:
+            file: yamllint/docker-compose.yaml
+            service: yamllint
 volumes:
     sockets:

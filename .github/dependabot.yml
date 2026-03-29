@@ -133,3 +133,63 @@ updates:
           prefix: chore(deps)
       labels:
           - dependencies
+
+    - package-ecosystem: docker
+      directory: /ruff/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /bandit/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /safety/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /trivy/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /actionlint/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /yamllint/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
