@@ -10,7 +10,7 @@ ENV PATH=${PATH}:/usr/bin/python:${TARGET_FOLDER} \
 
 WORKDIR ${TARGET_FOLDER}
 
-RUN set -ex pipefail \
+RUN set -exo pipefail \
     && apk add --quiet --update --no-cache build-base linux-headers \
     && pip install --quiet --prefer-binary --upgrade --no-cache-dir pip \
     && pip install --quiet --prefer-binary --no-cache-dir django==4.1.7 \
@@ -25,4 +25,4 @@ EXPOSE 8000
 CMD ["/scripts/cmd.sh"]
 
 HEALTHCHECK --interval=30s --timeout=30s --retries=10 --start-period=10s \
-    CMD -f /socket/drf-app.socket || exit 1
+    CMD [ -f /socket/drf-app.socket ] || exit 1

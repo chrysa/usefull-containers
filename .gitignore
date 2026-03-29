@@ -1,3 +1,21 @@
-/.history
-/usefull-containers.code-workspace
-/.idea
+# IDEs
+.history/
+.idea/
+.vscode/
+*.code-workspace
+
+# Environment
+.env
+!.env.example
+.secrets.baseline
+
+# Docker
+.docker/
+
+# Build / cache
+__pycache__/
+*.pyc
+*.pyo
+reports/
+.cache/
+

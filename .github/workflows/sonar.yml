@@ -1,0 +1,49 @@
+---
+name: 📊 SonarCloud
+run-name: ${{ github.workflow }} by ${{ github.actor }}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        types:
+            - opened
+            - ready_for_review
+            - reopened
+            - synchronize
+    schedule:
+        - cron: 0 6 * * 1
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+    sonar:
+        name: SonarCloud scan
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: SonarCloud scan
+              uses: SonarSource/sonarqube-scan-action@v5
+              with:
+                  args: >
+                      -Dsonar.projectKey=chrysa_usefull-containers
+                      -Dsonar.organization=chrysa
+                      -Dsonar.projectName=usefull-containers
+                      -Dsonar.sources=.
+                      -Dsonar.exclusions=**/.git/**,**/reports/**,**/.vscode/**
+                      -Dsonar.sourceEncoding=UTF-8
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
