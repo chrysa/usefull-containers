@@ -1,0 +1,86 @@
+---
+name: "\U0001F50E Analyse"
+run-name: ${{ github.workflow }} by ${{ github.actor }}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+    pull_request:
+        types:
+            - opened
+            - ready_for_review
+            - reopened
+            - synchronize
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    pre-commit:
+        name: Pre-commit checks
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.13'
+                  cache: pip
+            - name: Run pre-commit
+              uses: pre-commit/action@v3.0.1
+
+    hadolint:
+        name: Hadolint — ${{ matrix.service }}
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        strategy:
+            fail-fast: false
+            matrix:
+                service:
+                    - black
+                    - flake8
+                    - hadolint
+                    - mypy
+                    - pre-commit
+                    - pylint
+                    - pytest
+                    - python-dev
+                    - reorder-python-imports
+                    - sphinx
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Run hadolint on ${{ matrix.service }}/Dockerfile
+              uses: hadolint/hadolint-action@v3.1.0
+              with:
+                  dockerfile: ${{ matrix.service }}/Dockerfile
+                  config: .hadolint.yaml
+                  failure-threshold: warning
+
+    docker-compose-validate:
+        name: Validate docker-compose files
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Validate root docker-compose.yaml
+              run: docker compose config --quiet
+              shell: bash
+            - name: Validate service docker-compose files
+              run: |
+                  for svc in black flake8 hadolint mypy pre-commit pylint pytest python-dev reorder-python-imports sphinx; do
+                      echo "Validating ${svc}/docker-compose.yaml..."
+                      docker compose -f "${svc}/docker-compose.yaml" config --quiet
+                  done
+              shell: bash
+

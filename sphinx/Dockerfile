@@ -21,3 +21,5 @@ RUN set -x  \
    && pip install --quiet --no-cache-dir recommonmark==0.7.1 \
    && pip install --quiet --no-cache-dir sphinx==6.1.3 \
    && pip install --quiet --no-cache-dir sphinx-rtd-theme==1.2.0
+
+CMD ["sphinx-build", "-b", "html", ".", "_build"]

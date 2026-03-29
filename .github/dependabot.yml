@@ -1,0 +1,135 @@
+---
+version: 2
+updates:
+    - package-ecosystem: github-actions
+      directory: /.github/workflows/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+      groups:
+          actions-official:
+              patterns:
+                  - actions/*
+          docker-actions:
+              patterns:
+                  - docker/*
+          sonar-actions:
+              patterns:
+                  - SonarSource/*
+          community-actions:
+              patterns:
+                  - '*'
+
+    - package-ecosystem: pre-commit
+      directory: /
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /black/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /flake8/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /hadolint/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /mypy/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /pre-commit/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /pylint/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /pytest/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /python-dev/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /reorder-python-imports/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies
+
+    - package-ecosystem: docker
+      directory: /sphinx/
+      schedule:
+          interval: weekly
+          day: monday
+      commit-message:
+          prefix: chore(deps)
+      labels:
+          - dependencies

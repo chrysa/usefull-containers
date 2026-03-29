@@ -1,85 +1,52 @@
 ---
 default_language_version:
-    python: python3.9
+    python: python3.13
 fail_fast: false
-minimum_pre_commit_version: 3.0.4
+minimum_pre_commit_version: 4.1.0
 repos:
-    # - repo: meta
-    #   hooks:
-    #       - id: identity
-    #         stages: [manual]
-    #       - id: check-hooks-apply
-    #         stages: [manual]
-    #       - id: check-useless-excludes
-    #        stages: [manual]
-    - repo: https://github.com/asottile/setup-cfg-fmt
-      rev: 09259c821eda6517244b28758aa69cd1a4929929
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: f1dff44d3a9ae852957f34def96390f28719c232
       hooks:
-          - id: setup-cfg-fmt
-    - repo: https://github.com/IamTheFij/docker-pre-commit.git
-      rev: v2.1.1
+          - id: trailing-whitespace
+          - id: end-of-file-fixer
+          - id: check-yaml
+          - id: check-merge-conflict
+          - id: check-added-large-files
+          - id: mixed-line-ending
+    - repo: https://github.com/chrysa/pre-commit-tools
+      rev: f1acbfb7e0993f7cdda723ff665d532f83aff9e0
       hooks:
-          - id: docker-compose-check
-            stages: [manual]
+          - id: format-dockerfiles
+          - id: dockerfile-no-latest
+          - id: env-file-check
+          - id: yaml-sorter
+    - repo: https://github.com/AleksaC/hadolint-py
+      rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
+      hooks:
           - id: hadolint
-            stages: [manual]
-    - repo: https://github.com/cheshirekow/cmake-format-precommit
-      rev: v0.6.13
-      hooks:
-          - id: cmake-format
-            files: Makefile
-          - id: cmake-lint
-            files: Makefile
-    - repo: https://github.com/frnmst/md-toc
-      rev: 8.1.9
-      hooks:
-          - id: md-toc
-            stages:
-                - manual
-    - repo: https://github.com/smian/pre-commit-makefile.git
-      rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
-      hooks:
-          - id: makefile-doc
-            stages:
-                - manual
-    - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: v0.34.0
-      hooks:
-          - id: markdownlint
-            args: [--fix,]
-    - repo: https://github.com/executablebooks/mdformat
-      rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
-      hooks:
-          - id: mdformat
-        # Optionally add plugins
-            additional_dependencies:
-                - mdformat-gfm
-                - mdformat-black
-    - repo: https://github.com/lovesegfault/beautysh.git
-      rev: 9845efc3ea3e86cc0d41465d720a47f521b2799c
+            args:
+                - -c
+                - .hadolint.yaml
+    - repo: https://github.com/lovesegfault/beautysh
+      rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
       hooks:
           - id: beautysh
             args: [--indent-size, '4']
-    - repo: https://github.com/openstack/bashate.git
-      rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+    - repo: https://github.com/openstack/bashate
+      rev: ec2f2400915200d633299612a02d7d285e4be24c
       hooks:
           - id: bashate
             args:
                 - --ignore=E006,E020
-    - repo: https://github.com/pre-commit/mirrors-eslint
-      rev: v8.39.0
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: f7ed74202ac8ec26bab4a68359556c5243df142f
       hooks:
-          - id: eslint
-            args: [--config, svelte/code/.eslintrc.cjs]
-            additional_dependencies:
-                - eslint
-                - svelte
-                - typescript
-                - eslint-plugin-svelte3
-                - '@typescript-eslint/eslint-plugin'
-                - '@typescript-eslint/parser'
-                - eslint-config-prettier
-    - repo: https://github.com/pre-commit/mirrors-csslint
-      rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
+          - id: markdownlint
+            args: [--fix]
+            stages: [manual]
+    - repo: https://github.com/Yelp/detect-secrets
+      rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
       hooks:
-          - id: csslint
+          - id: detect-secrets
+            args: [--baseline, .secrets.baseline]
+            exclude: \.pre-commit-config\.yaml

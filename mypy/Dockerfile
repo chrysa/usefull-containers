@@ -1,10 +1,10 @@
-FROM    python:3.11-alpine
+FROM python:3.11-alpine
 
 COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
 COPY setup-default.cfg /opt/setup-default.cfg
 
-ENV PATH=$PATH:/home/mypy/.local/bin
-ENV MYPYPATH=/app
+ENV PATH=$PATH:/home/mypy/.local/bin \
+    MYPYPATH=/app
 
 WORKDIR /app
 
@@ -22,7 +22,5 @@ RUN set -x \
     && python -m pip install --quiet --no-cache-dir --upgrade pip \
     && pip install --quiet --no-cache-dir mypy==1.2.0 \
     && pip install --quiet --no-cache-dir junit-xml==1.9
-
-WORKDIR /app
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
