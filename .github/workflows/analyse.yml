@@ -56,6 +56,12 @@ jobs:
                     - python-dev
                     - reorder-python-imports
                     - sphinx
+                    - ruff
+                    - bandit
+                    - safety
+                    - trivy
+                    - actionlint
+                    - yamllint
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
