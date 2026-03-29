@@ -1,208 +1,267 @@
-<!--TOC-->
+# usefull-containers
 
-<!--TOC-->
+[![CI — Analyse](https://github.com/chrysa/usefull-containers/actions/workflows/analyse.yml/badge.svg)](https://github.com/chrysa/usefull-containers/actions/workflows/analyse.yml)
+[![CI — Build](https://github.com/chrysa/usefull-containers/actions/workflows/build-and-publish.yml/badge.svg)](https://github.com/chrysa/usefull-containers/actions/workflows/build-and-publish.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=chrysa_usefull-containers&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=chrysa_usefull-containers)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-chrysa-blue?logo=docker)](https://hub.docker.com/u/chrys4)
 
-## Black
+> A collection of ready-to-use Docker containers for Python code quality, testing, and development tooling.
 
-### Alias
+---
 
-```
-alias my_black="docker run --rm -ti --name=black --volume ${PWD}:/app chrys4/black:latest"
-```
+## Table of Contents
 
-### Base image
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+- [Containers](#containers)
+- [Makefile reference](#makefile-reference)
+- [CI/CD](#cicd)
+- [Contributing](#contributing)
 
-pyfound/black:23.3.0
+---
 
-## Flake8
+## Requirements
 
-### Alias
+- Docker >= 24
+- Docker Compose >= 2.20
+- GNU Make >= 4.3
+- Python >= 3.13 (pre-commit local execution)
 
-```
-alias my_flake8="docker run --rm -ti --name=flake8 --volume ${PWD}:/app chrys4/flake8:latest"
-```
+---
 
-### Base image
+## Quick Start
 
-python:3.11-alpine
+```bash
+# Copy and configure environment variables
+cp .env.example .env
 
-### Packages
+# Build all containers
+make build
 
-- flake8==6.0.0
-- flake8-black==0.3.6
-- flake8-html==0.4.3
-- flake8-junit-report==2.1.0
-- flake8-mypy==17.8.0
-
-## Hadolint
-
-### Alias
-
-```
-alias my_hadolint="docker run --rm -ti --name=hadolint --volume ${PWD}: chrys4/hadolint:latest bash -c '\`find . -name '*.[D-d]ockerfile' -name 'Dockerfile'\`'"
-```
-
-### Base image
-
-hadolint/hadolint:latest-debian
-
-## Mypy
-
-### Alias
-
-```
-alias my_mypy="docker run --rm -ti --name=mypy --volume ${PWD}:/app chrys4/mypy:latest $@"
+# Check container statuses
+make status
 ```
 
-### Base image
+---
 
-python:3.11-alpine
+## Containers
 
-### Packages
+| Container | Base Image | Docker Hub | Description |
+|---|---|---|---|
+| [black](#black) | `pyfound/black:23.3.0` | `chrys4/black` | Python code formatter |
+| [flake8](#flake8) | `python:3.11-alpine` | `chrys4/flake8` | PEP 8 style checker with reporting |
+| [hadolint](#hadolint) | `hadolint/hadolint:latest-debian` | `chrys4/hadolint` | Dockerfile linter |
+| [mypy](#mypy) | `python:3.11-alpine` | `chrys4/mypy` | Static type checker |
+| [pre-commit](#pre-commit) | `python:3.11-slim` | `chrys4/pre-commit` | Git hook manager |
+| [pylint](#pylint) | `python:3.11-alpine` | `chrys4/pylint` | Python static analyser with reporting |
+| [pytest](#pytest) | `python:3.11-alpine` | `chrys4/pytest` | Test runner with coverage & reporting |
+| [python-dev](#python-dev) | `python:3.11-slim` | `chrys4/python-dev` | Interactive dev shell (IPython + ipdb) |
+| [reorder-python-imports](#reorder-python-imports) | `python:3.11-alpine` | `chrys4/reorder-python-imports` | Automatic import sorter |
+| [sphinx](#sphinx) | `python:3.11-alpine` | `chrys4/sphinx` | Documentation generator |
 
-- mypy==1.0.1
-- junit-xml==1.9
+---
 
-## Pre-commit
+### Black
 
-### Alias
+Python opinionated code formatter, zero-config.
 
-```
-alias my_pre_commit="docker run --rm -ti --name=mypy --volume /var/run/docker.sock:/var/run/docker.sock --volume ${PWD}:/app chrys4/pre-commit:latest $@"
-```
+**Packages:** `pyfound/black:23.3.0` (upstream)
 
-### Base image
-
-python:3.11-slim
-
-### Packages
-
-- pre-commit==3.0.4
-
-## Pylint
-
-### Alias
-
-```
-alias my_pylint="docker run --rm -ti --name=pylint --volume ${PWD}:/app chrys4/pylint:latest $@"
-```
-
-### Base image
-
-python:3.11-alpine
-
-### Packages
-
-- pylint==2.16.2
-- pylint-junit==0.3.2
-- pylint-report==2.4.0
-
-## Pytest
-
-### Alias
-
-```
-alias my_pytest="docker run --rm -ti --name=pytest --volume ${PWD}:/app chrys4/pytest:latest pytest --rcfile=./setup.cfg $@"
+```bash
+alias my_black="docker run --rm -ti \
+  --name=black \
+  --volume ${PWD}:/app \
+  chrys4/black:latest"
 ```
 
-### Base image
+---
 
-python:3.11-alpine
+### Flake8
 
-### Packages
+PEP 8 checker with HTML and JUnit XML output.
 
-- faker==17.0.0
-- mock==5.0.1
-- pytest==7.2.1
-- pytest-benchmark==4.0.0
-- pytest-cov==4.0.0
-- pytest-depends==1.0.1
-- pytest-func-cov==0.2.3
-- pytest-html==3.2.0
-- pytest-mock==3.10.0
+**Packages:** `flake8==6.0.0`, `flake8-black==0.3.6`, `flake8-html==0.4.3`, `flake8-junit-report==2.1.0`, `flake8-mypy==17.8.0`
 
-## Python Dev
-
-### Base image
-
-python:3.11-slim
-
-### Packages
-
-- ipython==8.10.0
-- ipdb==0.13.9
-- prompt-toolkit==3.0.37
-
-## Reorder Python Imports
-
-### Alias
-
-```
-alias my_reorder="docker run --rm -ti --name=reorder-python-imports --volume ${PWD}:/app chrys4/reorder-python-imports:latest reorder-python-imports $@"
+```bash
+alias my_flake8="docker run --rm -ti \
+  --name=flake8 \
+  --volume ${PWD}:/app \
+  chrys4/flake8:latest"
 ```
 
-### Base image
+---
 
-python:3.11-alpine
+### Hadolint
 
-### Packages
+Dockerfile linter — enforces best practices and shell pitfalls.
 
-- reorder-python-imports==3.9.0
-
-## Sphinx
-
-### Alias
-
-```
-alias my_sphinx="docker run --rm -ti --name=sphinx --volume ${PWD}:/app chrys4/sphinx:latest bash $@"
+```bash
+alias my_hadolint="docker run --rm -ti \
+  --name=hadolint \
+  --volume ${PWD}:/app \
+  chrys4/hadolint:latest \
+  $(find . -name Dockerfile)"
 ```
 
-### Base image
+---
 
-python:3.11-alpine
+### Mypy
 
-### Packages
+Static type checker for Python with JUnit XML output.
 
-- graphviz==0.20.1
-- recommonmark==0.7.1
-- sphinx==6.1.3
-- sphinx-rtd-theme==1.2.0
+**Packages:** `mypy==1.2.0`, `junit-xml==1.9`
 
-# Makefile rules
-
-<!-- START makefile-doc -->
-
-```
-$ make help 
-make[1]: Entering directory '/mnt/d/drive/dev/repos/-perso-/usefull-containers'
-Variables:
- - "service_name" is a docker compose service name or a list of services separate by space as string ()
-
-
-target                                             help                                                                             usage                                                       
-------                                             ----                                                                             ----                                                        
-build                                               Build project                                                                    build [service_name#{service_name}]                        
-down                                                Down project containers                                                          down                                                       
-get-from-remote                                     get source from ducal server                                                                                                                
-hadolint                                            lint dockerfiles                                                                 hadolint                                                   
-help                                                This help dialog.                                                                make help                                                  
-logs                                                display logs                                                                                                                                
-logs-f                                              display logs with follow                                                                                                                    
-logs-tail                                           display logs tail                                                                [tail#`echo ${tail}`]                                      
-pre-commit                                          run localy precommit                                                                                                                        
-prune                                               remove service on the host and prune volume image and network unused                                                                        
-remote-connect                                      connect to ducal server                                                                                                                     
-remote-get                                          get source from ducal server                                                                                                                
-remote-send                                         send source to ducal server                                                                                                                 
-send-to-remote                                      send source to ducal server                                                                                                                 
-start                                               Start project containers                                                         [service_name#{service_name}]                              
-status                                              display status of all service                                                                                                               
-stop                                                Start project containers                                                         [service_name#{service_name}]                              
-tag-latest                                          tag services as latest                                                           make tag-latest                                            
-up-detach                                           Up project containers                                                             [service_name#{service_name}]                             
-upgradable-packages                                 list outdated package in service                                                                                                            
-up                                                  Up project containers                                                            [service_name#{service_name}]                              
-make[1]: Leaving directory '/mnt/d/drive/dev/repos/-perso-/usefull-containers' 
+```bash
+alias my_mypy="docker run --rm -ti \
+  --name=mypy \
+  --volume ${PWD}:/app \
+  chrys4/mypy:latest"
 ```
 
-<!-- END makefile-doc -->
+---
+
+### Pre-commit
+
+Git hook manager. Needs Docker socket access to run hooks that spin up containers.
+
+**Packages:** `pre-commit==3.2.2`
+
+```bash
+alias my_pre_commit="docker run --rm -ti \
+  --name=pre-commit \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  --volume ${PWD}:/app \
+  chrys4/pre-commit:latest"
+```
+
+---
+
+### Pylint
+
+Python static code analyser with HTML and JUnit output.
+
+**Packages:** `pylint==2.17.2`, `pylint-junit==0.3.2`, `pylint-report==2.4.0`
+
+```bash
+alias my_pylint="docker run --rm -ti \
+  --name=pylint \
+  --volume ${PWD}:/app \
+  chrys4/pylint:latest"
+```
+
+---
+
+### Pytest
+
+Full-featured test runner with coverage, benchmarks, HTML report, mocking.
+
+**Packages:** `pytest==7.2.2`, `pytest-cov==4.0.0`, `pytest-html==3.2.0`, `pytest-benchmark==4.0.0`, `pytest-mock==3.10.0`, `faker==18.4.0`, `mock==5.0.1`
+
+```bash
+alias my_pytest="docker run --rm -ti \
+  --name=pytest \
+  --volume ${PWD}:/app \
+  chrys4/pytest:latest pytest --rcfile=./setup.cfg"
+```
+
+---
+
+### Python Dev
+
+Interactive Python shell for development — IPython REPL + ipdb debugger.
+
+**Packages:** `ipython==8.12.0`, `ipdb==0.13.13`, `prompt-toolkit==3.0.38`
+
+```bash
+alias my_python_dev="docker run --rm -ti \
+  --name=python-dev \
+  --volume ${PWD}:/app \
+  chrys4/python-dev:latest"
+```
+
+---
+
+### Reorder Python Imports
+
+Automatically reorders and organises Python import statements.
+
+**Packages:** `reorder-python-imports==3.9.0`
+
+```bash
+alias my_reorder="docker run --rm -ti \
+  --name=reorder-python-imports \
+  --volume ${PWD}:/app \
+  chrys4/reorder-python-imports:latest"
+```
+
+---
+
+### Sphinx
+
+Python documentation generator with ReadTheDocs theme.
+
+**Packages:** `sphinx==6.1.3`, `sphinx-rtd-theme==1.2.0`, `recommonmark==0.7.1`, `graphviz==0.20.1`
+
+```bash
+alias my_sphinx="docker run --rm -ti \
+  --name=sphinx \
+  --volume ${PWD}:/app \
+  chrys4/sphinx:latest bash"
+```
+
+---
+
+## Makefile reference
+
+Run `make help` to see all available targets.
+
+| Target | Description | Args |
+|---|---|---|
+| `build` | Build a service image | `service=<name>` |
+| `up` | Start services (foreground) | `service=<name>` |
+| `up-detach` | Start services (background) | `service=<name>` |
+| `down` | Stop and remove all containers | |
+| `start` | Start a stopped service | `service=<name>` |
+| `stop` | Stop a running service | `service=<name>` |
+| `status` | Show all service statuses | |
+| `logs` | Show service logs | `service=<name>` |
+| `logs-f` | Follow service logs | `service=<name>` |
+| `logs-tail` | Show last N log lines | `service=<name> tail=10` |
+| `hadolint-analyse` | Lint all Dockerfiles | |
+| `pre-commit` | Run pre-commit on all files | |
+| `packages-version` | List outdated packages in all services | |
+| `prune` | Remove containers + prune Docker resources | |
+| `tag-latest` | Tag all service images as `:latest` | |
+
+---
+
+## CI/CD
+
+| Workflow | Trigger | Description |
+|---|---|---|
+| [`analyse.yml`](.github/workflows/analyse.yml) | push / pull_request | pre-commit hooks + hadolint per service |
+| [`build-and-publish.yml`](.github/workflows/build-and-publish.yml) | push `main`/`develop` | GitVersion → build → push to Docker Hub |
+| [`sonar.yml`](.github/workflows/sonar.yml) | push `main` / weekly | SonarCloud quality scan |
+
+Versioning follows [GitVersion](https://gitversion.net/) in `GitHubFlow` mode (configured in [`GitVersion.yml`](GitVersion.yml)).
+
+### Required secrets / variables
+
+| Name | Where | Description |
+|---|---|---|
+| `DOCKER_HUB_TOKEN` | Secret | Docker Hub access token |
+| `SONAR_TOKEN` | Secret | SonarCloud token |
+| `DOCKER_HUB_USERNAME` | Variable | Docker Hub username (e.g. `chrys4`) |
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Install pre-commit: `pip install "pre-commit>=4.1.0" && pre-commit install`
+4. Commit using [Conventional Commits](https://www.conventionalcommits.org/)
+5. Open a pull request
+
+See [ISSUE_TEMPLATE](.github/ISSUE_TEMPLATE/) for bug reports and feature requests.

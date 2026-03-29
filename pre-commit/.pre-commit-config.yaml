@@ -1,53 +1,33 @@
 ---
 default_language_version:
-  python: python3.9
+    python: python3.13
 fail_fast: false
-minimum_pre_commit_version: 3.0.4
+minimum_pre_commit_version: 4.1.0
 repos:
-  # - repo: meta
-  #   hooks:
-  #       - id: identity
-  #         stages:
-  #             - manual
-  #       - id: check-hooks-apply
-  #         stages:
-  #             - manual
-  #       - id: check-useless-excludes
-  #         stages:
-  #             - manual
-  - repo: https://github.com/IamTheFij/docker-pre-commit.git
-    rev: v2.0.1
-    hooks:
-      - id: docker-compose-check
-        files: docker-compose.[a-zZ-Z\-_.]+y[a]{0,1}ml$
-      - id: hadolint
-        files: .[Dd]ockerfile$
-  - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: 5842b32061da26bfab6508c61306d210d84215ec
-    hooks:
-      - id: setup-cfg-fmt
-  - repo: https://github.com/asottile/dead
-    rev: 4465de5b324804d61d2dd800b655069d5df4b2d6
-    hooks:
-      - id: dead
-        args: [--files, ^src/\W+.*.py$, --exclude, ^docs\W+.*.py$]
-  - repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v3.0.0a4
-    hooks:
-      - id: pylint
-        files: *.py$
-        args:
-          [
-            --rcfile=./src/setup.cfg,
-            --reports=no,
-            --persistent=no,
-            --score=no,
-            --disable=E0401,
-          ]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 449ace5e55cb1e43057ab67349dce1208e657768
-    hooks:
-      - id: mypy
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: f1dff44d3a9ae852957f34def96390f28719c232
+      hooks:
+          - id: trailing-whitespace
+          - id: end-of-file-fixer
+          - id: check-yaml
+          - id: check-merge-conflict
+    - repo: https://github.com/IamTheFij/docker-pre-commit.git
+      rev: v3.0.1
+      hooks:
+          - id: docker-compose-check
+            files: docker-compose\.[a-zA-Z\-_.]+y[a]{0,1}ml$
+          - id: hadolint
+            files: \.?[Dd]ockerfile$
+    - repo: https://github.com/chrysa/pre-commit-tools
+      rev: f1acbfb7e0993f7cdda723ff665d532f83aff9e0
+      hooks:
+          - id: format-dockerfiles
+          - id: dockerfile-no-latest
+          - id: env-file-check
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: 449ace5e55cb1e43057ab67349dce1208e657768
+      hooks:
+          - id: mypy
         args: [--ignore-missing-imports]
         files: *.py$
   - repo: https://github.com/pycqa/flake8
