@@ -1,0 +1,19 @@
+---
+services:
+    safety:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            labels:
+                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+                build_date: ${BUILD_DATE:-}
+                commit_id: ${CI_COMMIT_SHA:-}
+                vcs-url: ${CI_REPOSITORY_URL:-}
+                vcs-ref: ${CI_COMMIT_SHA:-}
+                departement: security
+                description: Python dependency vulnerability scanner
+                version: ${SAFETY_CONTAINER_VERSION}
+        container_name: safety
+        image: ${DOCKER_REPO:-local}/safety:${SAFETY_CONTAINER_VERSION}
+        tty: true
+        working_dir: /app

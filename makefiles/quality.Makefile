@@ -13,7 +13,8 @@ hadolint-analyse: ## Run hadolint on all Dockerfiles
 packages-version: black-packages-version flake8-packages-version mypy-packages-version \
 	pre-commit-packages-version python-dev-packages-version pylint-packages-version \
 	pytest-packages-version reorder-python-import-packages-version \
-	sphinx-packages-version ## List outdated packages in all active services
+	sphinx-packages-version ruff-packages-version bandit-packages-version \
+	safety-packages-version yamllint-packages-version ## List outdated packages in all active services
 
 pre-commit: ## Run pre-commit checks on all files
 	@pip install --quiet --no-cache-dir "pre-commit>=4.1.0"

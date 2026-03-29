@@ -1,0 +1,19 @@
+---
+services:
+    bandit:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            labels:
+                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+                build_date: ${BUILD_DATE:-}
+                commit_id: ${CI_COMMIT_SHA:-}
+                vcs-url: ${CI_REPOSITORY_URL:-}
+                vcs-ref: ${CI_COMMIT_SHA:-}
+                departement: security
+                description: Python security static analyser
+                version: ${BANDIT_CONTAINER_VERSION}
+        container_name: bandit
+        image: ${DOCKER_REPO:-local}/bandit:${BANDIT_CONTAINER_VERSION}
+        tty: true
+        working_dir: /app
