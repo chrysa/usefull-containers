@@ -19,3 +19,7 @@ __pycache__/
 reports/
 .cache/
 
+
+# Sonar
+sonar-project.properties
+.sonar/
