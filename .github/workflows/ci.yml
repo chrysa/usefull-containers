@@ -1,5 +1,6 @@
 ---
-name: "\U0001F50E Analyse"
+name: CI
+
 run-name: ${{ github.workflow }} by ${{ github.actor }}
 
 concurrency:
@@ -9,7 +10,6 @@ concurrency:
 on:
     push:
         branches:
-            - main
             - develop
     pull_request:
         types:
@@ -28,15 +28,12 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-            - name: Setup Python
-              uses: actions/setup-python@v5
+            - uses: actions/checkout@v6
+            - uses: actions/setup-python@v5
               with:
-                  python-version: '3.13'
+                  python-version: '3.14'
                   cache: pip
-            - name: Run pre-commit
-              uses: pre-commit/action@v3.0.1
+            - uses: pre-commit/action@v3.0.1
 
     hadolint:
         name: Hadolint — ${{ matrix.service }}
@@ -63,8 +60,7 @@ jobs:
                     - actionlint
                     - yamllint
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Run hadolint on ${{ matrix.service }}/Dockerfile
               uses: hadolint/hadolint-action@v3.1.0
               with:
@@ -77,8 +73,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 10
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Validate root docker-compose.yaml
               run: docker compose config --quiet
               shell: bash
@@ -89,4 +84,3 @@ jobs:
                       docker compose -f "${svc}/docker-compose.yaml" config --quiet
                   done
               shell: bash
-
