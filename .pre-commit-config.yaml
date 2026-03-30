@@ -14,7 +14,7 @@ repos:
           - id: check-added-large-files
           - id: mixed-line-ending
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: f1acbfb7e0993f7cdda723ff665d532f83aff9e0
+      rev: 625e085213a7c40bad6efe988d77179a4827f486
       hooks:
           - id: format-dockerfiles
           - id: dockerfile-no-latest
