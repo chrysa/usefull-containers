@@ -1,11 +1,15 @@
----
 extends: default
-
 rules:
-    line-length:
-        max: 120
-        level: warning
-    truthy:
-        allowed-values: ["true", "false", "yes", "no", "on", "off"]
-    comments:
-        min-spaces-from-content: 1
+  comments:
+    min-spaces-from-content: 1
+  line-length:
+    level: warning
+    max: 120
+  truthy:
+    allowed-values:
+    - 'false'
+    - 'no'
+    - 'off'
+    - 'on'
+    - 'true'
+    - 'yes'
