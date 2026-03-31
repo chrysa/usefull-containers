@@ -28,176 +28,176 @@ repos:
       rev: 449ace5e55cb1e43057ab67349dce1208e657768
       hooks:
           - id: mypy
-        args: [--ignore-missing-imports]
-        files: *.py$
-  - repo: https://github.com/pycqa/flake8
-    rev: c8d1be624612d338ab70ee523d01beca9f019bdc
-    hooks:
-      - id: flake8
-        files: *.py$
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: 56ee62fd758cbc2c1bb27bc3220083a11a4cfd11
-    hooks:
-      - id: python-no-eval
-      - id: python-no-log-warn
-      - id: python-use-type-annotations
-      - id: rst-backticks
-  - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: 803192698951433f710357b47982a23c63a07f4a
-    hooks:
-      - id: auto-walrus
-  - repo: https://github.com/dannysepler/rm_unneeded_f_str
-    rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
-    hooks:
-      - id: rm-unneeded-f-str
-  - repo: https://github.com/PyCQA/bandit
-    rev: d87faedd61c7d2107db9990036ecf7014579de2f
-    hooks:
-      - id: bandit
-  - repo: https://github.com/asottile/pyupgrade
-    rev: ddb39ad37166dbc938d853cc77606526a0b1622a
-    hooks:
-      - id: pyupgrade
-        args: [--py3-plus, --py3-only, --py39-plus]
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: 5601d5d39352a825eb96f2c4354ac39c45833294
-    hooks:
-      - id: reorder-python-imports
-        args: [--py3-plus, --py39-plus]
-  - repo: https://github.com/psf/black
-    rev: 25d886f52c2bbbb58386ac8050f4e67952507bc7
-    hooks:
-      - id: black
-  - repo: https://github.com/asottile/blacken-docs
-    rev: e91047933754d9ce46b4d4bf06117839d2c598e7
-    hooks:
-      - id: blacken-docs
-        additional_dependencies: [black]
-  - repo: https://github.com/econchick/interrogate
-    rev: 1.4.0
-    hooks:
-      - id: interrogate
-        args:
-          [
-            --ignore-init-method,
-            --ignore-init-module=false,
-            --ignore-magic=false,
-            --ignore-semiprivate=false,
-            --ignore-private=false,
-            --ignore-property-decorators=false,
-            --ignore-module,
-            --ignore-nested-functions=false,
-            --ignore-nested-classes,
-            --ignore-setters=false,
-            --fail-under=95,
-            --verbose=2,
-            --quiet=false,
-            --color,
-            --generate-badge=".",
-            --badge-format="svg",
-          ]
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-    rev: v1.1.1
-    hooks:
-      #          - id: htmllint
-      - id: markdown-toc
-        args: [--indent, "    ", -i]
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: fb029a2977e244ba6d72f9482f624a9812e48e14
-    hooks:
-      - id: markdownlint
-        args: [--fix, --ignore=src/**/node_modules]
-        stages: [manual]
-  - repo: https://github.com/smian/pre-commit-makefile.git
-    rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
-    hooks:
-      - id: makefile-doc
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.5
-    hooks:
-      - id: prettier
-        args: [--write] # edit files in-place
-        additional_dependencies:
-          - prettier
-          - prettier-plugin-svelte
-          - svelte
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.35.0
-    hooks:
-      - id: eslint
-        additional_dependencies:
-          - eslint
-          - svelte
-          - typescript
-          - eslint-plugin-svelte3
-          - "@typescript-eslint/eslint-plugin"
-          - "@typescript-eslint/parser"
-          - eslint-config-prettier
-  - repo: https://github.com/pre-commit/mirrors-jshint
-    rev: v2.13.0
-    hooks:
-      - id: jshint
-  - repo: https://github.com/pre-commit/mirrors-csslint
-    rev: 2da8122bb4506b52a710588605ec46e79d3f5bd1
-    hooks:
-      - id: csslint
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: 404656394cc0fd1f3f962a143ab738673037ea40
-    hooks:
-      - id: yamllint
-        args: [--format, parsable, --strict]
-  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.1.0
-    hooks:
-      - id: yamlfmt
-        args: [--width, "200"]
-  - repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.13
-    hooks:
-      - id: cmake-format
-        files: Makefile
-      - id: cmake-lint
-        files: Makefile
-  - repo: https://github.com/frnmst/md-toc
-    rev: 8.1.9
-    hooks:
-      - id: md-toc
-  - repo: https://github.com/smian/pre-commit-makefile.git
-    rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
-    hooks:
-      - id: makefile-doc
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: f219dde467e6aa3ea3c50b30322c0928ab4d3a12
-    hooks:
-      - id: markdownlint
-        args: [--fix]
-  - repo: https://github.com/executablebooks/mdformat
-    rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
-    hooks:
-      - id: mdformat
-        # Optionally add plugins
-        additional_dependencies:
-          - mdformat-gfm
-          - mdformat-black
-  - repo: https://github.com/lovesegfault/beautysh.git
-    rev: d616eb8d9d05ee4fb33de9c5521d99c3f0695d52
-    hooks:
-      - id: beautysh
-        args: [--indent-size, "4"]
-  - repo: https://github.com/openstack/bashate.git
-    rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
-    hooks:
-      - id: bashate
-        args:
-          - --ignore=E006,E020
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 9260cbc9c84c06022993bfbcc42fdbf0305c5b8e
-    hooks:
-      - id: check-json
-      - id: check-yaml
-        args:
-          - --allow-multiple-documents
-        files: .(yaml|yml)$
+            args: [--ignore-missing-imports]
+            files: *.py$
+    - repo: https://github.com/pycqa/flake8
+      rev: c8d1be624612d338ab70ee523d01beca9f019bdc
+      hooks:
+          - id: flake8
+            files: *.py$
+    - repo: https://github.com/pre-commit/pygrep-hooks
+      rev: 56ee62fd758cbc2c1bb27bc3220083a11a4cfd11
+      hooks:
+          - id: python-no-eval
+          - id: python-no-log-warn
+          - id: python-use-type-annotations
+          - id: rst-backticks
+    - repo: https://github.com/MarcoGorelli/auto-walrus
+      rev: 803192698951433f710357b47982a23c63a07f4a
+      hooks:
+          - id: auto-walrus
+    - repo: https://github.com/dannysepler/rm_unneeded_f_str
+      rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
+      hooks:
+          - id: rm-unneeded-f-str
+    - repo: https://github.com/PyCQA/bandit
+      rev: d87faedd61c7d2107db9990036ecf7014579de2f
+      hooks:
+          - id: bandit
+    - repo: https://github.com/asottile/pyupgrade
+      rev: ddb39ad37166dbc938d853cc77606526a0b1622a
+      hooks:
+          - id: pyupgrade
+            args: [--py3-plus, --py3-only, --py39-plus]
+    - repo: https://github.com/asottile/reorder_python_imports
+      rev: 5601d5d39352a825eb96f2c4354ac39c45833294
+      hooks:
+          - id: reorder-python-imports
+            args: [--py3-plus, --py39-plus]
+    - repo: https://github.com/psf/black
+      rev: 25d886f52c2bbbb58386ac8050f4e67952507bc7
+      hooks:
+          - id: black
+    - repo: https://github.com/asottile/blacken-docs
+      rev: e91047933754d9ce46b4d4bf06117839d2c598e7
+      hooks:
+          - id: blacken-docs
+            additional_dependencies: [black]
+    - repo: https://github.com/econchick/interrogate
+      rev: 1.4.0
+      hooks:
+          - id: interrogate
+            args:
+                [
+                    --ignore-init-method,
+                    --ignore-init-module=false,
+                    --ignore-magic=false,
+                    --ignore-semiprivate=false,
+                    --ignore-private=false,
+                    --ignore-property-decorators=false,
+                    --ignore-module,
+                    --ignore-nested-functions=false,
+                    --ignore-nested-classes,
+                    --ignore-setters=false,
+                    --fail-under=95,
+                    --verbose=2,
+                    --quiet=false,
+                    --color,
+                    --generate-badge=".",
+                    --badge-format="svg",
+                ]
+    - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+      rev: v1.1.1
+      hooks:
+          #          - id: htmllint
+          - id: markdown-toc
+            args: [--indent, "    ", -i]
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: fb029a2977e244ba6d72f9482f624a9812e48e14
+      hooks:
+          - id: markdownlint
+            args: [--fix, --ignore=src/**/node_modules]
+            stages: [manual]
+    - repo: https://github.com/smian/pre-commit-makefile.git
+      rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
+      hooks:
+          - id: makefile-doc
+    - repo: https://github.com/pre-commit/mirrors-prettier
+      rev: v3.0.0-alpha.5
+      hooks:
+          - id: prettier
+            args: [--write] # edit files in-place
+            additional_dependencies:
+                - prettier
+                - prettier-plugin-svelte
+                - svelte
+    - repo: https://github.com/pre-commit/mirrors-eslint
+      rev: v8.35.0
+      hooks:
+          - id: eslint
+            additional_dependencies:
+                - eslint
+                - svelte
+                - typescript
+                - eslint-plugin-svelte3
+                - "@typescript-eslint/eslint-plugin"
+                - "@typescript-eslint/parser"
+                - eslint-config-prettier
+    - repo: https://github.com/pre-commit/mirrors-jshint
+      rev: v2.13.0
+      hooks:
+          - id: jshint
+    - repo: https://github.com/pre-commit/mirrors-csslint
+      rev: 2da8122bb4506b52a710588605ec46e79d3f5bd1
+      hooks:
+          - id: csslint
+    - repo: https://github.com/adrienverge/yamllint.git
+      rev: 404656394cc0fd1f3f962a143ab738673037ea40
+      hooks:
+          - id: yamllint
+            args: [--format, parsable, --strict]
+    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+      rev: 0.1.0
+      hooks:
+          - id: yamlfmt
+            args: [--width, "200"]
+    - repo: https://github.com/cheshirekow/cmake-format-precommit
+      rev: v0.6.13
+      hooks:
+          - id: cmake-format
+            files: Makefile
+          - id: cmake-lint
+            files: Makefile
+    - repo: https://github.com/frnmst/md-toc
+      rev: 8.1.9
+      hooks:
+          - id: md-toc
+    - repo: https://github.com/smian/pre-commit-makefile.git
+      rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
+      hooks:
+          - id: makefile-doc
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: f219dde467e6aa3ea3c50b30322c0928ab4d3a12
+      hooks:
+          - id: markdownlint
+            args: [--fix]
+    - repo: https://github.com/executablebooks/mdformat
+      rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
+      hooks:
+          - id: mdformat
+            # Optionally add plugins
+            additional_dependencies:
+                - mdformat-gfm
+                - mdformat-black
+    - repo: https://github.com/lovesegfault/beautysh.git
+      rev: d616eb8d9d05ee4fb33de9c5521d99c3f0695d52
+      hooks:
+          - id: beautysh
+            args: [--indent-size, "4"]
+    - repo: https://github.com/openstack/bashate.git
+      rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+      hooks:
+          - id: bashate
+            args:
+                - --ignore=E006,E020
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: 9260cbc9c84c06022993bfbcc42fdbf0305c5b8e
+      hooks:
+          - id: check-json
+          - id: check-yaml
+            args:
+                - --allow-multiple-documents
+            files: .(yaml|yml)$
       - id: check-case-conflict
       - id: end-of-file-fixer
       - id: mixed-line-ending

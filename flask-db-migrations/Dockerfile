@@ -21,3 +21,4 @@ RUN set -x \
     && pip install --quiet --no-cache-dir SQLAlchemy==1.4.22
 
 CMD ["alembic","-x","data=true","upgrade","head"]
+
