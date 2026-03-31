@@ -1,19 +1,18 @@
----
 services:
-    yamllint:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            labels:
-                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
-                build_date: ${BUILD_DATE:-}
-                commit_id: ${CI_COMMIT_SHA:-}
-                vcs-url: ${CI_REPOSITORY_URL:-}
-                vcs-ref: ${CI_COMMIT_SHA:-}
-                departement: QA
-                description: YAML files linter
-                version: ${YAMLLINT_CONTAINER_VERSION}
-        container_name: yamllint
-        image: ${DOCKER_REPO:-local}/yamllint:${YAMLLINT_CONTAINER_VERSION}
-        tty: true
-        working_dir: /app
+  yamllint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      labels:
+        build_date: ${BUILD_DATE:-}
+        commit_id: ${CI_COMMIT_SHA:-}
+        departement: QA
+        description: YAML files linter
+        maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+        vcs-ref: ${CI_COMMIT_SHA:-}
+        vcs-url: ${CI_REPOSITORY_URL:-}
+        version: ${YAMLLINT_CONTAINER_VERSION}
+    container_name: yamllint
+    image: ${DOCKER_REPO:-local}/yamllint:${YAMLLINT_CONTAINER_VERSION}
+    tty: true
+    working_dir: /app

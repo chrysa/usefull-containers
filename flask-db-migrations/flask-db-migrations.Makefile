@@ -6,4 +6,3 @@ flask-db-migrations-tag-latest: ## Tag flask-db-migrations image as :latest
 
 flask-db-migrations-packages-version: ## List outdated packages in flask-db-migrations
 	@docker compose run --rm --entrypoint "pip list --outdated --format columns" flask-db-migrations
-

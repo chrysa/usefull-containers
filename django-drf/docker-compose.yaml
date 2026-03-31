@@ -1,46 +1,44 @@
----
-
 services:
-    django-drf:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            labels:
-                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
-                build_date: ${BUILD_DATE:-}
-                commit_id: ${CI_COMMIT_SHA:-}
-                vcs-url: ${CI_REPOSITORY_URL:-}
-                vcs-ref: ${CI_COMMIT_SHA:-}
-                departement: documentation
-                description: python documentation project
-                version: ${DANGO_DRF_CONTAINER_VERSION}
-        container_name: dango-drf
-        environment:
-            DEBUG: false
-        hostname: dango_drf
-        image: ${DOCKER_REPO:-local}/dango-drf:${DANGO_DRF_CONTAINER_VERSION}
-        tty: true
-        working_dir: /app
-        volumes:
-            - type: volume
-              source: sockets
-              target: /socket
-    django-drf-dev:
-        command: python manage.py runserver --verbosity 3 0.0.0.0:8080
-        container_name: dango_drf-dev
-        environment:
-            DEBUG: true
-        hostname: dango_drf-dev
-        image: ${DOCKER_REPO:-local}/dango-drf:${DANGO_DRF_CONTAINER_VERSION}
-        ports:
-            - 8080:8080
-        stdin_open: true
-        tty: true
-        volumes:
-            - type: bind
-              source: ./src
-              target: /drf-app
-            - type: volume
-              source: sockets
-              target: /socket
-        working_dir: /app
+  django-drf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      labels:
+        build_date: ${BUILD_DATE:-}
+        commit_id: ${CI_COMMIT_SHA:-}
+        departement: documentation
+        description: python documentation project
+        maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+        vcs-ref: ${CI_COMMIT_SHA:-}
+        vcs-url: ${CI_REPOSITORY_URL:-}
+        version: ${DANGO_DRF_CONTAINER_VERSION}
+    container_name: dango-drf
+    environment:
+      DEBUG: false
+    hostname: dango_drf
+    image: ${DOCKER_REPO:-local}/dango-drf:${DANGO_DRF_CONTAINER_VERSION}
+    tty: true
+    volumes:
+    - source: sockets
+      target: /socket
+      type: volume
+    working_dir: /app
+  django-drf-dev:
+    command: python manage.py runserver --verbosity 3 0.0.0.0:8080
+    container_name: dango_drf-dev
+    environment:
+      DEBUG: true
+    hostname: dango_drf-dev
+    image: ${DOCKER_REPO:-local}/dango-drf:${DANGO_DRF_CONTAINER_VERSION}
+    ports:
+    - 8080:8080
+    stdin_open: true
+    tty: true
+    volumes:
+    - source: ./src
+      target: /drf-app
+      type: bind
+    - source: sockets
+      target: /socket
+      type: volume
+    working_dir: /app
