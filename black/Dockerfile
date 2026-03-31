@@ -1,4 +1,4 @@
-FROM    pyfound/black:23.3.0
+FROM    pyfound/black:26.3.1
 
 WORKDIR /app
 
