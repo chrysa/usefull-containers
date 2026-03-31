@@ -1,81 +1,79 @@
----
 services:
-    black:
-        extends:
-            file: black/docker-compose.yaml
-            service: black
-    django-drf:
-        extends:
-            file: django-drf/docker-compose.yaml
-            service: django-drf
-    flake8:
-        extends:
-            file: flake8/docker-compose.yaml
-            service: flake8
-    flask:
-        extends:
-            file: flask/docker-compose.yaml
-            service: flask
-    flask-db-migrations:
-        extends:
-            file: flask-db-migrations/docker-compose.yaml
-            service: flask-db-migrations
-    hadolint:
-        extends:
-            file: hadolint/docker-compose.yaml
-            service: hadolint
-    mypy:
-        extends:
-            file: mypy/docker-compose.yaml
-            service: mypy
-    pre-commit:
-        extends:
-            file: pre-commit/docker-compose.yaml
-            service: pre-commit
-    pylint:
-        extends:
-            file: pylint/docker-compose.yaml
-            service: pylint
-    pytest:
-        extends:
-            file: pytest/docker-compose.yaml
-            service: pytest
-    python-dev:
-        extends:
-            file: python-dev/docker-compose.yaml
-            service: python-dev
-    reorder-python-imports:
-        extends:
-            file: reorder-python-imports/docker-compose.yaml
-            service: reorder-python-imports
-    sphinx:
-        extends:
-            file: sphinx/docker-compose.yaml
-            service: sphinx
-    ruff:
-        extends:
-            file: ruff/docker-compose.yaml
-            service: ruff
-    bandit:
-        extends:
-            file: bandit/docker-compose.yaml
-            service: bandit
-    safety:
-        extends:
-            file: safety/docker-compose.yaml
-            service: safety
-    trivy:
-        extends:
-            file: trivy/docker-compose.yaml
-            service: trivy
-    actionlint:
-        extends:
-            file: actionlint/docker-compose.yaml
-            service: actionlint
-    yamllint:
-        extends:
-            file: yamllint/docker-compose.yaml
-            service: yamllint
+  actionlint:
+    extends:
+      file: actionlint/docker-compose.yaml
+      service: actionlint
+  bandit:
+    extends:
+      file: bandit/docker-compose.yaml
+      service: bandit
+  black:
+    extends:
+      file: black/docker-compose.yaml
+      service: black
+  django-drf:
+    extends:
+      file: django-drf/docker-compose.yaml
+      service: django-drf
+  flake8:
+    extends:
+      file: flake8/docker-compose.yaml
+      service: flake8
+  flask:
+    extends:
+      file: flask/docker-compose.yaml
+      service: flask
+  flask-db-migrations:
+    extends:
+      file: flask-db-migrations/docker-compose.yaml
+      service: flask-db-migrations
+  hadolint:
+    extends:
+      file: hadolint/docker-compose.yaml
+      service: hadolint
+  mypy:
+    extends:
+      file: mypy/docker-compose.yaml
+      service: mypy
+  pre-commit:
+    extends:
+      file: pre-commit/docker-compose.yaml
+      service: pre-commit
+  pylint:
+    extends:
+      file: pylint/docker-compose.yaml
+      service: pylint
+  pytest:
+    extends:
+      file: pytest/docker-compose.yaml
+      service: pytest
+  python-dev:
+    extends:
+      file: python-dev/docker-compose.yaml
+      service: python-dev
+  reorder-python-imports:
+    extends:
+      file: reorder-python-imports/docker-compose.yaml
+      service: reorder-python-imports
+  ruff:
+    extends:
+      file: ruff/docker-compose.yaml
+      service: ruff
+  safety:
+    extends:
+      file: safety/docker-compose.yaml
+      service: safety
+  sphinx:
+    extends:
+      file: sphinx/docker-compose.yaml
+      service: sphinx
+  trivy:
+    extends:
+      file: trivy/docker-compose.yaml
+      service: trivy
+  yamllint:
+    extends:
+      file: yamllint/docker-compose.yaml
+      service: yamllint
 volumes:
-    sockets:
-
+  sockets: null

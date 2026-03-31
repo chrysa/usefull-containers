@@ -29,12 +29,12 @@ repos:
       hooks:
           - id: mypy
             args: [--ignore-missing-imports]
-            files: *.py$
+            files: "*.py$"
     - repo: https://github.com/pycqa/flake8
       rev: c8d1be624612d338ab70ee523d01beca9f019bdc
       hooks:
           - id: flake8
-            files: *.py$
+            files: "*.py$"
     - repo: https://github.com/pre-commit/pygrep-hooks
       rev: 56ee62fd758cbc2c1bb27bc3220083a11a4cfd11
       hooks:
@@ -198,19 +198,19 @@ repos:
             args:
                 - --allow-multiple-documents
             files: .(yaml|yml)$
-      - id: check-case-conflict
-      - id: end-of-file-fixer
-      - id: mixed-line-ending
-        args:
-          - --fix=lf
-      - id: pretty-format-json
-        args:
-          - --indent=4
-          - --autofix
-      - id: trailing-whitespace
-      - id: check-merge-conflict
-  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: 54f7f7c5cb9501110b928f2a98faa8024142f8d7
-    hooks:
-      - id: pretty-format-toml
-        args: [--autofix]
+          - id: check-case-conflict
+          - id: end-of-file-fixer
+          - id: mixed-line-ending
+            args:
+                - --fix=lf
+          - id: pretty-format-json
+            args:
+                - --indent=4
+                - --autofix
+          - id: trailing-whitespace
+          - id: check-merge-conflict
+    - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+      rev: 54f7f7c5cb9501110b928f2a98faa8024142f8d7
+      hooks:
+          - id: pretty-format-toml
+            args: [--autofix]
