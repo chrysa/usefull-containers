@@ -20,7 +20,7 @@ repos:
           - id: dockerfile-no-latest
           - id: env-file-check
           - id: yaml-sorter
-            exclude: ^\.github/workflows/
+            exclude: ^(\.github/|pre-commit/)
     - repo: https://github.com/AleksaC/hadolint-py
       rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
       hooks:

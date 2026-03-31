@@ -7,7 +7,6 @@
 # Environment
 .env
 !.env.example
-.secrets.baseline
 
 # Docker
 .docker/
