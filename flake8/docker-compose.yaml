@@ -1,21 +1,18 @@
----
-
 services:
-    flake8:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            labels:
-                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
-                build_date: ${BUILD_DATE:-}
-                commit_id: ${CI_COMMIT_SHA:-}
-                vcs-url: ${CI_REPOSITORY_URL:-}
-                vcs-ref: ${CI_COMMIT_SHA:-}
-                departement: QA
-                description: guideline checker for python projects
-                version: ${FLAKE8_CONTAINER_VERSION}
-
-        container_name: flake8
-        image: ${DOCKER_REPO:-local}/flake8:${FLAKE8_CONTAINER_VERSION}
-        tty: true
-        working_dir: /app
+  flake8:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      labels:
+        build_date: ${BUILD_DATE:-}
+        commit_id: ${CI_COMMIT_SHA:-}
+        departement: QA
+        description: guideline checker for python projects
+        maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+        vcs-ref: ${CI_COMMIT_SHA:-}
+        vcs-url: ${CI_REPOSITORY_URL:-}
+        version: ${FLAKE8_CONTAINER_VERSION}
+    container_name: flake8
+    image: ${DOCKER_REPO:-local}/flake8:${FLAKE8_CONTAINER_VERSION}
+    tty: true
+    working_dir: /app

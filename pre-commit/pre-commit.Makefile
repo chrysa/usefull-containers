@@ -6,4 +6,3 @@ pre-commit-tag-latest: ## Tag pre-commit image as :latest
 
 pre-commit-packages-version: ## List outdated packages in pre-commit
 	@docker compose run --rm --entrypoint "pip list --outdated --format columns" pre-commit
-

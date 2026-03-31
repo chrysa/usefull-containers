@@ -6,4 +6,3 @@ flask-tag-latest: ## Tag flask image as :latest
 
 flask-packages-version: ## List outdated packages in flask
 	@docker compose run --rm --entrypoint "pip list --outdated --format columns" flask
-

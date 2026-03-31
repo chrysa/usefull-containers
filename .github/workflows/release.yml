@@ -18,12 +18,12 @@ jobs:
         timeout-minutes: 10
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   fetch-depth: 0
             - name: Compute version
               id: gitversion
-              uses: chrysa/github-actions/gitversion@main
+              uses: chrysa/github-actions/gitversion@v1
             - name: Create release
               uses: softprops/action-gh-release@v2
               with:

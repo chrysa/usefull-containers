@@ -3,8 +3,8 @@ version: 2
 updates:
     - package-ecosystem: github-actions
       directory: /.github/workflows/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -27,8 +27,8 @@ updates:
 
     - package-ecosystem: pre-commit
       directory: /
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -38,8 +38,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /black/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -49,8 +49,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /flake8/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -60,8 +60,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /hadolint/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -71,8 +71,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /mypy/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -82,8 +82,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /pre-commit/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -93,8 +93,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /pylint/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -104,8 +104,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /pytest/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -115,8 +115,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /python-dev/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -126,8 +126,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /reorder-python-imports/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -137,8 +137,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /sphinx/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -148,8 +148,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /ruff/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -159,8 +159,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /bandit/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -170,8 +170,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /safety/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -181,8 +181,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /trivy/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -192,8 +192,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /actionlint/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
@@ -203,8 +203,8 @@ updates:
 
     - package-ecosystem: docker
       directory: /yamllint/
-      schedule:
       open-pull-requests-limit: 5
+      schedule:
           interval: weekly
           day: monday
       commit-message:
