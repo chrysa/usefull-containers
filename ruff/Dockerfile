@@ -1,4 +1,4 @@
-FROM python:3.13-alpine
+FROM python:3.14-alpine
 
 ENV PATH=$PATH:/root/.local/bin \
     GIT_DISCOVERY_ACROSS_FILESYSTEM=true
