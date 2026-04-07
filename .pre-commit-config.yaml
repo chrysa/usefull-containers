@@ -46,7 +46,7 @@ repos:
             args: [--fix]
             stages: [manual]
     - repo: https://github.com/Yelp/detect-secrets
-      rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
+      rev: 5e141933554a0b74e7341841f318be21e895339c
       hooks:
           - id: detect-secrets
             args: [--baseline, .secrets.baseline]
