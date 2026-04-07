@@ -40,7 +40,7 @@ repos:
             args:
                 - --ignore=E006,E020
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: 70466ee0aa1d9bca1fd4ce54bfbba370431ecced
+      rev: 804e22828e98e561085e47f39a15f42c8397b883
       hooks:
           - id: markdownlint
             args: [--fix]
