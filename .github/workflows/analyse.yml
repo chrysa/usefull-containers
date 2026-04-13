@@ -35,8 +35,12 @@ jobs:
               with:
                   python-version: '3.13'
                   cache: pip
+            - name: Install pre-commit
+              run: pip install --quiet pre-commit
+              shell: bash
             - name: Run pre-commit
-              uses: pre-commit/action@v3.0.1
+              run: pre-commit run --all-files --show-diff-on-failure
+              shell: bash
 
     hadolint:
         name: Hadolint — ${{ matrix.service }}
