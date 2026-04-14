@@ -1,6 +1,6 @@
 ---
 default_language_version:
-    python: python3.13
+    python: python3.14
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
@@ -14,12 +14,13 @@ repos:
           - id: check-added-large-files
           - id: mixed-line-ending
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: f1acbfb7e0993f7cdda723ff665d532f83aff9e0
+      rev: 2f1ce66f6619df34ef9ac8e0737296add680d146
       hooks:
           - id: format-dockerfiles
           - id: dockerfile-no-latest
           - id: env-file-check
           - id: yaml-sorter
+            exclude: ^(\.github/|pre-commit/|\.pre-commit-config\.yaml|\.hadolint\.yaml|\.yamllint\.yaml|\.markdownlint\.yml)
     - repo: https://github.com/AleksaC/hadolint-py
       rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
       hooks:
@@ -39,13 +40,13 @@ repos:
             args:
                 - --ignore=E006,E020
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: f7ed74202ac8ec26bab4a68359556c5243df142f
+      rev: 804e22828e98e561085e47f39a15f42c8397b883
       hooks:
           - id: markdownlint
             args: [--fix]
             stages: [manual]
     - repo: https://github.com/Yelp/detect-secrets
-      rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
+      rev: 5e141933554a0b74e7341841f318be21e895339c
       hooks:
           - id: detect-secrets
             args: [--baseline, .secrets.baseline]

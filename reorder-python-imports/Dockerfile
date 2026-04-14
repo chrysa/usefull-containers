@@ -1,4 +1,4 @@
-FROM  python:3.11-alpine
+FROM  python:3.14-alpine
 
 ENV PATH=$PATH:/home/reorder-python-imports/.local/bin GIT_DISCOVERY_ACROSS_FILESYSTEM=true
 

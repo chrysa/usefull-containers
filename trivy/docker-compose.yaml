@@ -1,23 +1,22 @@
----
 services:
-    trivy:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            labels:
-                maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
-                build_date: ${BUILD_DATE:-}
-                commit_id: ${CI_COMMIT_SHA:-}
-                vcs-url: ${CI_REPOSITORY_URL:-}
-                vcs-ref: ${CI_COMMIT_SHA:-}
-                departement: security
-                description: container and filesystem vulnerability scanner
-                version: ${TRIVY_CONTAINER_VERSION}
-        container_name: trivy
-        image: ${DOCKER_REPO:-local}/trivy:${TRIVY_CONTAINER_VERSION}
-        tty: true
-        working_dir: /app
-        volumes:
-            - type: bind
-              source: /var/run/docker.sock
-              target: /var/run/docker.sock
+  trivy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      labels:
+        build_date: ${BUILD_DATE:-}
+        commit_id: ${CI_COMMIT_SHA:-}
+        departement: security
+        description: container and filesystem vulnerability scanner
+        maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+        vcs-ref: ${CI_COMMIT_SHA:-}
+        vcs-url: ${CI_REPOSITORY_URL:-}
+        version: ${TRIVY_CONTAINER_VERSION}
+    container_name: trivy
+    image: ${DOCKER_REPO:-local}/trivy:${TRIVY_CONTAINER_VERSION}
+    tty: true
+    volumes:
+    - source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      type: bind
+    working_dir: /app
