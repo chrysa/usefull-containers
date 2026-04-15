@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 FROM python:3.14-slim
 
 COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
