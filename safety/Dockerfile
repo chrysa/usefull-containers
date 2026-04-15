@@ -22,3 +22,4 @@ RUN set -x \
     && pip install --prefer-binary --quiet --no-cache-dir safety==3.3.1
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
+
