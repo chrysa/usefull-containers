@@ -10,7 +10,7 @@ repos:
           - id: trailing-whitespace
           - id: end-of-file-fixer
           - id: check-yaml
-            exclude: ^\.github/ISSUE_TEMPLATE/
+            exclude: ^(\.github/)ISSUE_TEMPLATE/
           - id: check-merge-conflict
           - id: check-added-large-files
           - id: mixed-line-ending
