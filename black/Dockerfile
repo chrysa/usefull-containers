@@ -1,8 +1,11 @@
+# syntax=docker/dockerfile:1.4
+
 FROM    pyfound/black:26.3.1
 
 WORKDIR /app
 
-ENV PATH=$PATH:/home/black/.local/bin GIT_DISCOVERY_ACROSS_FILESYSTEM=true
+ENV PATH=$PATH:/home/black/.local/bin \
+    GIT_DISCOVERY_ACROSS_FILESYSTEM=true
 
 COPY docker-cmd.sh /opt/docker-cmd.sh
 
