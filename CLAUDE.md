@@ -1,5 +1,6 @@
 # usefull-containers
 
+> @[claude-sonnet-4-6]
 ## Project Overview
 Useful Docker containers for local development tooling across all chrysa projects.
 

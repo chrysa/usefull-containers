@@ -10,11 +10,12 @@ repos:
           - id: trailing-whitespace
           - id: end-of-file-fixer
           - id: check-yaml
+            exclude: ^(\.github/)ISSUE_TEMPLATE/
           - id: check-merge-conflict
           - id: check-added-large-files
           - id: mixed-line-ending
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: 2f1ce66f6619df34ef9ac8e0737296add680d146
+      rev: 6776765760636f4f81d1956480f35afac197954f
       hooks:
           - id: format-dockerfiles
           - id: dockerfile-no-latest

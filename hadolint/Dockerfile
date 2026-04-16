@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 FROM  hadolint/hadolint:latest-debian
 
 COPY .hadolint.yaml /app/.hadolint.yaml
