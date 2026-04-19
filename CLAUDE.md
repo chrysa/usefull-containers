@@ -1,39 +1,39 @@
-# usefull-containers
+# CLAUDE.md — usefull-containers
 
-> @[claude-sonnet-4-6]
-## Project Overview
-Useful Docker containers for local development tooling across all chrysa projects.
+## Project
 
-## Repository Structure
-See README.md for detailed structure.
+**Name:** usefull-containers
+**Stack:** Mixed / to document
+**Purpose:** [![CI — Analyse](https://github.com/chrysa/usefull-containers/actions/workflows/analyse.yml/badge.svg)](https://github.com/chrysa/usefull-containers/actions/workflows/analyse.yml).
 
-## Development Setup
-```bash
-make install
-make dev
-```
+## Working Rules
 
-## Testing
-```bash
-make test
-```
+- Language: English for code, comments, docs, issues and PRs.
+- Commits: Conventional Commits (`type(scope): description`).
+- Prefer repository make targets when a Makefile is available.
+- Read `.github/instructions/*.instructions.md` when present before starting task-specific work.
 
-## CI/CD
-- Pre-commit hooks: `.pre-commit-config.yaml`
-- CI: `.github/workflows/ci.yml`
-- PR dependency check: `.github/workflows/dependencies.yml`
-- Auto-labeler: `.github/workflows/labeler.yml`
-- Release: `.github/workflows/release.yml`
+## Claude Compatibility
 
-## Code Standards
-- All commits must follow conventional commit format
-- Pre-commit hooks must pass before push
-- CI must be green before merge
+- Claude Code hooks are configured in `.claude/settings.json`.
+- Shared hooks, thresholds and skills are vendored from `chrysa/shared-standards` into this repository.
+- Keep repository-specific overrides in this file and keep generic automation in `.claude/`.
 
-## Git Conventions
-- Branch naming: `feat/`, `fix/`, `chore/`, `refactor/`, `docs/`
-- Commits: conventional commits (`feat:`, `fix:`, `chore:`, etc.)
-- Changelog: auto-generated via `cliff.toml`
+## Read Order
 
-## Key Decisions
-See CHANGELOG.md for version history and notable changes.
+1. `~/.claude/CLAUDE.md` (private user preferences)
+2. `CLAUDE.md` (this repository)
+3. `.github/copilot-instructions.md`
+4. `.github/instructions/*.instructions.md` when present
+
+## Available Skills
+
+Local Claude skills in `.claude/skills/`:
+- `testing-pytest` for Python test work
+- `dockerfile-multistage` for Dockerfile authoring
+- `api-design` for REST and FastAPI/API design tasks
+
+## Repository Notes
+
+- Add repository-specific architecture, operational constraints, or domain rules here when needed.
+- If this repository needs extra Claude skills, add them under `.claude/skills/`.
