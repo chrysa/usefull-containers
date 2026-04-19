@@ -5,7 +5,7 @@ fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: f1dff44d3a9ae852957f34def96390f28719c232
+      rev: b89c5eef3ba3a74ecd506d968e63a8b80f697abf
       hooks:
           - id: trailing-whitespace
           - id: end-of-file-fixer
@@ -15,7 +15,7 @@ repos:
           - id: check-added-large-files
           - id: mixed-line-ending
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: 6776765760636f4f81d1956480f35afac197954f
+      rev: e538371cdb5dff59d3b67ef5e63dae3dce8bfc37
       hooks:
           - id: format-dockerfiles
           - id: dockerfile-no-latest
@@ -41,7 +41,7 @@ repos:
             args:
                 - --ignore=E006,E020
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: 804e22828e98e561085e47f39a15f42c8397b883
+      rev: cfc833bfc00c7cc40f702bd9e02df34d850d0291
       hooks:
           - id: markdownlint
             args: [--fix]

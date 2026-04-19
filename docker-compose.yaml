@@ -31,6 +31,10 @@ services:
     extends:
       file: hadolint/docker-compose.yaml
       service: hadolint
+  live-platform:
+    extends:
+      file: live-platform/docker-compose.yaml
+      service: live-platform
   mypy:
     extends:
       file: mypy/docker-compose.yaml
