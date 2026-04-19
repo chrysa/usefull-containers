@@ -1,0 +1,28 @@
+services:
+  live-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      labels:
+        build_date: ${BUILD_DATE:-}
+        commit_id: ${CI_COMMIT_SHA:-}
+        departement: devtools
+        description: "Real-time operational dashboard \u2014 backend API + SSE"
+        maintainer: ${MAINTAINER_NAME-} <${MAINTAINER_MAIL}>
+        vcs-ref: ${CI_COMMIT_SHA:-}
+        vcs-url: ${CI_REPOSITORY_URL:-}
+        version: ${LIVE_PLATFORM_CONTAINER_VERSION}
+    container_name: live-platform
+    environment:
+      GITHUB_ORGS: ${GITHUB_ORGS:-chrysa}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      NOTION_TOKEN: ${NOTION_TOKEN:-}
+      PORT: ${PORT:-7891}
+      PROJECTS_ROOT: ${PROJECTS_ROOT:-/projects}
+    image: ${DOCKER_REPO:-local}/live-platform:${LIVE_PLATFORM_CONTAINER_VERSION}
+    ports:
+    - ${PORT:-7891}:7891
+    tty: true
+    volumes:
+    - ${PROJECTS_ROOT:-/projects}:/projects:ro
+    working_dir: /app
