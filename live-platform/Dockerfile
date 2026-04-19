@@ -28,7 +28,7 @@ RUN pip install --quiet --no-cache-dir -r /tmp/requirements.txt
 
 FROM deps AS runtime
 
-COPY --chown=platform:platform . /app
+COPY --chown=platform:platform --chmod=0555 . /app
 
 USER platform
 
