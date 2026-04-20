@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - uses: actions/setup-python@v6
               with:
                   python-version: '3.14'
@@ -59,7 +59,7 @@ jobs:
                     - actionlint
                     - yamllint
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Run hadolint on ${{ matrix.service }}/Dockerfile
               uses: hadolint/hadolint-action@v3.3.0
               with:
@@ -72,7 +72,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 10
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Validate root docker-compose.yaml
               run: docker compose config --quiet
               shell: bash
