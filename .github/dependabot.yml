@@ -1,213 +1,77 @@
 ---
+# Dependabot template chrysa · avril 2026
+# Source : shared-standards/templates/github-config/dependabot.yml.tpl
+#
+# Schedule unifié : vendredi 04h00 UTC cron (évite PR en cours de sprint)
+# Cooldown 7j sur ecosystems bruyants · groups pour réduire volume PR
+#
+# Marqueurs {{ ... }} à remplacer par le script apply-ci-process.sh selon stack détectée.
+# Ecosystems possibles : pip, npm, docker, docker-compose, github-actions, pre-commit, cargo
+
 version: 2
 updates:
+    # ═══ GitHub Actions (tous repos) ═══
     - package-ecosystem: github-actions
-      directory: /.github/workflows/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
+      directory: .github/workflows/
+      assignees:
+          - chrysa
+      reviewers:
+          - chrysa
+      open-pull-requests-limit: 8
       commit-message:
-          prefix: chore(deps)
+          prefix: "[SKIP CI] [GA] "
       labels:
+          - skip-ci
           - dependencies
+          - Ci
+      schedule:
+          interval: cron
+          cronjob: "0 4 * * 5"
       groups:
           actions-official:
               patterns:
                   - actions/*
-          docker-actions:
+          peter-evans:
               patterns:
-                  - docker/*
-          sonar-actions:
-              patterns:
-                  - SonarSource/*
+                  - peter-evans/*
           community-actions:
               patterns:
-                  - '*'
+                  - "*"
+      cooldown:
+          default-days: 7
 
+    # ═══ Pre-commit (tous repos avec .pre-commit-config.yaml) ═══
     - package-ecosystem: pre-commit
       directory: /
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
+      assignees:
+          - chrysa
+      reviewers:
+          - chrysa
+      open-pull-requests-limit: 2
       commit-message:
-          prefix: chore(deps)
+          prefix: "[SKIP CI] [pre-commit] "
       labels:
+          - skip-ci
           - dependencies
+          - Pre-commit
+      schedule:
+          interval: cron
+          cronjob: "0 4 * * 5"
 
-    - package-ecosystem: docker
-      directory: /black/
+    # ═══ docker-compose ═══
+    - package-ecosystem: docker-compose
+      directory: /
+      assignees:
+          - chrysa
+      reviewers:
+          - chrysa
       open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
       commit-message:
-          prefix: chore(deps)
+          prefix: "[SKIP CI] [docker-compose] "
       labels:
+          - skip-ci
           - dependencies
-
-    - package-ecosystem: docker
-      directory: /flake8/
-      open-pull-requests-limit: 5
+          - Docker
       schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /hadolint/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /mypy/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /pre-commit/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /pylint/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /pytest/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /python-dev/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /reorder-python-imports/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /sphinx/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /ruff/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /bandit/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /safety/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /trivy/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /actionlint/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
-
-    - package-ecosystem: docker
-      directory: /yamllint/
-      open-pull-requests-limit: 5
-      schedule:
-          interval: weekly
-          day: monday
-      commit-message:
-          prefix: chore(deps)
-      labels:
-          - dependencies
+          interval: cron
+          cronjob: "0 4 * * 5"
