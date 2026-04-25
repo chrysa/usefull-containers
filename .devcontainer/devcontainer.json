@@ -1,0 +1,36 @@
+{
+  "name": "usefull-containers",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": { "dockerDashComposeVersion": "v2" },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" }
+  },
+  "postCreateCommand": "pip install uv pre-commit hadolint-py && pre-commit install && curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh && echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.bashrc && ~/.local/bin/rtk init -g --auto-patch",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "exiasr.hadolint",
+        "github.copilot",
+        "github.copilot-chat",
+        "mhutchie.git-graph",
+        "usernamehw.errorlens"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "[dockerfile]": {
+          "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+        },
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        }
+      }
+    }
+  },
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"
+  }
+}
