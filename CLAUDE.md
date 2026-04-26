@@ -8,7 +8,7 @@
 
 ## Working Rules
 
-- Language: English for code, comments, docs, issues and PRs.
+- Language: English — all code, comments, documentation, instructions, and configuration files must be in English.
 - Commits: Conventional Commits (`type(scope): description`).
 - Prefer repository make targets when a Makefile is available.
 - Read `.github/instructions/*.instructions.md` when present before starting task-specific work.
