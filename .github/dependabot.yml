@@ -57,4 +57,3 @@ updates:
       schedule:
           interval: cron
           cronjob: "0 4 * * 5"
-
