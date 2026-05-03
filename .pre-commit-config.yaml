@@ -5,7 +5,7 @@ fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 803469bde8523f208d030ce33f575d7bee0ba9bf
+      rev: v6.0.0
       hooks:
           - id: trailing-whitespace
           - id: end-of-file-fixer
@@ -15,7 +15,7 @@ repos:
           - id: check-added-large-files
           - id: mixed-line-ending
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: v0.1.1-54
+      rev: v0.1.1-58
       hooks:
           - id: format-dockerfiles
           - id: dockerfile-no-latest
@@ -23,31 +23,31 @@ repos:
           - id: yaml-sorter
             exclude: ^(\.github/|pre-commit/|\.pre-commit-config\.yaml|\.hadolint\.yaml|\.yamllint\.yaml|\.markdownlint\.yml)
     - repo: https://github.com/AleksaC/hadolint-py
-      rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
+      rev: v2.14.0
       hooks:
           - id: hadolint
             args:
                 - -c
                 - .hadolint.yaml
     - repo: https://github.com/lovesegfault/beautysh
-      rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
+      rev: v6.4.3
       hooks:
           - id: beautysh
             args: [--indent-size, '4']
     - repo: https://github.com/openstack/bashate
-      rev: ec2f2400915200d633299612a02d7d285e4be24c
+      rev: 2.1.1
       hooks:
           - id: bashate
             args:
                 - --ignore=E006,E020
     - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: cfc833bfc00c7cc40f702bd9e02df34d850d0291
+      rev: v0.48.0
       hooks:
           - id: markdownlint
             args: [--fix]
             stages: [manual]
     - repo: https://github.com/Yelp/detect-secrets
-      rev: 5e141933554a0b74e7341841f318be21e895339c
+      rev: v1.5.0
       hooks:
           - id: detect-secrets
             args: [--baseline, .secrets.baseline]
