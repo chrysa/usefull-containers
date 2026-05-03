@@ -13,7 +13,7 @@ repos:
   - id: mixed-line-ending
   - id: detect-private-key
   repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
 - hooks:
   - args:
     - --baseline
@@ -39,7 +39,7 @@ repos:
     stages:
     - commit-msg
   repo: https://github.com/compilerla/conventional-pre-commit
-  rev: v3.4.0
+  rev: v4.4.0
 - hooks:
   - args:
     - --disable
@@ -48,16 +48,16 @@ repos:
     - --
     id: markdownlint
   repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.43.0
+  rev: v0.48.0
 - hooks:
   - args:
     - -d
     - '{extends: default, rules: {line-length: disable, document-start: disable}}'
     id: yamllint
   repo: https://github.com/adrienverge/yamllint
-  rev: v1.35.1
+  rev: v1.38.0
 - hooks:
   - files: ^\.github/workflows/.*\.ya?ml$
     id: actionlint
   repo: https://github.com/rhysd/actionlint
-  rev: v1.7.7
+  rev: v1.7.12
