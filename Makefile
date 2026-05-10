@@ -35,6 +35,16 @@ logs: ## Tail service logs
 
 # ─── Development ──────────────────────────────────────────────────────────────
 
+install: ## Install backend dev dependencies
+	pip install -e ".[dev]"
+
+dev: up ## Start all services in development mode
+	$(DOCKER_COMPOSE) logs -f
+
+typecheck: ## Run type checkers (mypy + tsc via Docker)
+	$(DOCKER_COMPOSE) run --rm backend mypy .
+	$(DOCKER_COMPOSE) run --rm frontend npm run type-check
+
 pre-commit: ## Install and run pre-commit hooks
 	pre-commit install
 	pre-commit run --all-files
@@ -60,7 +70,7 @@ test: ## Run all tests via Docker
 	$(DOCKER_COMPOSE) run --rm frontend npm test
 
 test-cov: ## Run tests with coverage report
-	$(DOCKER_COMPOSE) run --rm backend pytest tests/ -v --cov --cov-report=term-missing --cov-report=xml
+	$(DOCKER_COMPOSE) run --rm backend pytest tests/ -v --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85
 
 # ─── Release ──────────────────────────────────────────────────────────────────
 
