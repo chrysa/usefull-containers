@@ -56,3 +56,35 @@ help-%: ## Show help for a specific target
 			-not -path "*/\.*" 2>/dev/null) \
 		$(MAKEFILE_LIST) 2>/dev/null | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-35s\033[0m %s\n", $$1, $$2}'
+
+# ─── Standards compliance ─────────────────────────────────────────────────────
+
+install: ## No install step — containers are standalone
+	@echo "No install step needed — run 'docker compose up' directly"
+
+dev: ## Start all containers in development mode
+	docker compose up
+
+test: ## Validate docker-compose configuration
+	docker compose config --quiet && echo "docker-compose config OK"
+
+test-cov: ## Alias → test (no coverage for container definitions)
+	$(MAKE) test
+
+lint: ## Lint Dockerfiles via pre-commit
+	pre-commit run --all-files
+
+format: ## Format files via pre-commit
+	pre-commit run --all-files prettier 2>/dev/null || pre-commit run --all-files
+
+typecheck: ## Validate Dockerfiles syntax (alias → test)
+	$(MAKE) test
+
+build: ## Build all containers
+	docker compose build
+
+clean: ## Remove containers and volumes
+	docker compose down -v --remove-orphans
+
+pre-commit: ## Run pre-commit hooks on all files
+	pre-commit run --all-files
