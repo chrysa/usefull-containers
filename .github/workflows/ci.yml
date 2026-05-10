@@ -10,7 +10,12 @@ concurrency:
 on:
     push:
         branches:
+            - main
             - develop
+            - "feat/**"
+            - "fix/**"
+            - "ci/**"
+            - "chore/**"
     pull_request:
         types:
             - opened
