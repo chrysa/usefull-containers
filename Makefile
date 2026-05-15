@@ -59,9 +59,7 @@ format: ## Run formatters (ruff + prettier via Docker)
 	$(DOCKER_COMPOSE) run --rm backend ruff format .
 	$(DOCKER_COMPOSE) run --rm frontend npm run format
 
-type-check: ## Run type checkers (mypy + tsc via Docker)
-	$(DOCKER_COMPOSE) run --rm backend mypy .
-	$(DOCKER_COMPOSE) run --rm frontend npm run type-check
+type-check: typecheck ## Legacy alias
 
 # ─── Tests ────────────────────────────────────────────────────────────────────
 

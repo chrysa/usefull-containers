@@ -1,5 +1,7 @@
 # satisfactory-factory-manager — Claude context
 
+> **Claude Code**: also read `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md` for code specifications.
+
 ## What does this project do?
 
 Factory planning tool for Satisfactory (Coffee Stain Studios). Replaces spreadsheets for production chain optimization: resource flow visualization, factory layout planning, AI Q&A assistant (in-game context). Phase 4 project — Gaming/OSS.
