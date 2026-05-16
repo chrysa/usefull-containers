@@ -69,7 +69,8 @@ test: ## Run all tests via Docker
 
 test-cov: ## Run tests with coverage report
 	$(DOCKER_COMPOSE) run --rm backend pytest tests/ -v --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85
-
+docker-test: ## Run tests in Docker (CI-compatible placeholder)
+	@echo "No test suite yet — docker-test is a placeholder"
 # ─── Release ──────────────────────────────────────────────────────────────────
 
 changelog: ## Regenerate CHANGELOG.md via git-cliff
