@@ -43,3 +43,21 @@ export function useDeleteBlueprintMutation() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 }
+
+export function useDownloadAllBlueprints() {
+  return useMutation<void, Error, void>({
+    mutationFn: async () => {
+      const res = await fetch("/api/v1/blueprints/download-all");
+      if (!res.ok) throw new Error(`Download failed: HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "blueprints.zip";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    },
+  });
+}

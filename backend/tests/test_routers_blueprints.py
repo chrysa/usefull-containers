@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -128,6 +129,41 @@ class TestDeleteBlueprintEndpoint:
     def test_delete_when_missing_should_return_404(self, patched_client: TestClient) -> None:
         resp = patched_client.delete("/api/v1/blueprints/ghost")
         assert resp.status_code == 404
+
+
+class TestDownloadAllEndpoint:
+    def test_download_all_when_empty_dir_should_return_200_with_valid_zip(
+        self, patched_client: TestClient
+    ) -> None:
+        resp = patched_client.get("/api/v1/blueprints/download-all")
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "application/zip"
+        assert 'filename="blueprints.zip"' in resp.headers["content-disposition"]
+        zf = zipfile.ZipFile(io.BytesIO(resp.content))
+        assert zf.namelist() == []
+
+    def test_download_all_when_blueprints_present_should_include_all_files(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, _ = populated_client
+        resp = client.get("/api/v1/blueprints/download-all")
+        assert resp.status_code == 200
+        zf = zipfile.ZipFile(io.BytesIO(resp.content))
+        names = zf.namelist()
+        assert "alpha.sbp" in names
+        assert "alpha.sbpcfg" in names
+        assert "beta.sbp" in names
+
+    def test_download_all_should_preserve_file_content(
+        self, patched_client: TestClient, tmp_path: Path
+    ) -> None:
+        from app import config as cfg_module
+        (tmp_path / "solo.sbp").write_bytes(b"REAL_SBP_BYTES")
+        cfg_module.settings.blueprints_dir = str(tmp_path)
+        resp = patched_client.get("/api/v1/blueprints/download-all")
+        assert resp.status_code == 200
+        zf = zipfile.ZipFile(io.BytesIO(resp.content))
+        assert zf.read("solo.sbp") == b"REAL_SBP_BYTES"
 
 
 class TestHealthEndpoint:

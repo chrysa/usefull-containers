@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from app.config import settings
-from app.constants import MAX_BLUEPRINT_SIZE_BYTES
+from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
 from app.models.blueprint import BlueprintList, BlueprintRead, BlueprintUploadResult
 from app.services.blueprint_service import (
     BlueprintDirectoryError,
     BlueprintNotFoundError,
+    build_blueprints_zip,
     delete_blueprint,
     get_blueprint,
     get_sbp_path,
@@ -27,6 +28,24 @@ async def list_all_blueprints() -> BlueprintList:
     except BlueprintDirectoryError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return BlueprintList(blueprints=blueprints, total=len(blueprints))
+
+
+@router.get("/download-all", status_code=200)
+async def download_all_blueprints() -> Response:
+    """
+    Download all blueprints as a single ZIP archive.
+    Useful for syncing an entire blueprint collection to a new device
+    (e.g. Steam Deck ↔ Windows PC).
+    """
+    try:
+        zip_bytes = build_blueprints_zip(settings.blueprints_dir)
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return Response(
+        content=zip_bytes,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{BLUEPRINTS_ZIP_FILENAME}"'},
+    )
 
 
 @router.get("/{name}", response_model=BlueprintRead, status_code=200)

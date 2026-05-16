@@ -11,3 +11,4 @@ BLUEPRINT_FILE_EXT: Final = ".sbp"
 BLUEPRINT_CFG_EXT: Final = ".sbpcfg"
 
 MAX_BLUEPRINT_SIZE_BYTES: Final = 50 * 1024 * 1024  # 50 MB
+BLUEPRINTS_ZIP_FILENAME: Final = "blueprints.zip"

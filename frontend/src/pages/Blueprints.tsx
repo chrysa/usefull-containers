@@ -4,6 +4,7 @@ import Skeleton from "../components/ui/Skeleton";
 import {
   useBlueprintsQuery,
   useDeleteBlueprintMutation,
+  useDownloadAllBlueprints,
   useUploadBlueprintMutation,
 } from "../domain/blueprints/queries";
 import styles from "./Blueprints.module.scss";
@@ -13,6 +14,7 @@ export default function BlueprintsPage() {
   const { data, isLoading, isError } = useBlueprintsQuery();
   const uploadMutation = useUploadBlueprintMutation();
   const deleteMutation = useDeleteBlueprintMutation();
+  const downloadAllMutation = useDownloadAllBlueprints();
 
   function handleUpload(formData: FormData) {
     uploadMutation.mutate(formData);
@@ -28,10 +30,22 @@ export default function BlueprintsPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1>{t("blueprints.title")}</h1>
-        <UploadButton
-          onUpload={handleUpload}
-          isUploading={uploadMutation.isPending}
-        />
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.downloadAllButton}
+            onClick={() => downloadAllMutation.mutate()}
+            disabled={downloadAllMutation.isPending}
+          >
+            {downloadAllMutation.isPending
+              ? t("blueprints.downloading")
+              : t("blueprints.download_all")}
+          </button>
+          <UploadButton
+            onUpload={handleUpload}
+            isUploading={uploadMutation.isPending}
+          />
+        </div>
       </header>
 
       {uploadMutation.isError && (
@@ -39,6 +53,9 @@ export default function BlueprintsPage() {
       )}
       {deleteMutation.isError && (
         <p className={styles.error}>{t("error")}: {deleteMutation.error.message}</p>
+      )}
+      {downloadAllMutation.isError && (
+        <p className={styles.error}>{t("error")}: {downloadAllMutation.error.message}</p>
       )}
 
       {isLoading && (

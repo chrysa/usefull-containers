@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import json
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -9,6 +11,7 @@ from app.models.blueprint import BlueprintRead
 from app.services.blueprint_service import (
     BlueprintDirectoryError,
     BlueprintNotFoundError,
+    build_blueprints_zip,
     delete_blueprint,
     get_blueprint,
     get_sbp_path,
@@ -129,3 +132,37 @@ class TestDeleteBlueprint:
     def test_delete_blueprint_when_missing_should_raise_not_found(self, tmp_path: Path) -> None:
         with pytest.raises(BlueprintNotFoundError):
             delete_blueprint(str(tmp_path), "ghost")
+
+
+class TestBuildBlueprintsZip:
+    def test_build_zip_when_empty_dir_should_return_valid_empty_zip(self, tmp_path: Path) -> None:
+        data = build_blueprints_zip(str(tmp_path))
+        zf = zipfile.ZipFile(io.BytesIO(data))
+        assert zf.namelist() == []
+
+    def test_build_zip_when_dir_missing_should_return_valid_empty_zip(self, tmp_path: Path) -> None:
+        data = build_blueprints_zip(str(tmp_path / "nonexistent"))
+        zf = zipfile.ZipFile(io.BytesIO(data))
+        assert zf.namelist() == []
+
+    def test_build_zip_when_blueprints_present_should_include_sbp_and_cfg(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "alpha")
+        _write_blueprint(tmp_path, "beta", with_cfg=False)
+        data = build_blueprints_zip(str(tmp_path))
+        zf = zipfile.ZipFile(io.BytesIO(data))
+        names = zf.namelist()
+        assert "alpha.sbp" in names
+        assert "alpha.sbpcfg" in names
+        assert "beta.sbp" in names
+
+    def test_build_zip_when_blueprints_present_should_preserve_file_content(self, tmp_path: Path) -> None:
+        (tmp_path / "solo.sbp").write_bytes(b"FAKE_SBP_CONTENT")
+        data = build_blueprints_zip(str(tmp_path))
+        zf = zipfile.ZipFile(io.BytesIO(data))
+        assert zf.read("solo.sbp") == b"FAKE_SBP_CONTENT"
+
+    def test_build_zip_when_path_is_not_dir_should_raise_directory_error(self, tmp_path: Path) -> None:
+        not_a_dir = tmp_path / "file.txt"
+        not_a_dir.write_text("hello")
+        with pytest.raises(BlueprintDirectoryError):
+            build_blueprints_zip(str(not_a_dir))

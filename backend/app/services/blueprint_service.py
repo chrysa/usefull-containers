@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import json
+import zipfile
 from datetime import datetime
 from pathlib import Path
 
@@ -134,3 +136,22 @@ def delete_blueprint(blueprints_dir: str, name: str) -> None:
         sbp_path.unlink()
     if cfg_path.exists():
         cfg_path.unlink()
+
+
+def build_blueprints_zip(blueprints_dir: str) -> bytes:
+    """
+    Pack all .sbp and .sbpcfg files from blueprints_dir into a ZIP archive.
+    Returns the raw ZIP bytes. Returns an empty ZIP when the directory is empty.
+    Raises BlueprintDirectoryError if blueprints_dir is not a directory.
+    """
+    directory = Path(blueprints_dir)
+    if directory.exists() and not directory.is_dir():
+        raise BlueprintDirectoryError(f"{blueprints_dir} is not a directory")
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+        if directory.exists():
+            for file in sorted(directory.iterdir()):
+                if file.suffix in {BLUEPRINT_FILE_EXT, BLUEPRINT_CFG_EXT}:
+                    zf.write(file, arcname=file.name)
+    return buf.getvalue()

@@ -58,4 +58,21 @@ export const blueprintsHandlers = [
     await delay(300);
     return new HttpResponse(null, { status: 204 });
   }),
+
+  http.get("/api/v1/blueprints/download-all", async () => {
+    await delay(500);
+    // Return a minimal valid ZIP (empty archive) for mock purposes
+    const emptyZip = new Uint8Array([
+      0x50, 0x4b, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    ]);
+    return new HttpResponse(emptyZip, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": 'attachment; filename="blueprints.zip"',
+      },
+    });
+  }),
 ];
