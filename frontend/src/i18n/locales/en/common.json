@@ -1,0 +1,20 @@
+{
+  "loading": "Loading...",
+  "not_found": "Page not found",
+  "go_home": "Go back home",
+  "error": "An error occurred",
+  "retry": "Retry",
+  "theme": {
+    "toggle": "Toggle theme"
+  },
+  "nav": {
+    "home": "Home",
+    "blueprints": "Blueprints"
+  },
+  "blueprints": {
+    "title": "Blueprint Sync",
+    "empty": "No blueprints found. Import a .sbp file to get started.",
+    "count": "{{count}} blueprint(s)",
+    "confirm_delete": "Delete blueprint \"{{name}}\"? This cannot be undone."
+  }
+}

@@ -1,0 +1,203 @@
+---
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+      - develop
+      - "feat/**"
+      - "fix/**"
+      - "chore/**"
+      - "ci/**"
+      - "docs/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+  statuses: write
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  pre-commit:
+    name: Pre-commit checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+        env:
+          SKIP: no-commit-to-branch
+
+  # ─────────────────────────────────────────────────────────────────────────
+  lint-backend:
+    name: Lint — Python / Ruff
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: chrysa/github-actions/python-setup@v1
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -e '.[dev]'
+
+      - uses: chrysa/github-actions/ruff-check@v1
+        with:
+          python-version: "3.12"
+          latest-python: "3.12"
+          config: backend/pyproject.toml
+          sources: backend
+
+  # ─────────────────────────────────────────────────────────────────────────
+  typecheck-backend:
+    name: Typecheck — mypy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: chrysa/github-actions/python-setup@v1
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -e '.[dev]'
+
+      - uses: chrysa/github-actions/mypy-check@v1
+        with:
+          python-version: "3.12"
+          latest-python: "3.12"
+          config-file: backend/pyproject.toml
+          sources: app
+
+  # ─────────────────────────────────────────────────────────────────────────
+  lint-frontend:
+    name: Lint — TypeScript / ESLint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: npm run lint
+
+  # ─────────────────────────────────────────────────────────────────────────
+  typecheck-frontend:
+    name: Typecheck — tsc
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [lint-frontend]
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run tsc
+        working-directory: frontend
+        run: npm run typecheck
+
+  # ─────────────────────────────────────────────────────────────────────────
+  test-backend:
+    name: Tests — pytest + coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [lint-backend]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Run pytest in Docker
+        run: docker compose -f docker-compose.test.yml run --rm backend-test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────────────
+  build-backend:
+    name: Build — Docker backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [test-backend]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build backend image (no push)
+        uses: docker/build-push-action@v7
+        with:
+          context: ./backend
+          push: false
+          tags: ghcr.io/${{ github.repository_owner }}/satisfactory-factory-manager/backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────────────────────────────────
+  build-frontend:
+    name: Build — Docker frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [typecheck-frontend]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build frontend image (no push)
+        uses: docker/build-push-action@v7
+        with:
+          context: ./frontend
+          push: false
+          tags: ghcr.io/${{ github.repository_owner }}/satisfactory-factory-manager/frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

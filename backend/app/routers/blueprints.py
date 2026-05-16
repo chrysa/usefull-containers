@@ -1,0 +1,102 @@
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi.responses import FileResponse
+
+from app.config import settings
+from app.constants import MAX_BLUEPRINT_SIZE_BYTES
+from app.models.blueprint import BlueprintList, BlueprintRead, BlueprintUploadResult
+from app.services.blueprint_service import (
+    BlueprintDirectoryError,
+    BlueprintNotFoundError,
+    delete_blueprint,
+    get_blueprint,
+    get_sbp_path,
+    list_blueprints,
+    save_blueprint,
+)
+
+router = APIRouter(prefix="/blueprints", tags=["blueprints"])
+
+
+@router.get("", response_model=BlueprintList, status_code=200)
+async def list_all_blueprints() -> BlueprintList:
+    """List all blueprints from the configured directory."""
+    try:
+        blueprints = list_blueprints(settings.blueprints_dir)
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return BlueprintList(blueprints=blueprints, total=len(blueprints))
+
+
+@router.get("/{name}", response_model=BlueprintRead, status_code=200)
+async def get_blueprint_detail(name: str) -> BlueprintRead:
+    """Return metadata for a single blueprint."""
+    try:
+        return get_blueprint(settings.blueprints_dir, name)
+    except BlueprintNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{name}/download", status_code=200)
+async def download_blueprint(name: str) -> FileResponse:
+    """Download the .sbp binary file for a blueprint."""
+    try:
+        path = get_sbp_path(settings.blueprints_dir, name)
+    except BlueprintNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return FileResponse(
+        path=str(path),
+        media_type="application/octet-stream",
+        filename=path.name,
+    )
+
+
+@router.post("", response_model=BlueprintUploadResult, status_code=201)
+async def upload_blueprint(
+    sbp_file: UploadFile,
+    cfg_file: UploadFile | None = None,
+) -> BlueprintUploadResult:
+    """
+    Upload a blueprint (.sbp required, .sbpcfg optional).
+    The blueprint name is derived from the uploaded filename (stem).
+    """
+    if sbp_file.filename is None:
+        raise HTTPException(status_code=422, detail="sbp_file must have a filename")
+
+    from pathlib import Path as _Path
+
+    name = _Path(sbp_file.filename).stem
+    if not name:
+        raise HTTPException(status_code=422, detail="Blueprint name cannot be empty")
+
+    sbp_data = await sbp_file.read()
+    if len(sbp_data) > MAX_BLUEPRINT_SIZE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Blueprint file exceeds maximum size of {MAX_BLUEPRINT_SIZE_BYTES} bytes",
+        )
+
+    cfg_data: bytes | None = None
+    if cfg_file is not None:
+        cfg_data = await cfg_file.read()
+
+    try:
+        is_new = save_blueprint(settings.blueprints_dir, name, sbp_data, cfg_data)
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return BlueprintUploadResult(name=name, created=is_new)
+
+
+@router.delete("/{name}", status_code=204)
+async def remove_blueprint(name: str) -> None:
+    """Delete a blueprint's .sbp and .sbpcfg files."""
+    try:
+        delete_blueprint(settings.blueprints_dir, name)
+    except BlueprintNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

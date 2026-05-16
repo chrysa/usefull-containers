@@ -1,0 +1,10 @@
+services:
+  backend-test:
+    build:
+      context: ./backend
+      target: deps
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=85"

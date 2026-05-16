@@ -27,8 +27,10 @@ jobs:
                       -Dsonar.projectKey=chrysa_satisfactory-factory-manager
                       -Dsonar.organization=chrysa
                       -Dsonar.projectName=satisfactory-factory-manager
-                      -Dsonar.sources=.
-                      -Dsonar.exclusions=**/.git/**,**/reports/**,**/.vscode/**,**/node_modules/**,**/__pycache__/**,**/dist/**,**/.mypy_cache/**
+                      -Dsonar.sources=backend/app,frontend/src
+                      -Dsonar.tests=backend/tests
+                      -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+                      -Dsonar.exclusions=**/.git/**,**/reports/**,**/.vscode/**,**/node_modules/**,**/__pycache__/**,**/dist/**,**/.mypy_cache/**,**/public/mockServiceWorker.js
                       -Dsonar.sourceEncoding=UTF-8
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

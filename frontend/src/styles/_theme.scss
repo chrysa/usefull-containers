@@ -1,0 +1,27 @@
+:root {
+  --bg: #f4f6f8;
+  --bg-secondary: #ffffff;
+  --header-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --surface-hover: #f9fafb;
+  --skeleton-base: #e5e7eb;
+  --skeleton-highlight: #f3f4f6;
+}
+
+html.dark {
+  --bg: #0f1117;
+  --bg-secondary: #1a1d27;
+  --header-bg: #1a1d27;
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+  --border: #374151;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --surface-hover: #1f2937;
+  --skeleton-base: #374151;
+  --skeleton-highlight: #4b5563;
+}

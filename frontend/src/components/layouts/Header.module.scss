@@ -1,0 +1,20 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--space-lg);
+  background: var(--header-bg);
+  border-bottom: var(--border-light);
+}
+
+.logo {
+  font-weight: 700;
+  font-size: var(--font-lg);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}

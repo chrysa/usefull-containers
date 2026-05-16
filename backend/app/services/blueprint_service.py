@@ -1,0 +1,136 @@
+from __future__ import annotations
+
+import json
+from datetime import datetime
+from pathlib import Path
+
+from app.constants import BLUEPRINT_CFG_EXT, BLUEPRINT_FILE_EXT
+from app.models.blueprint import BlueprintColor, BlueprintRead
+
+
+class BlueprintNotFoundError(Exception):
+    pass
+
+
+class BlueprintDirectoryError(Exception):
+    pass
+
+
+def _parse_cfg(cfg_path: Path) -> tuple[str, int, BlueprintColor | None, dict]:
+    """Parse a .sbpcfg JSON file. Returns (description, icon_id, color, raw)."""
+    try:
+        raw: dict = json.loads(cfg_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return "", 0, None, {}
+
+    description: str = raw.get("description", "")
+    icon_id: int = int(raw.get("iconID", 0))
+    color_data = raw.get("color")
+    color: BlueprintColor | None = None
+    if isinstance(color_data, dict):
+        color = BlueprintColor(
+            r=float(color_data.get("R", 0.0)),
+            g=float(color_data.get("G", 0.0)),
+            b=float(color_data.get("B", 0.0)),
+            a=float(color_data.get("A", 1.0)),
+        )
+    return description, icon_id, color, raw
+
+
+def list_blueprints(blueprints_dir: str) -> list[BlueprintRead]:
+    """Scan blueprints_dir and return all blueprint metadata."""
+    directory = Path(blueprints_dir)
+    if not directory.exists():
+        return []
+    if not directory.is_dir():
+        raise BlueprintDirectoryError(f"{blueprints_dir} is not a directory")
+
+    # Collect all blueprint names (stems present as .sbp or .sbpcfg)
+    names: set[str] = set()
+    for f in directory.iterdir():
+        if f.suffix in (BLUEPRINT_FILE_EXT, BLUEPRINT_CFG_EXT):
+            names.add(f.stem)
+
+    results: list[BlueprintRead] = []
+    for name in sorted(names):
+        sbp_path = directory / f"{name}{BLUEPRINT_FILE_EXT}"
+        cfg_path = directory / f"{name}{BLUEPRINT_CFG_EXT}"
+
+        has_sbp = sbp_path.exists()
+        has_cfg = cfg_path.exists()
+
+        description, icon_id, color, cfg_raw = _parse_cfg(cfg_path) if has_cfg else ("", 0, None, None)
+
+        size_bytes = sbp_path.stat().st_size if has_sbp else 0
+        modified_at: datetime | None = None
+        if has_sbp:
+            modified_at = datetime.fromtimestamp(sbp_path.stat().st_mtime)
+
+        results.append(
+            BlueprintRead(
+                name=name,
+                description=description,
+                icon_id=icon_id,
+                color=color,
+                has_sbp=has_sbp,
+                has_cfg=has_cfg,
+                size_bytes=size_bytes,
+                modified_at=modified_at,
+                cfg_raw=cfg_raw,
+            )
+        )
+    return results
+
+
+def get_blueprint(blueprints_dir: str, name: str) -> BlueprintRead:
+    """Return metadata for a single blueprint by name."""
+    all_blueprints = list_blueprints(blueprints_dir)
+    for bp in all_blueprints:
+        if bp.name == name:
+            return bp
+    raise BlueprintNotFoundError(f"Blueprint '{name}' not found")
+
+
+def get_sbp_path(blueprints_dir: str, name: str) -> Path:
+    """Return Path to the .sbp file, raising BlueprintNotFoundError if absent."""
+    path = Path(blueprints_dir) / f"{name}{BLUEPRINT_FILE_EXT}"
+    if not path.exists():
+        raise BlueprintNotFoundError(f"Blueprint .sbp file '{name}' not found")
+    return path
+
+
+def save_blueprint(blueprints_dir: str, name: str, sbp_data: bytes, cfg_data: bytes | None) -> bool:
+    """
+    Write a blueprint to disk. Returns True if created (new), False if overwritten.
+    Raises BlueprintDirectoryError if the directory cannot be created.
+    """
+    directory = Path(blueprints_dir)
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise BlueprintDirectoryError(f"Cannot create blueprints directory: {exc}") from exc
+
+    sbp_path = directory / f"{name}{BLUEPRINT_FILE_EXT}"
+    is_new = not sbp_path.exists()
+
+    sbp_path.write_bytes(sbp_data)
+    if cfg_data is not None:
+        cfg_path = directory / f"{name}{BLUEPRINT_CFG_EXT}"
+        cfg_path.write_bytes(cfg_data)
+
+    return is_new
+
+
+def delete_blueprint(blueprints_dir: str, name: str) -> None:
+    """Remove a blueprint's .sbp and .sbpcfg files. Raises BlueprintNotFoundError if absent."""
+    directory = Path(blueprints_dir)
+    sbp_path = directory / f"{name}{BLUEPRINT_FILE_EXT}"
+    cfg_path = directory / f"{name}{BLUEPRINT_CFG_EXT}"
+
+    if not sbp_path.exists() and not cfg_path.exists():
+        raise BlueprintNotFoundError(f"Blueprint '{name}' not found")
+
+    if sbp_path.exists():
+        sbp_path.unlink()
+    if cfg_path.exists():
+        cfg_path.unlink()

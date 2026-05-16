@@ -64,13 +64,13 @@ type-check: typecheck ## Legacy alias
 # ─── Tests ────────────────────────────────────────────────────────────────────
 
 test: ## Run all tests via Docker
-	$(DOCKER_COMPOSE) run --rm backend pytest tests/ -v
-	$(DOCKER_COMPOSE) run --rm frontend npm test
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
 
 test-cov: ## Run tests with coverage report
-	$(DOCKER_COMPOSE) run --rm backend pytest tests/ -v --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85
-docker-test: ## Run tests in Docker (CI-compatible placeholder)
-	@echo "No test suite yet — docker-test is a placeholder"
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
+
+docker-test: ## Run tests in Docker (CI-compatible)
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
 # ─── Release ──────────────────────────────────────────────────────────────────
 
 changelog: ## Regenerate CHANGELOG.md via git-cliff
