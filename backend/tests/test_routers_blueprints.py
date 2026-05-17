@@ -19,8 +19,10 @@ def _write_blueprint(directory: Path, name: str, *, with_cfg: bool = True) -> No
 @pytest.fixture
 def patched_client(tmp_path: Path) -> TestClient:
     from app import config as cfg_module
+
     cfg_module.settings.blueprints_dir = str(tmp_path)
     from app.main import create_app
+
     return TestClient(create_app())
 
 
@@ -29,13 +31,17 @@ def populated_client(tmp_path: Path) -> tuple[TestClient, Path]:
     _write_blueprint(tmp_path, "alpha")
     _write_blueprint(tmp_path, "beta")
     from app import config as cfg_module
+
     cfg_module.settings.blueprints_dir = str(tmp_path)
     from app.main import create_app
+
     return TestClient(create_app()), tmp_path
 
 
 class TestListBlueprintsEndpoint:
-    def test_list_when_empty_should_return_200_with_empty_list(self, patched_client: TestClient) -> None:
+    def test_list_when_empty_should_return_200_with_empty_list(
+        self, patched_client: TestClient
+    ) -> None:
         resp = patched_client.get("/api/v1/blueprints")
         assert resp.status_code == 200
         data = resp.json()
@@ -96,6 +102,7 @@ class TestUploadBlueprintEndpoint:
         self, patched_client: TestClient, tmp_path: Path
     ) -> None:
         from app import config as cfg_module
+
         blueprints_dir = Path(cfg_module.settings.blueprints_dir)
 
         cfg_content = json.dumps({"description": "test"}).encode()
@@ -158,12 +165,95 @@ class TestDownloadAllEndpoint:
         self, patched_client: TestClient, tmp_path: Path
     ) -> None:
         from app import config as cfg_module
+
         (tmp_path / "solo.sbp").write_bytes(b"REAL_SBP_BYTES")
         cfg_module.settings.blueprints_dir = str(tmp_path)
         resp = patched_client.get("/api/v1/blueprints/download-all")
         assert resp.status_code == 200
         zf = zipfile.ZipFile(io.BytesIO(resp.content))
         assert zf.read("solo.sbp") == b"REAL_SBP_BYTES"
+
+
+class TestUploadBatchEndpoint:
+    def test_batch_upload_new_blueprints_should_return_207(
+        self, patched_client: TestClient
+    ) -> None:
+        files = [
+            ("files", ("alpha.sbp", io.BytesIO(b"SBP_A"), "application/octet-stream")),
+            ("files", ("beta.sbp", io.BytesIO(b"SBP_B"), "application/octet-stream")),
+        ]
+        resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
+        assert resp.status_code == 207
+        data = resp.json()
+        assert "alpha" in data["created"]
+        assert "beta" in data["created"]
+        assert data["total"] == 2
+
+    def test_batch_upload_with_cfg_should_save_both_files(
+        self, patched_client: TestClient, tmp_path: Path
+    ) -> None:
+        from app import config as cfg_module
+
+        cfg_module.settings.blueprints_dir = str(tmp_path)
+        files = [
+            ("files", ("iron.sbp", io.BytesIO(b"SBP_IRON"), "application/octet-stream")),
+            ("files", ("iron.sbpcfg", io.BytesIO(b'{"description":"Iron"}'), "application/json")),
+        ]
+        resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
+        assert resp.status_code == 207
+        assert "iron" in resp.json()["created"]
+        assert (tmp_path / "iron.sbpcfg").exists()
+
+    def test_batch_upload_existing_should_report_updated(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, _ = populated_client
+        files = [("files", ("alpha.sbp", io.BytesIO(b"NEW_DATA"), "application/octet-stream"))]
+        resp = client.post("/api/v1/blueprints/upload-batch", files=files)
+        assert resp.status_code == 207
+        assert "alpha" in resp.json()["updated"]
+
+    def test_batch_upload_empty_files_should_return_207_zero_total(
+        self, patched_client: TestClient
+    ) -> None:
+        resp = patched_client.post("/api/v1/blueprints/upload-batch", files=[])
+        assert resp.status_code == 207
+        assert resp.json()["total"] == 0
+
+    def test_batch_upload_directory_error_should_return_500(
+        self, patched_client: TestClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from app.routers import blueprints as bp_router
+        from app.services.blueprint_service import BlueprintDirectoryError
+
+        def _raise(*_a: object, **_kw: object) -> None:
+            raise BlueprintDirectoryError("no dir")
+
+        monkeypatch.setattr(bp_router, "save_blueprint_batch", _raise)
+        files = [("files", ("x.sbp", io.BytesIO(b"DATA"), "application/octet-stream"))]
+        resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
+        assert resp.status_code == 500
+
+    def test_batch_upload_oversized_file_should_be_skipped(
+        self, patched_client: TestClient
+    ) -> None:
+        # Build a payload exceeding MAX_BLUEPRINT_SIZE_BYTES (50 MB) — use monkeypatch to keep test fast
+        from app import constants as c
+        original = c.MAX_BLUEPRINT_SIZE_BYTES
+        # Temporarily shrink the limit so a 10-byte file is "oversized"
+        import app.routers.blueprints as bp_module
+
+        original_max = bp_module.MAX_BLUEPRINT_SIZE_BYTES
+        # monkeypatch module-level constant in the router
+        bp_module.MAX_BLUEPRINT_SIZE_BYTES = 5
+        try:
+            files = [("files", ("big.sbp", io.BytesIO(b"123456789"), "application/octet-stream"))]
+            resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
+            # file is silently skipped → total=0
+            assert resp.status_code == 207
+            assert resp.json()["total"] == 0
+        finally:
+            bp_module.MAX_BLUEPRINT_SIZE_BYTES = original_max
 
 
 class TestHealthEndpoint:

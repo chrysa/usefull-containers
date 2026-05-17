@@ -34,6 +34,13 @@ class BlueprintUploadResult(BaseModel):
     created: bool  # True = new, False = overwritten
 
 
+class BatchUploadResult(BaseModel):
+    created: list[str]
+    updated: list[str]
+    failed: list[str]
+    total: int
+
+
 class SyncResult(BaseModel):
     scanned: int
     added: int

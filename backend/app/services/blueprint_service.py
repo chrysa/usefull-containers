@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from app.constants import BLUEPRINT_CFG_EXT, BLUEPRINT_FILE_EXT
-from app.models.blueprint import BlueprintColor, BlueprintRead
+from app.models.blueprint import BatchUploadResult, BlueprintColor, BlueprintRead
 
 
 class BlueprintNotFoundError(Exception):
@@ -61,7 +61,9 @@ def list_blueprints(blueprints_dir: str) -> list[BlueprintRead]:
         has_sbp = sbp_path.exists()
         has_cfg = cfg_path.exists()
 
-        description, icon_id, color, cfg_raw = _parse_cfg(cfg_path) if has_cfg else ("", 0, None, None)
+        description, icon_id, color, cfg_raw = (
+            _parse_cfg(cfg_path) if has_cfg else ("", 0, None, None)
+        )
 
         size_bytes = sbp_path.stat().st_size if has_sbp else 0
         modified_at: datetime | None = None
@@ -155,3 +157,44 @@ def build_blueprints_zip(blueprints_dir: str) -> bytes:
                 if file.suffix in {BLUEPRINT_FILE_EXT, BLUEPRINT_CFG_EXT}:
                     zf.write(file, arcname=file.name)
     return buf.getvalue()
+
+
+def save_blueprint_batch(
+    blueprints_dir: str,
+    files: dict[str, bytes],
+) -> BatchUploadResult:
+    """
+    Save multiple blueprints at once.
+
+    ``files`` maps filenames (e.g. ``"iron-smelter.sbp"``) to their raw bytes.
+    The function pairs each ``.sbp`` with its optional ``.sbpcfg`` by stem.
+    Files with an unexpected extension are silently ignored.
+
+    Returns a :class:`BatchUploadResult` summarising created/updated/failed names.
+    """
+    from pathlib import Path as _Path
+
+    # Group by stem: collect sbp + optional cfg
+    sbp_map: dict[str, bytes] = {}
+    cfg_map: dict[str, bytes] = {}
+
+    for filename, data in files.items():
+        p = _Path(filename)
+        if p.suffix == BLUEPRINT_FILE_EXT:
+            sbp_map[p.stem] = data
+        elif p.suffix == BLUEPRINT_CFG_EXT:
+            cfg_map[p.stem] = data
+
+    created: list[str] = []
+    updated: list[str] = []
+    failed: list[str] = []
+
+    for name, sbp_data in sbp_map.items():
+        try:
+            is_new = save_blueprint(blueprints_dir, name, sbp_data, cfg_map.get(name))
+            (created if is_new else updated).append(name)
+        except BlueprintDirectoryError:
+            failed.append(name)
+
+    total = len(created) + len(updated) + len(failed)
+    return BatchUploadResult(created=created, updated=updated, failed=failed, total=total)

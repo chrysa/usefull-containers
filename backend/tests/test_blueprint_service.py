@@ -17,6 +17,7 @@ from app.services.blueprint_service import (
     get_sbp_path,
     list_blueprints,
     save_blueprint,
+    save_blueprint_batch,
 )
 
 
@@ -36,11 +37,15 @@ class TestListBlueprints:
         result = list_blueprints(str(tmp_path))
         assert result == []
 
-    def test_list_blueprints_when_dir_missing_should_return_empty_list(self, tmp_path: Path) -> None:
+    def test_list_blueprints_when_dir_missing_should_return_empty_list(
+        self, tmp_path: Path
+    ) -> None:
         result = list_blueprints(str(tmp_path / "nonexistent"))
         assert result == []
 
-    def test_list_blueprints_when_blueprints_present_should_return_all(self, tmp_path: Path) -> None:
+    def test_list_blueprints_when_blueprints_present_should_return_all(
+        self, tmp_path: Path
+    ) -> None:
         _write_blueprint(tmp_path, "alpha")
         _write_blueprint(tmp_path, "beta")
         result = list_blueprints(str(tmp_path))
@@ -49,7 +54,9 @@ class TestListBlueprints:
         assert "alpha" in names
         assert "beta" in names
 
-    def test_list_blueprints_when_cfg_present_should_parse_description(self, tmp_path: Path) -> None:
+    def test_list_blueprints_when_cfg_present_should_parse_description(
+        self, tmp_path: Path
+    ) -> None:
         _write_blueprint(tmp_path, "myblueprint")
         result = list_blueprints(str(tmp_path))
         assert result[0].description == "Desc myblueprint"
@@ -61,7 +68,9 @@ class TestListBlueprints:
         assert result[0].color is not None
         assert result[0].color.r == pytest.approx(0.1)
 
-    def test_list_blueprints_when_only_sbp_no_cfg_should_return_blueprint(self, tmp_path: Path) -> None:
+    def test_list_blueprints_when_only_sbp_no_cfg_should_return_blueprint(
+        self, tmp_path: Path
+    ) -> None:
         _write_blueprint(tmp_path, "nocfg", with_cfg=False)
         result = list_blueprints(str(tmp_path))
         assert len(result) == 1
@@ -145,7 +154,9 @@ class TestBuildBlueprintsZip:
         zf = zipfile.ZipFile(io.BytesIO(data))
         assert zf.namelist() == []
 
-    def test_build_zip_when_blueprints_present_should_include_sbp_and_cfg(self, tmp_path: Path) -> None:
+    def test_build_zip_when_blueprints_present_should_include_sbp_and_cfg(
+        self, tmp_path: Path
+    ) -> None:
         _write_blueprint(tmp_path, "alpha")
         _write_blueprint(tmp_path, "beta", with_cfg=False)
         data = build_blueprints_zip(str(tmp_path))
@@ -155,14 +166,62 @@ class TestBuildBlueprintsZip:
         assert "alpha.sbpcfg" in names
         assert "beta.sbp" in names
 
-    def test_build_zip_when_blueprints_present_should_preserve_file_content(self, tmp_path: Path) -> None:
+    def test_build_zip_when_blueprints_present_should_preserve_file_content(
+        self, tmp_path: Path
+    ) -> None:
         (tmp_path / "solo.sbp").write_bytes(b"FAKE_SBP_CONTENT")
         data = build_blueprints_zip(str(tmp_path))
         zf = zipfile.ZipFile(io.BytesIO(data))
         assert zf.read("solo.sbp") == b"FAKE_SBP_CONTENT"
 
-    def test_build_zip_when_path_is_not_dir_should_raise_directory_error(self, tmp_path: Path) -> None:
+    def test_build_zip_when_path_is_not_dir_should_raise_directory_error(
+        self, tmp_path: Path
+    ) -> None:
         not_a_dir = tmp_path / "file.txt"
         not_a_dir.write_text("hello")
         with pytest.raises(BlueprintDirectoryError):
             build_blueprints_zip(str(not_a_dir))
+
+
+class TestSaveBlueprintBatch:
+    def test_batch_with_only_sbp_files_should_create_blueprints(self, tmp_path: Path) -> None:
+        files = {
+            "alpha.sbp": b"SBP_ALPHA",
+            "beta.sbp": b"SBP_BETA",
+        }
+        result = save_blueprint_batch(str(tmp_path), files)
+        assert result.total == 2
+        assert "alpha" in result.created
+        assert "beta" in result.created
+        assert result.updated == []
+        assert result.failed == []
+
+    def test_batch_with_sbp_and_cfg_should_save_both(self, tmp_path: Path) -> None:
+        files = {
+            "iron.sbp": b"SBP_IRON",
+            "iron.sbpcfg": b'{"description":"Iron"}',
+        }
+        result = save_blueprint_batch(str(tmp_path), files)
+        assert "iron" in result.created
+        assert (tmp_path / "iron.sbpcfg").exists()
+
+    def test_batch_update_existing_should_count_as_updated(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "alpha")
+        files = {"alpha.sbp": b"NEW_SBP_DATA"}
+        result = save_blueprint_batch(str(tmp_path), files)
+        assert "alpha" in result.updated
+        assert result.created == []
+
+    def test_batch_ignores_non_blueprint_extensions(self, tmp_path: Path) -> None:
+        files = {
+            "readme.txt": b"hello",
+            "valid.sbp": b"SBP_DATA",
+        }
+        result = save_blueprint_batch(str(tmp_path), files)
+        assert result.total == 1
+        assert "valid" in result.created
+
+    def test_batch_with_empty_files_dict_should_return_zero_total(self, tmp_path: Path) -> None:
+        result = save_blueprint_batch(str(tmp_path), {})
+        assert result.total == 0
+        assert result.created == []

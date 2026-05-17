@@ -17,6 +17,10 @@
     "count": "{{count}} blueprint(s)",
     "confirm_delete": "Supprimer le blueprint \u00ab {{name}} \u00bb ? Cette action est irréversible.",
     "download_all": "Tout télécharger (.zip)",
-    "downloading": "Téléchargement..."
+    "downloading": "Téléchargement...",
+    "batch_upload": "Importer des blueprints",
+    "batch_uploading": "Import en cours...",
+    "batch_result": "Import terminé : {{created}} créés, {{updated}} mis à jour, {{failed}} en erreur.",
+    "batch_drop_hint": "Déposez des fichiers .sbp / .sbpcfg ici ou cliquez pour sélectionner"
   }
 }

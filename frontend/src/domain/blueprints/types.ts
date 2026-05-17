@@ -28,3 +28,10 @@ export interface BlueprintUploadResult {
   name: string;
   created: boolean;
 }
+
+export interface BatchUploadResult {
+  created: string[];
+  updated: string[];
+  failed: string[];
+  total: number;
+}

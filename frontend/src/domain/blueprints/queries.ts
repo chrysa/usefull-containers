@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../api/http/client";
-import type { Blueprint, BlueprintList, BlueprintUploadResult } from "./types";
+import type { BatchUploadResult, Blueprint, BlueprintList, BlueprintUploadResult } from "./types";
 
 const QUERY_KEY = "blueprints";
 const API_BASE = "/v1/blueprints";
@@ -59,5 +59,24 @@ export function useDownloadAllBlueprints() {
       a.remove();
       URL.revokeObjectURL(url);
     },
+  });
+}
+
+export function useBatchUploadMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<BatchUploadResult, Error, FileList>({
+    mutationFn: async (fileList: FileList) => {
+      const formData = new FormData();
+      Array.from(fileList).forEach((file) => {
+        formData.append("files", file, file.name);
+      });
+      const res = await fetch("/api/v1/blueprints/upload-batch", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error(`Batch upload failed: HTTP ${res.status}`);
+      return res.json() as Promise<BatchUploadResult>;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 }

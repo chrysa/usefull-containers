@@ -75,4 +75,12 @@ export const blueprintsHandlers = [
       },
     });
   }),
+
+  http.post("/api/v1/blueprints/upload-batch", async () => {
+    await delay(700);
+    return HttpResponse.json(
+      { created: ["iron-smelter-mock", "copper-mock"], updated: [], failed: [], total: 2 },
+      { status: 207 }
+    );
+  }),
 ];

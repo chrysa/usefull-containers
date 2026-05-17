@@ -1,11 +1,18 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, UploadFile
+from typing import Annotated
+
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 
 from app.config import settings
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
-from app.models.blueprint import BlueprintList, BlueprintRead, BlueprintUploadResult
+from app.models.blueprint import (
+    BatchUploadResult,
+    BlueprintList,
+    BlueprintRead,
+    BlueprintUploadResult,
+)
 from app.services.blueprint_service import (
     BlueprintDirectoryError,
     BlueprintNotFoundError,
@@ -15,6 +22,7 @@ from app.services.blueprint_service import (
     get_sbp_path,
     list_blueprints,
     save_blueprint,
+    save_blueprint_batch,
 )
 
 router = APIRouter(prefix="/blueprints", tags=["blueprints"])
@@ -71,6 +79,32 @@ async def download_blueprint(name: str) -> FileResponse:
         media_type="application/octet-stream",
         filename=path.name,
     )
+
+
+@router.post("/upload-batch", response_model=BatchUploadResult, status_code=207)
+async def upload_blueprint_batch(
+    files: Annotated[list[UploadFile], File()] = [],
+) -> BatchUploadResult:
+    """
+    Upload multiple blueprints at once (multi-file form upload).
+    Accepts any mix of .sbp and .sbpcfg files; pairs are matched by stem.
+    Files with other extensions are ignored.
+    Returns HTTP 207 with per-name created/updated/failed lists.
+    """
+    batch: dict[str, bytes] = {}
+    for upload in files:
+        if upload.filename is None:
+            continue
+        data = await upload.read()
+        if len(data) > MAX_BLUEPRINT_SIZE_BYTES:
+            continue  # silently skip oversized files
+        batch[upload.filename] = data
+
+    try:
+        result = save_blueprint_batch(settings.blueprints_dir, batch)
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return result
 
 
 @router.post("", response_model=BlueprintUploadResult, status_code=201)

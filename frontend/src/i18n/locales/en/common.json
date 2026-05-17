@@ -17,6 +17,10 @@
     "count": "{{count}} blueprint(s)",
     "confirm_delete": "Delete blueprint \"{{name}}\"? This cannot be undone.",
     "download_all": "Download All (.zip)",
-    "downloading": "Downloading..."
+    "downloading": "Downloading...",
+    "batch_upload": "Upload Blueprints",
+    "batch_uploading": "Uploading...",
+    "batch_result": "Upload complete: {{created}} created, {{updated}} updated, {{failed}} failed.",
+    "batch_drop_hint": "Drop .sbp / .sbpcfg files here or click to select"
   }
 }

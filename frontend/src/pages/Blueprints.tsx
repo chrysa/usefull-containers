@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { BlueprintCard, UploadButton } from "../features/blueprints";
 import Skeleton from "../components/ui/Skeleton";
+import { DropZone } from "../components/DropZone/DropZone";
 import {
+  useBatchUploadMutation,
   useBlueprintsQuery,
   useDeleteBlueprintMutation,
   useDownloadAllBlueprints,
@@ -15,6 +17,7 @@ export default function BlueprintsPage() {
   const uploadMutation = useUploadBlueprintMutation();
   const deleteMutation = useDeleteBlueprintMutation();
   const downloadAllMutation = useDownloadAllBlueprints();
+  const batchUploadMutation = useBatchUploadMutation();
 
   function handleUpload(formData: FormData) {
     uploadMutation.mutate(formData);
@@ -57,6 +60,15 @@ export default function BlueprintsPage() {
       {downloadAllMutation.isError && (
         <p className={styles.error}>{t("error")}: {downloadAllMutation.error.message}</p>
       )}
+      {batchUploadMutation.isError && (
+        <p className={styles.error}>{t("error")}: {batchUploadMutation.error.message}</p>
+      )}
+
+      <DropZone
+        onUpload={(files) => batchUploadMutation.mutate(files)}
+        isUploading={batchUploadMutation.isPending}
+        result={batchUploadMutation.data ?? null}
+      />
 
       {isLoading && (
         <div className={styles.grid}>
