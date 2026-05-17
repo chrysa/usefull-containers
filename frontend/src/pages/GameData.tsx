@@ -89,8 +89,7 @@ export default function GameDataPage() {
             <button
               type="button"
               role="tab"
-              {/* eslint-disable-next-line jsx-a11y/aria-proptypes */}
-              aria-selected={tab === "items" ? "true" : "false"}
+              aria-selected={tab === "items"}
               className={tab === "items" ? styles.tabActive : styles.tab}
               onClick={() => { setTab("items"); setSearch(""); setDebouncedSearch(""); }}
             >
@@ -99,8 +98,7 @@ export default function GameDataPage() {
             <button
               type="button"
               role="tab"
-              {/* eslint-disable-next-line jsx-a11y/aria-proptypes */}
-              aria-selected={tab === "recipes" ? "true" : "false"}
+              aria-selected={tab === "recipes"}
               className={tab === "recipes" ? styles.tabActive : styles.tab}
               onClick={() => { setTab("recipes"); setSearch(""); setDebouncedSearch(""); }}
             >
@@ -120,8 +118,7 @@ export default function GameDataPage() {
           {tab === "items" && (
             <section className={styles.grid} aria-label={t("gamedata.items")}>
               {itemsQuery.isLoading && Array.from({ length: 12 }).map((_, i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Skeleton key={`sk-${i}`} height="100px" radius="8px" />
+                <Skeleton key={`item-sk-${i}`} height="100px" radius="8px" />
               ))}
               {itemsQuery.data?.length === 0 && (
                 <p className={styles.noResults}>{t("gamedata.no_results")}</p>
@@ -135,8 +132,7 @@ export default function GameDataPage() {
           {tab === "recipes" && (
             <section className={styles.grid} aria-label={t("gamedata.recipes")}>
               {recipesQuery.isLoading && Array.from({ length: 12 }).map((_, i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Skeleton key={`sk-${i}`} height="130px" radius="8px" />
+                <Skeleton key={`recipe-sk-${i}`} height="130px" radius="8px" />
               ))}
               {recipesQuery.data?.length === 0 && (
                 <p className={styles.noResults}>{t("gamedata.no_results")}</p>

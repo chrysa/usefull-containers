@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
-from pathlib import Path
 
 
 @pytest.fixture
@@ -11,6 +12,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("BLUEPRINTS_DIR", str(tmp_path))
     # Re-import to pick up env override
     import importlib
+
     import app.config as cfg_module
     importlib.reload(cfg_module)
     from app.config import settings

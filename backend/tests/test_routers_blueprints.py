@@ -237,10 +237,9 @@ class TestUploadBatchEndpoint:
     def test_batch_upload_oversized_file_should_be_skipped(
         self, patched_client: TestClient
     ) -> None:
-        # Build a payload exceeding MAX_BLUEPRINT_SIZE_BYTES (50 MB) — use monkeypatch to keep test fast
-        from app import constants as c
+        # Build a payload exceeding MAX_BLUEPRINT_SIZE_BYTES (50 MB).
+        # Use monkeypatch to keep test fast.
 
-        original = c.MAX_BLUEPRINT_SIZE_BYTES
         # Temporarily shrink the limit so a 10-byte file is "oversized"
         import app.routers.blueprints as bp_module
 

@@ -58,6 +58,22 @@
     "products": "Products",
     "produced_in": "Produced in"
   },
+  "home": {
+    "title": "Dashboard",
+    "subtitle": "Blueprint Sync Hub",
+    "stat_blueprints": "Blueprints",
+    "stat_tags": "Unique Tags",
+    "stat_hub": "Hub Status",
+    "hub_online": "Online",
+    "hub_offline": "Offline",
+    "hub_checking": "Checking…",
+    "recent_title": "Recent Blueprints",
+    "recent_empty": "No blueprints yet.",
+    "quicklinks_title": "Quick Access",
+    "go_blueprints": "Manage Blueprints",
+    "go_gamedata": "Game Data",
+    "go_calculator": "Calculator"
+  },
   "calculator": {
     "title": "Production Calculator",
     "no_data": "No game data available. Import a Satisfactory Tools ZIP from the Game Data page first.",

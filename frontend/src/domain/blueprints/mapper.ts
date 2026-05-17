@@ -13,5 +13,6 @@ export function mapBlueprint(raw: any): Blueprint {
     size_bytes: Number(raw.size_bytes ?? 0),
     modified_at: raw.modified_at ?? null,
     cfg_raw: raw.cfg_raw ?? null,
+    tags: Array.isArray(raw.tags) ? (raw.tags as string[]) : [],
   };
 }

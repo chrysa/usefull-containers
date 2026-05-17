@@ -28,7 +28,6 @@ export default function BlueprintsPage() {
   }
 
   function handleDelete(name: string) {
-    // eslint-disable-next-line no-alert
     if (!globalThis.confirm(t("blueprints.confirm_delete", { name }))) return;
     deleteMutation.mutate(name);
   }
@@ -130,9 +129,7 @@ export default function BlueprintsPage() {
       {isLoading && (
         <div className={styles.grid}>
           {Array.from({ length: 6 }).map((_item, i) => (
-            // skeleton placeholders — index key acceptable here (no reorder)
-            // eslint-disable-next-line react/no-array-index-key
-            <Skeleton key={`skeleton-${i}`} height="120px" radius="8px" />
+            <Skeleton key={`blueprint-sk-${i}`} height="120px" radius="8px" />
           ))}
         </div>
       )}

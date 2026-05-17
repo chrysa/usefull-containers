@@ -18,3 +18,13 @@ services:
       - ./agent:/app
     command: >
       sh -c "pytest tests/ -v --cov=sfm_agent --cov-report=term-missing --cov-report=xml --cov-fail-under=85"
+
+  frontend-lint:
+    build:
+      context: ./frontend
+      target: deps
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm run lint"

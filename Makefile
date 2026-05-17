@@ -52,12 +52,12 @@ pre-commit: ## Install and run pre-commit hooks
 # ─── Quality ──────────────────────────────────────────────────────────────────
 
 lint: ## Run linters (ruff + eslint via Docker)
-	$(DOCKER_COMPOSE) run --rm backend ruff check .
-	$(DOCKER_COMPOSE) run --rm frontend npm run lint
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps backend-test sh -c "ruff check ."
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint
 
 format: ## Run formatters (ruff + prettier via Docker)
-	$(DOCKER_COMPOSE) run --rm backend ruff format .
-	$(DOCKER_COMPOSE) run --rm frontend npm run format
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps backend-test sh -c "ruff format ."
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint sh -c "npm run format"
 
 type-check: typecheck ## Legacy alias
 

@@ -69,7 +69,7 @@ export function TagEditor({ blueprintName, tags }: Props) {
             commitTag();
             setEditing(false);
           }}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
+          // autoFocus intentional: tag input gains focus when entering edit mode
           autoFocus
           aria-label={t("blueprints.tag_placeholder")}
         />

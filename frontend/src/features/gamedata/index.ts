@@ -3,5 +3,3 @@ export { ItemCard } from "./ItemCard";
 export { RecipeCard } from "./RecipeCard";
 export { ItemsList } from "./ItemsList";
 export { RecipesList } from "./RecipesList";
-export { ItemCard } from "./ItemCard";
-export { RecipeCard } from "./RecipeCard";

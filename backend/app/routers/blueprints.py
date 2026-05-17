@@ -102,7 +102,7 @@ async def download_blueprint_cfg(name: str) -> FileResponse:
 
 @router.post("/upload-batch", response_model=BatchUploadResult, status_code=207)
 async def upload_blueprint_batch(
-    files: Annotated[list[UploadFile], File()] = [],
+    files: Annotated[list[UploadFile], File()] = None,
 ) -> BatchUploadResult:
     """
     Upload multiple blueprints at once (multi-file form upload).
@@ -110,6 +110,8 @@ async def upload_blueprint_batch(
     Files with other extensions are ignored.
     Returns HTTP 207 with per-name created/updated/failed lists.
     """
+    if files is None:
+        files = []
     batch: dict[str, bytes] = {}
     for upload in files:
         if upload.filename is None:

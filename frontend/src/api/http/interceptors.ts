@@ -2,7 +2,7 @@
 // This module is imported by client.ts if you need to centralise side-effects
 // outside of the http wrapper (e.g. refreshing tokens, analytics).
 
-export function onRequest(path: string, init: RequestInit): RequestInit {
+export function onRequest(_path: string, init: RequestInit): RequestInit {
   // Example: attach auth header
   // const token = localStorage.getItem("token");
   // if (token) init.headers = { ...init.headers, Authorization: `Bearer ${token}` };

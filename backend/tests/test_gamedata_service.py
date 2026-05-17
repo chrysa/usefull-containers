@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from app.models.gamedata import ItemSummary, RecipeIngredient, RecipeSummary
+from app.models.gamedata import RecipeIngredient, RecipeSummary
 from app.services.gamedata_service import (
     GameDataNotFoundError,
     GameDataParseError,
@@ -16,7 +16,6 @@ from app.services.gamedata_service import (
     list_items,
     list_recipes,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

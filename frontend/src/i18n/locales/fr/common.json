@@ -58,6 +58,22 @@
     "products": "Produits",
     "produced_in": "Produit dans"
   },
+  "home": {
+    "title": "Tableau de bord",
+    "subtitle": "Blueprint Sync Hub",
+    "stat_blueprints": "Blueprints",
+    "stat_tags": "Tags uniques",
+    "stat_hub": "Statut du hub",
+    "hub_online": "En ligne",
+    "hub_offline": "Hors ligne",
+    "hub_checking": "Vérification…",
+    "recent_title": "Blueprints récents",
+    "recent_empty": "Aucun blueprint.",
+    "quicklinks_title": "Accès rapide",
+    "go_blueprints": "Gérer les blueprints",
+    "go_gamedata": "Données du jeu",
+    "go_calculator": "Calculateur"
+  },
   "calculator": {
     "title": "Calculateur de production",
     "no_data": "Aucune donnée de jeu disponible. Importez d'abord un ZIP Satisfactory Tools depuis la page Données de jeu.",

@@ -102,18 +102,6 @@ export function useSetTagsMutation(name: string) {
   const queryClient = useQueryClient();
   return useMutation<Blueprint, Error, string[]>({
     mutationFn: (tags: string[]) =>
-      http.patch<Blueprint>(`${API_BASE}/${name}/tags`, { tags } satisfies BlueprintTagsUpdate),
-    onSuccess: (updated) => {
-      queryClient.setQueryData([QUERY_KEY, name], updated);
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
-    },
-  });
-}
-
-export function useSetTagsMutation(name: string) {
-  const queryClient = useQueryClient();
-  return useMutation<Blueprint, Error, string[]>({
-    mutationFn: (tags: string[]) =>
       http.patch<Blueprint>(`${API_BASE}/${encodeURIComponent(name)}/tags`, {
         tags,
       } satisfies BlueprintTagsUpdate),
