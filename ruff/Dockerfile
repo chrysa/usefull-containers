@@ -10,8 +10,8 @@ WORKDIR /app
 RUN set -x \
     && apk add --quiet --no-cache build-base bash git \
     && rm -rf /var/cache/apk/* \
-    && python -m pip install --quiet --no-cache-dir --upgrade pip \
-    && pip install --quiet --no-cache-dir ruff==0.9.10
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir ruff==0.9.10
 
 COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
 
