@@ -1,5 +1,6 @@
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BlueprintCard, UploadButton } from "../features/blueprints";
+import { BlueprintCard, TagFilterBar, UploadButton } from "../features/blueprints";
 import Skeleton from "../components/ui/Skeleton";
 import { DropZone } from "../components/DropZone/DropZone";
 import {
@@ -14,6 +15,7 @@ import styles from "./Blueprints.module.scss";
 
 export default function BlueprintsPage() {
   const { t } = useTranslation();
+  const [activeTags, setActiveTags] = useState<ReadonlySet<string>>(new Set());
   const { data, isLoading, isError } = useBlueprintsQuery();
   const uploadMutation = useUploadBlueprintMutation();
   const deleteMutation = useDeleteBlueprintMutation();
@@ -29,6 +31,29 @@ export default function BlueprintsPage() {
     // eslint-disable-next-line no-alert
     if (!globalThis.confirm(t("blueprints.confirm_delete", { name }))) return;
     deleteMutation.mutate(name);
+  }
+
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    for (const bp of data?.blueprints ?? []) {
+      for (const tag of bp.tags) tagSet.add(tag);
+    }
+    return [...tagSet].sort((a, b) => a.localeCompare(b));
+  }, [data]);
+
+  const filteredBlueprints = useMemo(() => {
+    const bps = data?.blueprints ?? [];
+    if (activeTags.size === 0) return bps;
+    return bps.filter((bp) => bp.tags.some((t) => activeTags.has(t)));
+  }, [data, activeTags]);
+
+  function toggleTag(tag: string) {
+    setActiveTags((prev) => {
+      const next = new Set(prev);
+      if (next.has(tag)) next.delete(tag);
+      else next.add(tag);
+      return next;
+    });
   }
 
   return (
@@ -120,11 +145,17 @@ export default function BlueprintsPage() {
 
       {data != null && data.blueprints.length > 0 && (
         <>
+          <TagFilterBar
+            allTags={allTags}
+            activeTags={activeTags}
+            onToggle={toggleTag}
+            onClear={() => setActiveTags(new Set())}
+          />
           <p className={styles.count}>
-            {t("blueprints.count", { count: data.total })}
+            {t("blueprints.count", { count: activeTags.size > 0 ? filteredBlueprints.length : data.total })}
           </p>
           <div className={styles.grid}>
-            {data.blueprints.map((bp) => (
+            {filteredBlueprints.map((bp) => (
               <BlueprintCard
                 key={bp.name}
                 blueprint={bp}
@@ -132,6 +163,9 @@ export default function BlueprintsPage() {
               />
             ))}
           </div>
+          {filteredBlueprints.length === 0 && activeTags.size > 0 && (
+            <p className={styles.empty}>{t("blueprints.no_tag_match")}</p>
+          )}
         </>
       )}
     </div>

@@ -30,7 +30,10 @@
     "tags_label": "Blueprint tags",
     "tag_add": "Add tag",
     "tag_remove": "Remove tag {{tag}}",
-    "tag_placeholder": "Enter a tag..."
+    "tag_placeholder": "Enter a tag...",
+    "filter_by_tag": "Filter by tag",
+    "clear_filters": "Clear filters",
+    "no_tag_match": "No blueprints match the selected tags."
   },
   "gamedata": {
     "title": "Game Data",
