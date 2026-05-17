@@ -51,6 +51,8 @@ while [[ $# -gt 0 ]]; do
                 [ -h | --help]"
             exit 2
             ;;
+        *)
+            ;;
     esac
 done
 
