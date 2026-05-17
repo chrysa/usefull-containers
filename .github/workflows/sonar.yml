@@ -1,24 +1,21 @@
 ---
-name: 📊 SonarCloud
-run-name: ${{ github.workflow }} by ${{ github.actor }}
-
-concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+name: SonarCloud Analysis
 
 on:
     push:
         branches:
             - main
+            - master
+            - develop
     pull_request:
         types:
             - opened
-            - ready_for_review
-            - reopened
             - synchronize
-    schedule:
-        - cron: 0 6 * * 1
-    workflow_dispatch:
+            - reopened
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -26,24 +23,19 @@ permissions:
 
 jobs:
     sonar:
+        if: github.actor != 'dependabot[bot]'
         name: SonarCloud scan
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
-            - name: Checkout code
+            - name: Checkout
               uses: actions/checkout@v6
               with:
                   fetch-depth: 0
             - name: SonarCloud scan
-              uses: SonarSource/sonarqube-scan-action@v4.2.1
+              uses: chrysa/github-actions/sonar-scan@v1
               with:
-                  args: >
-                      -Dsonar.projectKey=chrysa_usefull-containers
-                      -Dsonar.organization=chrysa
-                      -Dsonar.projectName=usefull-containers
-                      -Dsonar.sources=.
-                      -Dsonar.exclusions=**/.git/**,**/reports/**,**/.vscode/**
-                      -Dsonar.sourceEncoding=UTF-8
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  sonar-token: ${{ secrets.SONAR_TOKEN }}
+                  project-key: chrysa_usefull-containers
+                  sources: .
+                  tests: tests
