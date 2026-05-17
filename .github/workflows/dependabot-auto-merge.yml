@@ -1,34 +1,13 @@
+name: Dependabot Auto-merge
+
 "on":
   pull_request_target:
     types:
     - opened
     - synchronize
     - reopened
-concurrency:
-  cancel-in-progress: false
-  group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   auto-merge:
-    if: github.actor == 'dependabot[bot]'
-    name: Auto-merge Dependabot PR
-    runs-on: ubuntu-latest
-    steps:
-    - id: metadata
-      name: Fetch Dependabot metadata
-      uses: dependabot/fetch-metadata@v3
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-    - env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-      name: Approve PR
-      run: gh pr review --approve "${PR_NUMBER}"
-    - env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-      name: Enable auto-merge (squash — waits for CI)
-      run: gh pr merge --auto --squash "${PR_NUMBER}"
-name: Dependabot Auto-merge
-permissions:
-  contents: write
-  pull-requests: write
+    uses: chrysa/github-actions/.github/workflows/dependabot-auto-merge.yml@main
+    secrets: inherit

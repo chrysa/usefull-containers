@@ -3,7 +3,7 @@
 set -e
 echo "====>> run ruff"
 
-if [ -z "$1" ]; then
+if [[ -z "$1" ]]; then
     cmd="ruff check"
     files=$(find /app -name "*.py" -not -path "*/.git/*")
     set -x

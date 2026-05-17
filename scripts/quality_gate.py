@@ -17,6 +17,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 
+_OVERALL_PASS = "OVERALL_RESULT|PASS"
+_OVERALL_FAIL = "OVERALL_RESULT|FAIL"
+
+
 class QualityGate:
     CONFIG_FILE = ".quality-gate.json"
     BASELINE_FILE = ".quality-gate-baseline.json"
@@ -196,12 +200,65 @@ class QualityGate:
         self._write_report(report)
 
         if all_ok:
-            print("OVERALL_RESULT|PASS")
+            print(_OVERALL_PASS)
             return True
 
-        print("OVERALL_RESULT|FAIL")
+        print(_OVERALL_FAIL)
         print("ERROR: baseline contains failing gates; fix quality checks before using this baseline")
         return False
+
+    def _process_verify_gate(
+        self,
+        gate_name: str,
+        current: Dict[str, Any],
+        baseline_gate: Dict[str, Any],
+        baseline_valid: bool,
+        threshold_cfg: Dict[str, Any],
+        default_op: str,
+        metric_name: str,
+    ) -> Dict[str, Any]:
+        operator = str(threshold_cfg.get("operator", default_op))
+        baseline_metric = baseline_gate.get("metric", 0)
+        target = threshold_cfg.get("value", baseline_metric)
+        current_metric = current.get("metric", 0)
+
+        passed = True
+        reason = "ok"
+
+        if not baseline_valid:
+            passed = False
+            reason = "invalid_baseline"
+        elif current.get("exit_code", 1) != 0:
+            passed = False
+            reason = "command_failed"
+        else:
+            try:
+                passed = self._compare(current_metric, target, operator)
+                if not passed:
+                    reason = "metric_regression"
+            except Exception:
+                passed = False
+                reason = "comparison_error"
+
+        status = "PASS" if passed else "FAIL"
+        print(
+            f"GATE_RESULT|{gate_name}|{status}|baseline={baseline_metric}|"
+            f"target={target}|current={current_metric}|op={operator}|"
+            f"exit={current.get('exit_code', 1)}|reason={reason}"
+        )
+        return {
+            "gate": gate_name,
+            "status": status,
+            "reason": reason,
+            "operator": operator,
+            "baseline_metric": baseline_metric,
+            "target": target,
+            "current_metric": current_metric,
+            "exit_code": current.get("exit_code", 1),
+            "metric_name": metric_name,
+            "command": current.get("command", ""),
+            "passed": passed,
+        }
 
     def verify(self) -> bool:
         print("VERIFY|START")
@@ -213,7 +270,7 @@ class QualityGate:
                 "baseline_file": str(self.baseline_path),
             }
             self._write_report(report)
-            print("OVERALL_RESULT|FAIL")
+            print(_OVERALL_FAIL)
             print("ERROR: baseline file not found; run quality-gate-baseline first")
             return False
 
@@ -227,55 +284,14 @@ class QualityGate:
         for gate_name, key, metric_name, default_op, default_cmd in self.gates:
             current = self._run_gate(gate_name, key, metric_name, default_cmd)
             baseline_gate = baseline.get("gates", {}).get(gate_name, {})
-
             threshold_cfg = self.config.get("thresholds", {}).get(key, {})
-            operator = str(threshold_cfg.get("operator", default_op))
-            baseline_metric = baseline_gate.get("metric", 0)
-            target = threshold_cfg.get("value", baseline_metric)
-            current_metric = current.get("metric", 0)
-
-            passed = True
-            reason = "ok"
-
-            if not baseline_valid:
-                passed = False
-                reason = "invalid_baseline"
-            elif current.get("exit_code", 1) != 0:
-                passed = False
-                reason = "command_failed"
-            else:
-                try:
-                    passed = self._compare(current_metric, target, operator)
-                    if not passed:
-                        reason = "metric_regression"
-                except Exception:
-                    passed = False
-                    reason = "comparison_error"
-
-            if not passed:
+            gate_result = self._process_verify_gate(
+                gate_name, current, baseline_gate, baseline_valid,
+                threshold_cfg, default_op, metric_name,
+            )
+            if not gate_result.pop("passed"):
                 all_passed = False
-
-            status = "PASS" if passed else "FAIL"
-            print(
-                f"GATE_RESULT|{gate_name}|{status}|baseline={baseline_metric}|"
-                f"target={target}|current={current_metric}|op={operator}|"
-                f"exit={current.get('exit_code', 1)}|reason={reason}"
-            )
-
-            gate_reports.append(
-                {
-                    "gate": gate_name,
-                    "status": status,
-                    "reason": reason,
-                    "operator": operator,
-                    "baseline_metric": baseline_metric,
-                    "target": target,
-                    "current_metric": current_metric,
-                    "exit_code": current.get("exit_code", 1),
-                    "metric_name": metric_name,
-                    "command": current.get("command", ""),
-                }
-            )
+            gate_reports.append(gate_result)
 
         report = {
             "mode": "verify",
@@ -287,10 +303,10 @@ class QualityGate:
         self._write_report(report)
 
         if all_passed:
-            print("OVERALL_RESULT|PASS")
+            print(_OVERALL_PASS)
             return True
 
-        print("OVERALL_RESULT|FAIL")
+        print(_OVERALL_FAIL)
         return False
 
 

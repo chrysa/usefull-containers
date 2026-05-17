@@ -4,9 +4,9 @@ set -e
 echo "====>> run black"
 cmd="black"
 
-if [ -f "/app/black.toml" ]; then
+if [[ -f "/app/black.toml" ]]; then
     config="--config=/app/black.toml"
-elif [ -f "/app/pyproject.toml" ]; then
+elif [[ -f "/app/pyproject.toml" ]]; then
     config="--config=/app/pyproject.toml"
 else
     config="--config=/opt/black-default.toml"
@@ -50,6 +50,8 @@ while [[ $# -gt 0 ]]; do
                 [ -g | --git] detect file from git status
                 [ -h | --help]"
             exit 2
+            ;;
+        *)
             ;;
     esac
 done
