@@ -7,6 +7,7 @@ import {
   useBlueprintsQuery,
   useDeleteBlueprintMutation,
   useDownloadAllBlueprints,
+  useImportZipMutation,
   useUploadBlueprintMutation,
 } from "../domain/blueprints/queries";
 import styles from "./Blueprints.module.scss";
@@ -18,6 +19,7 @@ export default function BlueprintsPage() {
   const deleteMutation = useDeleteBlueprintMutation();
   const downloadAllMutation = useDownloadAllBlueprints();
   const batchUploadMutation = useBatchUploadMutation();
+  const importZipMutation = useImportZipMutation();
 
   function handleUpload(formData: FormData) {
     uploadMutation.mutate(formData);
@@ -48,6 +50,24 @@ export default function BlueprintsPage() {
             onUpload={handleUpload}
             isUploading={uploadMutation.isPending}
           />
+          <label className={styles.importZipLabel}>
+            <input
+              type="file"
+              accept=".zip"
+              hidden
+              aria-label={t("blueprints.import_zip_hint")}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) importZipMutation.mutate(file);
+                e.target.value = "";
+              }}
+            />
+            <span className={styles.importZipButton}>
+              {importZipMutation.isPending
+                ? t("blueprints.importing_zip")
+                : t("blueprints.import_zip")}
+            </span>
+          </label>
         </div>
       </header>
 
@@ -62,6 +82,18 @@ export default function BlueprintsPage() {
       )}
       {batchUploadMutation.isError && (
         <p className={styles.error}>{t("error")}: {batchUploadMutation.error.message}</p>
+      )}
+      {importZipMutation.isError && (
+        <p className={styles.error}>{t("error")}: {importZipMutation.error.message}</p>
+      )}
+      {importZipMutation.isSuccess && importZipMutation.data && (
+        <p className={styles.batchResult}>
+          {t("blueprints.import_result", {
+            created: importZipMutation.data.created.length,
+            updated: importZipMutation.data.updated.length,
+            failed: importZipMutation.data.failed.length,
+          })}
+        </p>
       )}
 
       <DropZone

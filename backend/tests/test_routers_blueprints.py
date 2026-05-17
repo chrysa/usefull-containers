@@ -239,6 +239,7 @@ class TestUploadBatchEndpoint:
     ) -> None:
         # Build a payload exceeding MAX_BLUEPRINT_SIZE_BYTES (50 MB) — use monkeypatch to keep test fast
         from app import constants as c
+
         original = c.MAX_BLUEPRINT_SIZE_BYTES
         # Temporarily shrink the limit so a 10-byte file is "oversized"
         import app.routers.blueprints as bp_module
@@ -254,6 +255,59 @@ class TestUploadBatchEndpoint:
             assert resp.json()["total"] == 0
         finally:
             bp_module.MAX_BLUEPRINT_SIZE_BYTES = original_max
+
+
+class TestImportZipEndpoint:
+    def test_import_valid_zip_should_return_207_with_created(
+        self, patched_client: TestClient
+    ) -> None:
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, mode="w") as zf:
+            zf.writestr("iron.sbp", b"SBP_IRON")
+            zf.writestr("iron.sbpcfg", b'{"description":"Iron"}')
+        buf.seek(0)
+        resp = patched_client.post(
+            "/api/v1/blueprints/import-zip",
+            files=[("zip_file", ("blueprints.zip", buf, "application/zip"))],
+        )
+        assert resp.status_code == 207
+        data = resp.json()
+        assert "iron" in data["created"]
+        assert data["total"] == 1
+
+    def test_import_zip_updates_existing_blueprints(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, _ = populated_client
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, mode="w") as zf:
+            zf.writestr("alpha.sbp", b"UPDATED_SBP")
+        buf.seek(0)
+        resp = client.post(
+            "/api/v1/blueprints/import-zip",
+            files=[("zip_file", ("blueprints.zip", buf, "application/zip"))],
+        )
+        assert resp.status_code == 207
+        assert "alpha" in resp.json()["updated"]
+
+    def test_import_invalid_zip_should_return_400(self, patched_client: TestClient) -> None:
+        resp = patched_client.post(
+            "/api/v1/blueprints/import-zip",
+            files=[("zip_file", ("bad.zip", io.BytesIO(b"not a zip"), "application/zip"))],
+        )
+        assert resp.status_code == 400
+
+    def test_import_zip_with_non_blueprint_files_ignored(self, patched_client: TestClient) -> None:
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, mode="w") as zf:
+            zf.writestr("readme.txt", b"ignore me")
+        buf.seek(0)
+        resp = patched_client.post(
+            "/api/v1/blueprints/import-zip",
+            files=[("zip_file", ("blueprints.zip", buf, "application/zip"))],
+        )
+        assert resp.status_code == 207
+        assert resp.json()["total"] == 0
 
 
 class TestHealthEndpoint:

@@ -80,3 +80,20 @@ export function useBatchUploadMutation() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 }
+
+export function useImportZipMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<BatchUploadResult, Error, File>({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("zip_file", file, file.name);
+      const res = await fetch("/api/v1/blueprints/import-zip", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error(`Import failed: HTTP ${res.status}`);
+      return res.json() as Promise<BatchUploadResult>;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  });
+}

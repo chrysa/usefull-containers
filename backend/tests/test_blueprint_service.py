@@ -13,8 +13,10 @@ from app.services.blueprint_service import (
     BlueprintNotFoundError,
     build_blueprints_zip,
     delete_blueprint,
+    extract_zip_to_batch,
     get_blueprint,
     get_sbp_path,
+    InvalidZipError,
     list_blueprints,
     save_blueprint,
     save_blueprint_batch,
@@ -225,3 +227,46 @@ class TestSaveBlueprintBatch:
         result = save_blueprint_batch(str(tmp_path), {})
         assert result.total == 0
         assert result.created == []
+
+
+def _make_zip(files: dict[str, bytes]) -> bytes:
+    """Build an in-memory ZIP from a filename→bytes mapping."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, mode="w") as zf:
+        for name, data in files.items():
+            zf.writestr(name, data)
+    return buf.getvalue()
+
+
+class TestExtractZipToBatch:
+    def test_extracts_sbp_and_cfg_files(self) -> None:
+        zip_bytes = _make_zip({"alpha.sbp": b"SBP", "alpha.sbpcfg": b"{}"})
+        result = extract_zip_to_batch(zip_bytes, max_file_size=1024)
+        assert "alpha.sbp" in result
+        assert "alpha.sbpcfg" in result
+        assert result["alpha.sbp"] == b"SBP"
+
+    def test_ignores_non_blueprint_extensions(self) -> None:
+        zip_bytes = _make_zip({"readme.txt": b"hello", "iron.sbp": b"SBP"})
+        result = extract_zip_to_batch(zip_bytes, max_file_size=1024)
+        assert "readme.txt" not in result
+        assert "iron.sbp" in result
+
+    def test_skips_oversized_files(self) -> None:
+        zip_bytes = _make_zip({"big.sbp": b"x" * 100})
+        result = extract_zip_to_batch(zip_bytes, max_file_size=50)
+        assert "big.sbp" not in result
+
+    def test_flattens_nested_directory_entries(self) -> None:
+        zip_bytes = _make_zip({"subdir/iron.sbp": b"SBP_IRON"})
+        result = extract_zip_to_batch(zip_bytes, max_file_size=1024)
+        assert "iron.sbp" in result
+
+    def test_invalid_zip_raises_error(self) -> None:
+        with pytest.raises(InvalidZipError):
+            extract_zip_to_batch(b"not a zip", max_file_size=1024)
+
+    def test_empty_zip_returns_empty_dict(self) -> None:
+        zip_bytes = _make_zip({})
+        result = extract_zip_to_batch(zip_bytes, max_file_size=1024)
+        assert result == {}

@@ -9,7 +9,8 @@
   },
   "nav": {
     "home": "Home",
-    "blueprints": "Blueprints"
+    "blueprints": "Blueprints",
+    "gamedata": "Game Data"
   },
   "blueprints": {
     "title": "Blueprint Sync",
@@ -21,6 +22,21 @@
     "batch_upload": "Upload Blueprints",
     "batch_uploading": "Uploading...",
     "batch_result": "Upload complete: {{created}} created, {{updated}} updated, {{failed}} failed.",
-    "batch_drop_hint": "Drop .sbp / .sbpcfg files here or click to select"
+    "batch_drop_hint": "Drop .sbp / .sbpcfg files here or click to select",
+    "import_zip": "Import from ZIP",
+    "importing_zip": "Importing...",
+    "import_zip_hint": "Select a .zip file containing .sbp / .sbpcfg blueprints",
+    "import_result": "Import complete: {{created}} created, {{updated}} updated, {{failed}} failed."
+  },
+  "gamedata": {
+    "title": "Game Data",
+    "import": "Import ZIP",
+    "importing": "Importing...",
+    "import_hint": "Select a Satisfactory Tools data.zip file",
+    "import_result": "Imported {{items}} items and {{recipes}} recipes from {{file}}.",
+    "items": "Items",
+    "recipes": "Recipes",
+    "source": "Source: {{file}} — imported {{date}}",
+    "empty": "No game data imported yet. Use \"Import ZIP\" to load a Satisfactory Tools export."
   }
 }

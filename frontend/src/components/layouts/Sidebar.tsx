@@ -8,6 +8,7 @@ export default function Sidebar() {
     <nav className={styles.sidebar}>
       <NavLink to="/">{t("nav.home")}</NavLink>
       <NavLink to="/blueprints">{t("nav.blueprints")}</NavLink>
+      <NavLink to="/gamedata">{t("nav.gamedata")}</NavLink>
     </nav>
   );
 }

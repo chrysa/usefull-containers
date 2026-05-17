@@ -198,3 +198,35 @@ def save_blueprint_batch(
 
     total = len(created) + len(updated) + len(failed)
     return BatchUploadResult(created=created, updated=updated, failed=failed, total=total)
+
+
+class InvalidZipError(Exception):
+    pass
+
+
+def extract_zip_to_batch(zip_data: bytes, max_file_size: int) -> dict[str, bytes]:
+    """
+    Extract blueprint files from a ZIP archive in memory.
+
+    Returns a ``{filename: bytes}`` mapping containing only ``.sbp`` and
+    ``.sbpcfg`` files. Files larger than *max_file_size* bytes are silently
+    skipped.  Nested directories are flattened (basename only).
+
+    Raises :exc:`InvalidZipError` when *zip_data* is not a valid ZIP archive.
+    """
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(zip_data))
+    except zipfile.BadZipFile as exc:
+        raise InvalidZipError("Uploaded file is not a valid ZIP archive") from exc
+
+    result: dict[str, bytes] = {}
+    for entry in zf.infolist():
+        if entry.is_dir():
+            continue
+        name = Path(entry.filename).name  # strip directory components
+        if Path(name).suffix not in {BLUEPRINT_FILE_EXT, BLUEPRINT_CFG_EXT}:
+            continue
+        if entry.file_size > max_file_size:
+            continue
+        result[name] = zf.read(entry.filename)
+    return result

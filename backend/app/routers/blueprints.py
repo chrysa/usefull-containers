@@ -16,8 +16,10 @@ from app.models.blueprint import (
 from app.services.blueprint_service import (
     BlueprintDirectoryError,
     BlueprintNotFoundError,
+    InvalidZipError,
     build_blueprints_zip,
     delete_blueprint,
+    extract_zip_to_batch,
     get_blueprint,
     get_sbp_path,
     list_blueprints,
@@ -100,6 +102,26 @@ async def upload_blueprint_batch(
             continue  # silently skip oversized files
         batch[upload.filename] = data
 
+    try:
+        result = save_blueprint_batch(settings.blueprints_dir, batch)
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return result
+
+
+@router.post("/import-zip", response_model=BatchUploadResult, status_code=207)
+async def import_blueprints_from_zip(zip_file: UploadFile) -> BatchUploadResult:
+    """
+    Import blueprints from a ZIP archive (e.g. a file previously downloaded via
+    the ``/download-all`` endpoint).  All ``.sbp`` and ``.sbpcfg`` entries are
+    extracted and saved; other file types inside the ZIP are ignored.
+    Returns HTTP 207 with per-name created/updated/failed lists.
+    """
+    data = await zip_file.read()
+    try:
+        batch = extract_zip_to_batch(data, MAX_BLUEPRINT_SIZE_BYTES)
+    except InvalidZipError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     try:
         result = save_blueprint_batch(settings.blueprints_dir, batch)
     except BlueprintDirectoryError as exc:

@@ -83,4 +83,12 @@ export const blueprintsHandlers = [
       { status: 207 }
     );
   }),
+
+  http.post("/api/v1/blueprints/import-zip", async () => {
+    await delay(600);
+    return HttpResponse.json(
+      { created: ["imported-bp-1", "imported-bp-2"], updated: [], failed: [], total: 2 },
+      { status: 207 }
+    );
+  }),
 ];
