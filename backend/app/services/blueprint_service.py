@@ -117,6 +117,14 @@ def get_sbp_path(blueprints_dir: str, name: str) -> Path:
     return path
 
 
+def get_cfg_path(blueprints_dir: str, name: str) -> Path:
+    """Return Path to the .sbpcfg file, raising BlueprintNotFoundError if absent."""
+    path = Path(blueprints_dir) / f"{name}{BLUEPRINT_CFG_EXT}"
+    if not path.exists():
+        raise BlueprintNotFoundError(f"Blueprint .sbpcfg file '{name}' not found")
+    return path
+
+
 def save_blueprint(blueprints_dir: str, name: str, sbp_data: bytes, cfg_data: bytes | None) -> bool:
     """
     Write a blueprint to disk. Returns True if created (new), False if overwritten.

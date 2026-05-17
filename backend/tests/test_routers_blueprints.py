@@ -371,3 +371,30 @@ class TestBlueprintTagsEndpoint:
         resp = client.delete("/api/v1/blueprints/alpha")
         assert resp.status_code == 204
         assert not (directory / "alpha.meta.json").exists()
+
+
+class TestDownloadBlueprintCfgEndpoint:
+    def test_download_cfg_returns_200(self, populated_client: tuple[TestClient, Path]) -> None:
+        client, _ = populated_client
+        resp = client.get("/api/v1/blueprints/alpha/download-cfg")
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "application/octet-stream"
+        assert resp.content  # non-empty binary content
+
+    def test_download_cfg_returns_404_when_missing(self, patched_client: TestClient) -> None:
+        resp = patched_client.get("/api/v1/blueprints/ghost/download-cfg")
+        assert resp.status_code == 404
+
+    def test_download_cfg_no_cfg_file_returns_404(
+        self, patched_client: TestClient, tmp_path: Path
+    ) -> None:
+        # Blueprint exists as .sbp only (no .sbpcfg)
+        from app import config as cfg_module
+
+        cfg_module.settings.blueprints_dir = str(tmp_path)
+        (tmp_path / "solo.sbp").write_bytes(b"SBP_FAKE_DATA")
+        from app.main import create_app
+
+        client = TestClient(create_app())
+        resp = client.get("/api/v1/blueprints/solo/download-cfg")
+        assert resp.status_code == 404

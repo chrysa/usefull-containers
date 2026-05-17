@@ -1,0 +1,171 @@
+from __future__ import annotations
+
+import logging
+import signal
+import sys
+import threading
+import time
+from pathlib import Path
+
+import click
+import httpx
+from rich.console import Console
+from rich.table import Table
+
+from .config import AgentConfig
+from .state import AgentState
+from .syncer import BlueprintSyncer
+from .watcher import BlueprintWatcher
+
+console = Console()
+log = logging.getLogger(__name__)
+
+
+def _setup_logging(verbose: bool) -> None:
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+
+@click.group()
+def cli() -> None:
+    """sfm-agent — Satisfactory Factory Manager local sync daemon.
+
+    \b
+    Environment variables (all prefixed SFM_):
+      SFM_HUB_URL          Hub base URL  (default: http://localhost:8000)
+      SFM_BLUEPRINTS_DIR   Local blueprint folder
+      SFM_POLL_INTERVAL    Seconds between full polls (default: 60)
+    """
+
+
+@cli.command()
+@click.option(
+    "--hub",
+    envvar="SFM_HUB_URL",
+    default="http://localhost:8000",
+    show_default=True,
+    help="Hub base URL",
+)
+@click.option(
+    "--dir",
+    "bp_dir",
+    envvar="SFM_BLUEPRINTS_DIR",
+    required=True,
+    type=click.Path(),
+    help="Local blueprints directory",
+)
+@click.option(
+    "--poll",
+    envvar="SFM_POLL_INTERVAL",
+    default=60,
+    show_default=True,
+    type=int,
+    help="Poll interval (seconds)",
+)
+@click.option("--verbose", "-v", is_flag=True, help="Enable debug logging")
+def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
+    """Start the sync daemon (file watcher + periodic poll)."""
+    _setup_logging(verbose)
+    bp_path = Path(bp_dir).expanduser().resolve()
+    if not bp_path.exists():
+        console.print(f"[red]Blueprint directory not found: {bp_path}[/red]")
+        sys.exit(1)
+
+    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, poll_interval=poll)
+    state = AgentState(cfg.state_file)
+
+    console.print("[bold green]sfm-agent starting[/bold green]")
+    console.print(f"  Hub : [cyan]{cfg.hub_url}[/cyan]")
+    console.print(f"  Dir : [cyan]{bp_path}[/cyan]")
+    console.print(f"  Poll: [cyan]{poll}s[/cyan]")
+
+    stop_event = threading.Event()
+
+    def _on_signal(signum: int, _frame: object) -> None:
+        console.print("\n[yellow]Stopping...[/yellow]")
+        stop_event.set()
+
+    signal.signal(signal.SIGINT, _on_signal)
+    signal.signal(signal.SIGTERM, _on_signal)
+
+    with BlueprintSyncer(cfg, state) as syncer:
+        console.print("[cyan]Initial sync...[/cyan]")
+        result = syncer.sync()
+        console.print(
+            f"  ↑ {len(result.uploaded)} uploaded  "
+            f"↓ {len(result.downloaded)} downloaded  "
+            f"✗ {len(result.errors)} errors"
+        )
+
+        watcher = BlueprintWatcher(syncer, cfg)
+        watcher.start()
+        last_poll = time.monotonic()
+
+        try:
+            while not stop_event.is_set():
+                if time.monotonic() - last_poll >= poll:
+                    result = syncer.sync()
+                    if result.uploaded or result.downloaded:
+                        console.print(
+                            f"[cyan]Poll:[/cyan] ↑{len(result.uploaded)} ↓{len(result.downloaded)}"
+                        )
+                    last_poll = time.monotonic()
+                stop_event.wait(timeout=5)
+        finally:
+            watcher.stop()
+
+    console.print("[green]Done.[/green]")
+
+
+@cli.command()
+@click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
+@click.option("--dir", "bp_dir", envvar="SFM_BLUEPRINTS_DIR", required=True, type=click.Path())
+@click.option("--verbose", "-v", is_flag=True)
+def sync(hub: str, bp_dir: str, verbose: bool) -> None:
+    """Run a one-shot bidirectional sync and exit."""
+    _setup_logging(verbose)
+    bp_path = Path(bp_dir).expanduser().resolve()
+    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path)
+    state = AgentState(cfg.state_file)
+
+    with BlueprintSyncer(cfg, state) as syncer:
+        result = syncer.sync()
+
+    t = Table(title="Sync result")
+    t.add_column("Category", style="bold")
+    t.add_column("Count", justify="right")
+    t.add_row("Uploaded", str(len(result.uploaded)))
+    t.add_row("Downloaded", str(len(result.downloaded)))
+    t.add_row("Errors", str(len(result.errors)), style="red" if result.errors else "")
+    console.print(t)
+
+    if result.errors:
+        for err in result.errors:
+            console.print(f"  [red]✗ {err}[/red]")
+        sys.exit(1)
+
+
+@cli.command()
+@click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
+def status(hub: str) -> None:
+    """Check hub reachability and show blueprint count."""
+    try:
+        resp = httpx.get(f"{hub}/api/v1/health", timeout=5)
+        if resp.status_code == 200:
+            console.print(f"[green]Hub reachable[/green]: {hub}")
+        else:
+            console.print(f"[yellow]Hub HTTP {resp.status_code}[/yellow]")
+    except httpx.HTTPError as exc:
+        console.print(f"[red]Hub unreachable: {exc}[/red]")
+        sys.exit(1)
+
+    try:
+        resp = httpx.get(f"{hub}/api/v1/blueprints", timeout=5)
+        data = resp.json()
+        console.print(f"  Blueprints on hub: {data.get('total', '?')}")
+    except (httpx.HTTPError, ValueError):
+        pass

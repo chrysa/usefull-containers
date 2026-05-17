@@ -71,6 +71,9 @@ test-cov: ## Run tests with coverage report
 
 docker-test: ## Run tests in Docker (CI-compatible)
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
+
+agent-test: ## Run agent (sfm-agent) tests in Docker
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm agent-test
 # ─── Release ──────────────────────────────────────────────────────────────────
 
 changelog: ## Regenerate CHANGELOG.md via git-cliff

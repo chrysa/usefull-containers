@@ -8,3 +8,13 @@ services:
       - ./backend:/app
     command: >
       sh -c "pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=85"
+
+  agent-test:
+    build:
+      context: ./agent
+      target: deps
+    working_dir: /app
+    volumes:
+      - ./agent:/app
+    command: >
+      sh -c "pytest tests/ -v --cov=sfm_agent --cov-report=term-missing --cov-report=xml --cov-fail-under=85"

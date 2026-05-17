@@ -22,6 +22,7 @@ from app.services.blueprint_service import (
     delete_blueprint,
     extract_zip_to_batch,
     get_blueprint,
+    get_cfg_path,
     get_sbp_path,
     list_blueprints,
     save_blueprint,
@@ -76,6 +77,20 @@ async def download_blueprint(name: str) -> FileResponse:
     """Download the .sbp binary file for a blueprint."""
     try:
         path = get_sbp_path(settings.blueprints_dir, name)
+    except BlueprintNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return FileResponse(
+        path=str(path),
+        media_type="application/octet-stream",
+        filename=path.name,
+    )
+
+
+@router.get("/{name}/download-cfg", status_code=200)
+async def download_blueprint_cfg(name: str) -> FileResponse:
+    """Download the .sbpcfg binary file for a blueprint."""
+    try:
+        path = get_cfg_path(settings.blueprints_dir, name)
     except BlueprintNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return FileResponse(
