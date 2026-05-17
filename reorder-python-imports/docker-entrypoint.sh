@@ -7,7 +7,7 @@ cmd="reorder-python-imports"
 config="--py3-plus --application-directories=."
 
 
-if [ -z "$@" ]; then
+if [[ -z "$@" ]]; then
     files=$(find /app -name "*.py")
 else
     files="$@"
