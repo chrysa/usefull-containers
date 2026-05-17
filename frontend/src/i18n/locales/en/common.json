@@ -37,6 +37,17 @@
     "items": "Items",
     "recipes": "Recipes",
     "source": "Source: {{file}} — imported {{date}}",
-    "empty": "No game data imported yet. Use \"Import ZIP\" to load a Satisfactory Tools export."
+    "empty": "No game data imported yet. Use \"Import ZIP\" to load a Satisfactory Tools export.",
+    "explore": "Explore game data",
+    "search_placeholder": "Search by name or ID...",
+    "search_items": "Search items\u2026",
+    "search_recipes": "Search recipes\u2026",
+    "no_results": "No results found.",
+    "count_items": "{{count}} item(s)",
+    "count_recipes": "{{count}} recipe(s)",
+    "stack_size": "Stack: {{count}}",
+    "ingredients": "Ingredients",
+    "products": "Products",
+    "produced_in": "Produced in"
   }
 }

@@ -1,0 +1,72 @@
+.card {
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #313244);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-primary, #89b4fa);
+  }
+}
+
+.name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text, #cdd6f4);
+}
+
+.id {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #6c7086);
+  font-family: monospace;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, #9399b2);
+}
+
+.ingredients,
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.ingredient,
+.product {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.ingredient {
+  background: var(--color-danger-bg, #311b1b);
+  color: var(--color-danger, #f38ba8);
+  border: 1px solid var(--color-danger, #f38ba8);
+}
+
+.product {
+  background: var(--color-success-bg, #1b3120);
+  color: var(--color-success, #a6e3a1);
+  border: 1px solid var(--color-success, #a6e3a1);
+}
+
+.machine {
+  font-size: 0.75rem;
+  color: var(--color-accent, #cba6f7);
+  margin-top: auto;
+}

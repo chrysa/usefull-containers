@@ -17,21 +17,21 @@ export function useGameDataStatsQuery() {
   });
 }
 
-export function useItemsQuery(query = "") {
+export function useItemsQuery(query = "", hasData = true) {
   return useQuery<ItemSummary[]>({
     queryKey: [QUERY_KEY, "items", query],
     queryFn: () =>
       http.get<ItemSummary[]>(`${API_BASE}/items${query ? `?q=${encodeURIComponent(query)}` : ""}`),
-    enabled: false, // only fetch when explicitly requested
+    enabled: hasData,
   });
 }
 
-export function useRecipesQuery(query = "") {
+export function useRecipesQuery(query = "", hasData = true) {
   return useQuery<RecipeSummary[]>({
     queryKey: [QUERY_KEY, "recipes", query],
     queryFn: () =>
       http.get<RecipeSummary[]>(`${API_BASE}/recipes${query ? `?q=${encodeURIComponent(query)}` : ""}`),
-    enabled: false,
+    enabled: hasData,
   });
 }
 

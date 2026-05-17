@@ -16,7 +16,7 @@
     "title": "Sync Blueprints",
     "empty": "Aucun blueprint trouvé. Importez un fichier .sbp pour commencer.",
     "count": "{{count}} blueprint(s)",
-    "confirm_delete": "Supprimer le blueprint \u00ab {{name}} \u00bb ? Cette action est irréversible.",
+    "confirm_delete": "Supprimer le blueprint « {{name}} » ? Cette action est irréversible.",
     "download_all": "Tout télécharger (.zip)",
     "downloading": "Téléchargement...",
     "batch_upload": "Importer des blueprints",
@@ -37,6 +37,17 @@
     "items": "Objets",
     "recipes": "Recettes",
     "source": "Source : {{file}} — importé le {{date}}",
-    "empty": "Aucune donnée de jeu importée. Utilisez \"Importer un ZIP\" pour charger un export Satisfactory Tools."
+    "empty": "Aucune donnée de jeu importée. Utilisez \"Importer un ZIP\" pour charger un export Satisfactory Tools.",
+    "explore": "Explorer les données de jeu",
+    "search_placeholder": "Rechercher par nom ou ID...",
+    "search_items": "Rechercher des objets\u2026",
+    "search_recipes": "Rechercher des recettes\u2026",
+    "no_results": "Aucun résultat.",
+    "count_items": "{{count}} objet(s)",
+    "count_recipes": "{{count}} recette(s)",
+    "stack_size": "Pile\u00a0: {{count}}",
+    "ingredients": "Ingrédients",
+    "products": "Produits",
+    "produced_in": "Produit dans"
   }
 }
