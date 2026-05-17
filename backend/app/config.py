@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.constants import BLUEPRINTS_DIR_DEFAULT, GAMEDATA_DIR_DEFAULT
+from app.constants import BLUEPRINTS_DIR_DEFAULT, DATA_DIR_DEFAULT, GAMEDATA_DIR_DEFAULT
 
 
 class Settings(BaseSettings):
@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     blueprints_dir: str = BLUEPRINTS_DIR_DEFAULT
     gamedata_dir: str = GAMEDATA_DIR_DEFAULT
+    data_dir: str = DATA_DIR_DEFAULT
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
     debug: bool = False
 

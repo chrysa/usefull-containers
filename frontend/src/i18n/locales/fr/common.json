@@ -11,7 +11,8 @@
     "home": "Accueil",
     "blueprints": "Blueprints",
     "gamedata": "Données de jeu",
-    "calculator": "Calculateur"
+    "calculator": "Calculateur",
+    "plans": "Plans"
   },
   "blueprints": {
     "title": "Sync Blueprints",
@@ -73,6 +74,26 @@
     "go_blueprints": "Gérer les blueprints",
     "go_gamedata": "Données du jeu",
     "go_calculator": "Calculateur"
+  },
+  "plans": {
+    "title": "Plans de production",
+    "create": "Nouveau plan",
+    "empty": "Aucun plan. Créez un plan pour organiser votre production.",
+    "error": "Impossible de charger les plans.",
+    "confirm_delete": "Supprimer ce plan ? Cette action est irréversible.",
+    "items_count": "{{count}} objet(s)",
+    "blueprints_count": "{{count}} blueprint(s)",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "form": {
+      "create_title": "Nouveau plan de production",
+      "edit_title": "Modifier le plan",
+      "name_label": "Nom",
+      "description_label": "Description",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    }
   },
   "calculator": {
     "title": "Calculateur de production",

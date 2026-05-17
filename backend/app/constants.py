@@ -17,3 +17,6 @@ BLUEPRINTS_ZIP_FILENAME: Final = "blueprints.zip"
 GAMEDATA_DIR_DEFAULT: Final = "/data/gamedata"
 GAMEDATA_JSON_FILENAME: Final = "gamedata.json"
 MAX_GAMEDATA_ZIP_SIZE_BYTES: Final = 100 * 1024 * 1024  # 100 MB
+
+DATA_DIR_DEFAULT: Final = "/data"
+PLANS_FILENAME: Final = "plans.json"
