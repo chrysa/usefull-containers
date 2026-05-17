@@ -21,7 +21,7 @@ RUN set -x \
 USER yamllint
 
 RUN set -x \
-    && python -m pip install --prefer-binary --quiet --no-cache-dir --upgrade pip \
-    && pip install --prefer-binary --quiet --no-cache-dir yamllint==1.35.1
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir yamllint==1.35.1
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]

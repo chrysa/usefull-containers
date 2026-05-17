@@ -20,9 +20,9 @@ RUN set -x \
 USER pylint
 
 RUN set -x \
-    && python -m pip install --prefer-binary --quiet --no-cache-dir --upgrade pip \
-    && pip install --prefer-binary --quiet --no-cache-dir pylint==2.17.2 \
-    && pip install --prefer-binary --quiet --no-cache-dir pylint-junit==0.3.2 \
-    && pip install --prefer-binary --quiet --no-cache-dir pylint-report==2.4.0
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir pylint==2.17.2 \
+    && pip install --only-binary :all: --quiet --no-cache-dir pylint-junit==0.3.2 \
+    && pip install --only-binary :all: --quiet --no-cache-dir pylint-report==2.4.0
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]

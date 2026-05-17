@@ -21,8 +21,8 @@ RUN set -x \
 USER mypy
 
 RUN set -x \
-    && python -m pip install --quiet --no-cache-dir --upgrade pip \
-    && pip install --quiet --no-cache-dir mypy==1.2.0 \
-    && pip install --quiet --no-cache-dir junit-xml==1.9
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir mypy==1.2.0 \
+    && pip install --only-binary :all: --quiet --no-cache-dir junit-xml==1.9
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
