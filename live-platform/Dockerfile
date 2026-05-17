@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 WORKDIR /app
 
 RUN set -x \
-    && python -m pip install --quiet --no-cache-dir --upgrade pip \
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
     && addgroup --system platform \
     && adduser --system --shell /bin/sh --ingroup platform platform \
     && chown -R platform:platform /app
@@ -22,7 +22,7 @@ FROM base AS deps
 
 COPY requirements.txt /tmp/requirements.txt
 
-RUN pip install --quiet --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --only-binary :all: --quiet --no-cache-dir -r /tmp/requirements.txt
 
 # ── runtime ───────────────────────────────────────────────────────────────────
 

@@ -18,15 +18,15 @@ RUN set -x \
 USER flask
 
 RUN set -x \
-    && python -m pip install --quiet --no-cache-dir --upgrade pip \
-    && pip install --quiet --no-cache-dir flask-marshmallow==0.14.0 \
-    && pip install --quiet --no-cache-dir flask-restx==0.5.0 \
-    && pip install --quiet --no-cache-dir Flask-WTF==0.15.1 \
-    && pip install --quiet --no-cache-dir marshmallow-sqlalchemy==0.26.1 \
-    && pip install --quiet --no-cache-dir PyYAML==5.4.1 \
-    && pip install --quiet --no-cache-dir requests==2.26.0 \
-    && pip install --quiet --no-cache-dir uwsgi==2.0.19.1 \
-    && pip install --quiet --no-cache-dir wtforms==2.3.3
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir flask-marshmallow==0.14.0 \
+    && pip install --only-binary :all: --quiet --no-cache-dir flask-restx==0.5.0 \
+    && pip install --only-binary :all: --quiet --no-cache-dir Flask-WTF==0.15.1 \
+    && pip install --only-binary :all: --quiet --no-cache-dir marshmallow-sqlalchemy==0.26.1 \
+    && pip install --only-binary :all: --quiet --no-cache-dir PyYAML==5.4.1 \
+    && pip install --only-binary :all: --quiet --no-cache-dir requests==2.26.0 \
+    && pip install --only-binary :all: --quiet --no-cache-dir uwsgi==2.0.19.1 \
+    && pip install --only-binary :all: --quiet --no-cache-dir wtforms==2.3.3
 
 WORKDIR /app
 

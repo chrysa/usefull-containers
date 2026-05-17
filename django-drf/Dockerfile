@@ -14,11 +14,11 @@ WORKDIR ${TARGET_FOLDER}
 
 RUN set -exo pipefail \
     && apk add --quiet --update --no-cache build-base linux-headers \
-    && pip install --quiet --prefer-binary --upgrade --no-cache-dir pip \
-    && pip install --quiet --prefer-binary --no-cache-dir django==4.1.7 \
-    && pip install --quiet --prefer-binary --no-cache-dir djangorestframework==3.14.0 \
-    && pip install --quiet --prefer-binary --no-cache-dir requests==2.28.2 \
-    && pip install --quiet --prefer-binary --no-cache-dir uWSGI==2.0.21 \
+    && pip install --only-binary :all: --quiet --upgrade --no-cache-dir pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir django==4.1.7 \
+    && pip install --only-binary :all: --quiet --no-cache-dir djangorestframework==3.14.0 \
+    && pip install --only-binary :all: --quiet --no-cache-dir requests==2.28.2 \
+    && pip install --only-binary :all: --quiet --no-cache-dir uWSGI==2.0.21 \
     && mkdir -p /var/log/uwsgi /socket \
     && find /scripts -name "*.sh" -exec chmod +x {} \;
 

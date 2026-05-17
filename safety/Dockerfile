@@ -20,7 +20,7 @@ RUN set -x \
 USER safety
 
 RUN set -x \
-    && python -m pip install --prefer-binary --quiet --no-cache-dir --upgrade pip \
-    && pip install --prefer-binary --quiet --no-cache-dir safety==3.3.1
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir safety==3.3.1
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]

@@ -20,8 +20,8 @@ RUN set -x \
 USER bandit
 
 RUN set -x \
-    && python -m pip install --prefer-binary --quiet --no-cache-dir --upgrade pip \
-    && pip install --prefer-binary --quiet --no-cache-dir bandit==1.8.3 \
-    && pip install --prefer-binary --quiet --no-cache-dir bandit-junit==0.0.6
+    && python -m pip install --only-binary :all: --quiet --no-cache-dir --upgrade pip \
+    && pip install --only-binary :all: --quiet --no-cache-dir bandit==1.8.3 \
+    && pip install --only-binary :all: --quiet --no-cache-dir bandit-junit==0.0.6
 
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
