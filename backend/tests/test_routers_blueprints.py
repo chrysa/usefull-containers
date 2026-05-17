@@ -315,3 +315,59 @@ class TestHealthEndpoint:
         resp = patched_client.get("/api/v1/health")
         assert resp.status_code == 200
         assert resp.json()["status"] == "ok"
+
+
+class TestBlueprintTagsEndpoint:
+    def test_set_tags_creates_meta_json(self, populated_client: tuple[TestClient, Path]) -> None:
+        client, directory = populated_client
+        resp = client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["factory", "iron"]})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert set(data["tags"]) == {"factory", "iron"}
+        meta_path = directory / "alpha.meta.json"
+        assert meta_path.exists()
+        assert json.loads(meta_path.read_text())["tags"] == ["factory", "iron"]
+
+    def test_set_tags_replaces_existing_tags(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, directory = populated_client
+        client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["old"]})
+        resp = client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["new1", "new2"]})
+        assert resp.status_code == 200
+        assert set(resp.json()["tags"]) == {"new1", "new2"}
+
+    def test_set_tags_clears_tags_when_empty_list(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, directory = populated_client
+        client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["x"]})
+        resp = client.patch("/api/v1/blueprints/alpha/tags", json={"tags": []})
+        assert resp.status_code == 200
+        assert resp.json()["tags"] == []
+
+    def test_set_tags_on_missing_blueprint_returns_404(self, patched_client: TestClient) -> None:
+        resp = patched_client.patch("/api/v1/blueprints/ghost/tags", json={"tags": ["x"]})
+        assert resp.status_code == 404
+
+    def test_list_blueprints_includes_tags(self, populated_client: tuple[TestClient, Path]) -> None:
+        client, directory = populated_client
+        (directory / "alpha.meta.json").write_text(
+            json.dumps({"tags": ["steel", "copper"]}), encoding="utf-8"
+        )
+        resp = client.get("/api/v1/blueprints")
+        assert resp.status_code == 200
+        blueprints = {b["name"]: b for b in resp.json()["blueprints"]}
+        assert set(blueprints["alpha"]["tags"]) == {"steel", "copper"}
+        assert blueprints["beta"]["tags"] == []
+
+    def test_tags_cleared_on_blueprint_delete(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, directory = populated_client
+        (directory / "alpha.meta.json").write_text(
+            json.dumps({"tags": ["to-delete"]}), encoding="utf-8"
+        )
+        resp = client.delete("/api/v1/blueprints/alpha")
+        assert resp.status_code == 204
+        assert not (directory / "alpha.meta.json").exists()

@@ -9,6 +9,7 @@ API_PREFIX: Final = "/api/v1"
 BLUEPRINTS_DIR_DEFAULT: Final = "/data/blueprints"
 BLUEPRINT_FILE_EXT: Final = ".sbp"
 BLUEPRINT_CFG_EXT: Final = ".sbpcfg"
+BLUEPRINT_META_EXT: Final = ".meta.json"
 
 MAX_BLUEPRINT_SIZE_BYTES: Final = 50 * 1024 * 1024  # 50 MB
 BLUEPRINTS_ZIP_FILENAME: Final = "blueprints.zip"

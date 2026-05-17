@@ -11,6 +11,7 @@ const mockBlueprints = [
     size_bytes: 12480,
     modified_at: "2026-05-10T14:30:00",
     cfg_raw: null,
+    tags: ["iron", "smelter"],
   },
   {
     name: "copper-refinery",
@@ -22,6 +23,7 @@ const mockBlueprints = [
     size_bytes: 8192,
     modified_at: "2026-05-12T09:15:00",
     cfg_raw: null,
+    tags: ["copper"],
   },
   {
     name: "steel-beam-factory",
@@ -33,6 +35,7 @@ const mockBlueprints = [
     size_bytes: 24576,
     modified_at: "2026-05-14T18:00:00",
     cfg_raw: null,
+    tags: [],
   },
 ];
 
@@ -57,6 +60,15 @@ export const blueprintsHandlers = [
   http.delete("/api/v1/blueprints/:name", async () => {
     await delay(300);
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.patch("/api/v1/blueprints/:name/tags", async ({ params, request }) => {
+    await delay(300);
+    const { name } = params as { name: string };
+    const body = await request.json() as { tags: string[] };
+    const bp = mockBlueprints.find((b) => b.name === name);
+    if (!bp) return HttpResponse.json({ detail: "Not found" }, { status: 404 });
+    return HttpResponse.json({ ...bp, tags: body.tags });
   }),
 
   http.get("/api/v1/blueprints/download-all", async () => {

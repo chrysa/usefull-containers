@@ -26,7 +26,11 @@
     "import_zip": "Import from ZIP",
     "importing_zip": "Importing...",
     "import_zip_hint": "Select a .zip file containing .sbp / .sbpcfg blueprints",
-    "import_result": "Import complete: {{created}} created, {{updated}} updated, {{failed}} failed."
+    "import_result": "Import complete: {{created}} created, {{updated}} updated, {{failed}} failed.",
+    "tags_label": "Blueprint tags",
+    "tag_add": "Add tag",
+    "tag_remove": "Remove tag {{tag}}",
+    "tag_placeholder": "Enter a tag..."
   },
   "gamedata": {
     "title": "Game Data",
@@ -40,8 +44,8 @@
     "empty": "No game data imported yet. Use \"Import ZIP\" to load a Satisfactory Tools export.",
     "explore": "Explore game data",
     "search_placeholder": "Search by name or ID...",
-    "search_items": "Search items\u2026",
-    "search_recipes": "Search recipes\u2026",
+    "search_items": "Search items…",
+    "search_recipes": "Search recipes…",
     "no_results": "No results found.",
     "count_items": "{{count}} item(s)",
     "count_recipes": "{{count}} recipe(s)",

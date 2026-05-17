@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../api/http/client";
-import type { BatchUploadResult, Blueprint, BlueprintList, BlueprintUploadResult } from "./types";
+import type { BatchUploadResult, Blueprint, BlueprintList, BlueprintTagsUpdate, BlueprintUploadResult } from "./types";
 
 const QUERY_KEY = "blueprints";
 const API_BASE = "/v1/blueprints";
@@ -94,6 +94,17 @@ export function useImportZipMutation() {
       if (!res.ok) throw new Error(`Import failed: HTTP ${res.status}`);
       return res.json() as Promise<BatchUploadResult>;
     },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  });
+}
+
+export function useSetTagsMutation(name: string) {
+  const queryClient = useQueryClient();
+  return useMutation<Blueprint, Error, string[]>({
+    mutationFn: (tags: string[]) =>
+      http.patch<Blueprint>(`${API_BASE}/${encodeURIComponent(name)}/tags`, {
+        tags,
+      } satisfies BlueprintTagsUpdate),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 }

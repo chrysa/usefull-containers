@@ -1,5 +1,6 @@
 import React from "react";
 import type { Blueprint } from "../../domain/blueprints/types";
+import { TagEditor } from "./TagEditor";
 import styles from "./BlueprintCard.module.scss";
 
 interface Props {
@@ -42,6 +43,8 @@ export default function BlueprintCard({ blueprint, onDelete }: Props) {
       {blueprint.description && (
         <p className={styles.description}>{blueprint.description}</p>
       )}
+
+      <TagEditor blueprintName={blueprint.name} tags={blueprint.tags} />
 
       <footer className={styles.footer}>
         <span className={styles.meta}>{formatBytes(blueprint.size_bytes)}</span>

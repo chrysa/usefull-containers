@@ -22,6 +22,11 @@ class BlueprintRead(BaseModel):
     size_bytes: int = 0
     modified_at: datetime | None = None
     cfg_raw: dict | None = None  # raw .sbpcfg content
+    tags: list[str] = Field(default_factory=list)
+
+
+class BlueprintTagsUpdate(BaseModel):
+    tags: list[str] = Field(default_factory=list)
 
 
 class BlueprintList(BaseModel):

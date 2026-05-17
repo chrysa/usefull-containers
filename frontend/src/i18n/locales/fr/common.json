@@ -26,7 +26,11 @@
     "importing_zip": "Importation...",
     "import_zip_hint": "Sélectionnez un fichier .zip contenant des blueprints .sbp / .sbpcfg",
     "import_result": "Importation terminée : {{created}} créé(s), {{updated}} mis à jour, {{failed}} échoué(s).",
-    "batch_drop_hint": "Déposez des fichiers .sbp / .sbpcfg ici ou cliquez pour sélectionner"
+    "batch_drop_hint": "Déposez des fichiers .sbp / .sbpcfg ici ou cliquez pour sélectionner",
+    "tags_label": "Tags du blueprint",
+    "tag_add": "Ajouter un tag",
+    "tag_remove": "Supprimer le tag {{tag}}",
+    "tag_placeholder": "Saisir un tag..."
   },
   "gamedata": {
     "title": "Données de jeu",
@@ -40,12 +44,12 @@
     "empty": "Aucune donnée de jeu importée. Utilisez \"Importer un ZIP\" pour charger un export Satisfactory Tools.",
     "explore": "Explorer les données de jeu",
     "search_placeholder": "Rechercher par nom ou ID...",
-    "search_items": "Rechercher des objets\u2026",
-    "search_recipes": "Rechercher des recettes\u2026",
+    "search_items": "Rechercher des objets…",
+    "search_recipes": "Rechercher des recettes…",
     "no_results": "Aucun résultat.",
     "count_items": "{{count}} objet(s)",
     "count_recipes": "{{count}} recette(s)",
-    "stack_size": "Pile\u00a0: {{count}}",
+    "stack_size": "Pile : {{count}}",
     "ingredients": "Ingrédients",
     "products": "Produits",
     "produced_in": "Produit dans"

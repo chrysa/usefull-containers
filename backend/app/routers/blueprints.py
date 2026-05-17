@@ -11,6 +11,7 @@ from app.models.blueprint import (
     BatchUploadResult,
     BlueprintList,
     BlueprintRead,
+    BlueprintTagsUpdate,
     BlueprintUploadResult,
 )
 from app.services.blueprint_service import (
@@ -25,6 +26,7 @@ from app.services.blueprint_service import (
     list_blueprints,
     save_blueprint,
     save_blueprint_batch,
+    set_tags,
 )
 
 router = APIRouter(prefix="/blueprints", tags=["blueprints"])
@@ -175,3 +177,12 @@ async def remove_blueprint(name: str) -> None:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except BlueprintDirectoryError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.patch("/{name}/tags", response_model=BlueprintRead, status_code=200)
+async def update_blueprint_tags(name: str, body: BlueprintTagsUpdate) -> BlueprintRead:
+    """Replace the tag list for a blueprint. Creates or overwrites the .meta.json sidecar."""
+    try:
+        return set_tags(settings.blueprints_dir, name, body.tags)
+    except BlueprintNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc

@@ -17,6 +17,7 @@ export interface Blueprint {
   size_bytes: number;
   modified_at: string | null;
   cfg_raw: Record<string, unknown> | null;
+  tags: string[];
 }
 
 export interface BlueprintList {
@@ -34,4 +35,8 @@ export interface BatchUploadResult {
   updated: string[];
   failed: string[];
   total: number;
+}
+
+export interface BlueprintTagsUpdate {
+  tags: string[];
 }

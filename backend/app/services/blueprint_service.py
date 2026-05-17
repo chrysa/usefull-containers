@@ -6,7 +6,7 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 
-from app.constants import BLUEPRINT_CFG_EXT, BLUEPRINT_FILE_EXT
+from app.constants import BLUEPRINT_CFG_EXT, BLUEPRINT_FILE_EXT, BLUEPRINT_META_EXT
 from app.models.blueprint import BatchUploadResult, BlueprintColor, BlueprintRead
 
 
@@ -37,6 +37,19 @@ def _parse_cfg(cfg_path: Path) -> tuple[str, int, BlueprintColor | None, dict]:
             a=float(color_data.get("A", 1.0)),
         )
     return description, icon_id, color, raw
+
+
+def _read_tags(directory: Path, name: str) -> list[str]:
+    """Return tags from the .meta.json sidecar, or empty list if absent."""
+    meta_path = directory / f"{name}{BLUEPRINT_META_EXT}"
+    if not meta_path.exists():
+        return []
+    try:
+        data = json.loads(meta_path.read_text(encoding="utf-8"))
+        raw_tags = data.get("tags", [])
+        return [str(t) for t in raw_tags if isinstance(t, str)]
+    except (json.JSONDecodeError, OSError):
+        return []
 
 
 def list_blueprints(blueprints_dir: str) -> list[BlueprintRead]:
@@ -81,6 +94,7 @@ def list_blueprints(blueprints_dir: str) -> list[BlueprintRead]:
                 size_bytes=size_bytes,
                 modified_at=modified_at,
                 cfg_raw=cfg_raw,
+                tags=_read_tags(directory, name),
             )
         )
     return results
@@ -138,6 +152,9 @@ def delete_blueprint(blueprints_dir: str, name: str) -> None:
         sbp_path.unlink()
     if cfg_path.exists():
         cfg_path.unlink()
+    meta_path = directory / f"{name}{BLUEPRINT_META_EXT}"
+    if meta_path.exists():
+        meta_path.unlink()
 
 
 def build_blueprints_zip(blueprints_dir: str) -> bytes:
@@ -230,3 +247,32 @@ def extract_zip_to_batch(zip_data: bytes, max_file_size: int) -> dict[str, bytes
             continue
         result[name] = zf.read(entry.filename)
     return result
+
+
+def set_tags(blueprints_dir: str, name: str, tags: list[str]) -> BlueprintRead:
+    """
+    Persist *tags* for a blueprint in its .meta.json sidecar, then return
+    the updated :class:`BlueprintRead`.
+
+    Raises :exc:`BlueprintNotFoundError` when no .sbp or .sbpcfg file exists
+    for *name*.
+    """
+    directory = Path(blueprints_dir)
+    sbp_path = directory / f"{name}{BLUEPRINT_FILE_EXT}"
+    cfg_path = directory / f"{name}{BLUEPRINT_CFG_EXT}"
+
+    if not sbp_path.exists() and not cfg_path.exists():
+        raise BlueprintNotFoundError(f"Blueprint '{name}' not found")
+
+    meta_path = directory / f"{name}{BLUEPRINT_META_EXT}"
+    # Read existing sidecar to preserve future fields, then update tags
+    try:
+        existing: dict = (
+            json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
+        )
+    except (json.JSONDecodeError, OSError):
+        existing = {}
+    existing["tags"] = tags
+    meta_path.write_text(json.dumps(existing, ensure_ascii=False), encoding="utf-8")
+
+    return get_blueprint(blueprints_dir, name)
