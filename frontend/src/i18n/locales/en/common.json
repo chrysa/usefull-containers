@@ -10,7 +10,8 @@
   "nav": {
     "home": "Home",
     "blueprints": "Blueprints",
-    "gamedata": "Game Data"
+    "gamedata": "Game Data",
+    "calculator": "Calculator"
   },
   "blueprints": {
     "title": "Blueprint Sync",
@@ -56,5 +57,21 @@
     "ingredients": "Ingredients",
     "products": "Products",
     "produced_in": "Produced in"
+  },
+  "calculator": {
+    "title": "Production Calculator",
+    "no_data": "No game data available. Import a Satisfactory Tools ZIP from the Game Data page first.",
+    "loading": "Loading game data...",
+    "target_item": "Target item",
+    "select_placeholder": "Select an item...",
+    "quantity": "Quantity",
+    "calculate": "Calculate",
+    "production_tree": "Production tree",
+    "raw_requirements": "Total raw requirements",
+    "col_item": "Item",
+    "col_quantity": "Quantity",
+    "col_type": "Type",
+    "type_raw": "Raw resource",
+    "type_intermediate": "Intermediate"
   }
 }

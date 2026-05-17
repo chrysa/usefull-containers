@@ -10,7 +10,8 @@
   "nav": {
     "home": "Accueil",
     "blueprints": "Blueprints",
-    "gamedata": "Données de jeu"
+    "gamedata": "Données de jeu",
+    "calculator": "Calculateur"
   },
   "blueprints": {
     "title": "Sync Blueprints",
@@ -56,5 +57,21 @@
     "ingredients": "Ingrédients",
     "products": "Produits",
     "produced_in": "Produit dans"
+  },
+  "calculator": {
+    "title": "Calculateur de production",
+    "no_data": "Aucune donnée de jeu disponible. Importez d'abord un ZIP Satisfactory Tools depuis la page Données de jeu.",
+    "loading": "Chargement des données de jeu...",
+    "target_item": "Objet cible",
+    "select_placeholder": "Sélectionner un objet...",
+    "quantity": "Quantité",
+    "calculate": "Calculer",
+    "production_tree": "Arbre de production",
+    "raw_requirements": "Ressources brutes totales",
+    "col_item": "Objet",
+    "col_quantity": "Quantité",
+    "col_type": "Type",
+    "type_raw": "Ressource brute",
+    "type_intermediate": "Intermédiaire"
   }
 }

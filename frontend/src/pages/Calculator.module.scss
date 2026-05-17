@@ -1,0 +1,192 @@
+.page {
+  padding: 1.5rem 2rem;
+  max-width: 1000px;
+
+  h1 {
+    margin: 0 0 1.5rem;
+    font-size: 1.5rem;
+  }
+}
+
+// ── Form ─────────────────────────────────────────────────────────────────────
+
+.form {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem 1rem;
+  align-items: center;
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  max-width: 540px;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #aaa);
+  white-space: nowrap;
+}
+
+.select,
+.input {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--color-border, #444);
+  border-radius: 6px;
+  background: var(--color-bg, #13131f);
+  color: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+
+  &:focus {
+    outline: 2px solid var(--color-accent, #7c3aed);
+    outline-offset: 1px;
+  }
+}
+
+.submitBtn {
+  grid-column: 1 / -1;
+  margin-top: 0.4rem;
+  padding: 0.55rem 1.25rem;
+  background: var(--color-accent, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+}
+
+// ── Results ───────────────────────────────────────────────────────────────────
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section {
+  h2 {
+    font-size: 1.1rem;
+    margin: 0 0 0.75rem;
+    color: var(--color-text-secondary, #ccc);
+  }
+}
+
+// ── Tree ─────────────────────────────────────────────────────────────────────
+
+.treeList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  .treeList {
+    padding-left: 1.5rem;
+    border-left: 1px dashed var(--color-border, #333);
+    margin-left: 0.5rem;
+  }
+}
+
+.treeRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--color-surface, #1e1e2e);
+  }
+}
+
+.itemLabel {
+  font-weight: 500;
+  flex: 1;
+}
+
+.rawLabel {
+  font-weight: 500;
+  flex: 1;
+  color: var(--color-accent-secondary, #f59e0b);
+}
+
+.qty {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 4ch;
+  text-align: right;
+  color: var(--color-accent, #7c3aed);
+}
+
+.recipe {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary, #888);
+}
+
+.rawBadge {
+  font-size: 0.7rem;
+  padding: 0 0.4rem;
+  background: var(--color-accent-secondary, #f59e0b);
+  color: #000;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    padding: 0.45rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border, #333);
+  }
+
+  th {
+    color: var(--color-text-secondary, #aaa);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  tbody tr:hover {
+    background: var(--color-surface, #1e1e2e);
+  }
+}
+
+.rawRow {
+  td {
+    color: var(--color-accent-secondary, #f59e0b);
+  }
+}
+
+.qtyCell {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+// ── Empty states ──────────────────────────────────────────────────────────────
+
+.noData {
+  color: var(--color-text-secondary, #888);
+  font-style: italic;
+  margin-top: 1rem;
+}

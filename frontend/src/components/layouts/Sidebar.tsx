@@ -9,6 +9,7 @@ export default function Sidebar() {
       <NavLink to="/">{t("nav.home")}</NavLink>
       <NavLink to="/blueprints">{t("nav.blueprints")}</NavLink>
       <NavLink to="/gamedata">{t("nav.gamedata")}</NavLink>
+      <NavLink to="/calculator">{t("nav.calculator")}</NavLink>
     </nav>
   );
 }
