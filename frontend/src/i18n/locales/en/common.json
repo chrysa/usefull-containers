@@ -88,9 +88,11 @@
     "size": "File size",
     "modified": "Last modified",
     "files": "Available files",
-    "delete": "Delete"
+    "delete": "Delete",
+    "download": "Download"
   },
-  "plans": {    "title": "Factory Plans",
+  "plans": {
+    "title": "Factory Plans",
     "create": "New Plan",
     "empty": "No plans yet. Create a plan to start organising your production.",
     "error": "Failed to load plans.",
