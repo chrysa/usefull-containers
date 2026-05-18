@@ -20,6 +20,8 @@ from app.services.blueprint_service import (
     list_blueprints,
     save_blueprint,
     save_blueprint_batch,
+    set_tags,
+    update_description,
 )
 
 
@@ -270,3 +272,49 @@ class TestExtractZipToBatch:
         zip_bytes = _make_zip({})
         result = extract_zip_to_batch(zip_bytes, max_file_size=1024)
         assert result == {}
+
+
+class TestSetTags:
+    def test_sets_tags_on_existing_blueprint(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "iron", with_cfg=True)
+        result = set_tags(str(tmp_path), "iron", ["alpha", "beta"])
+        assert result.tags == ["alpha", "beta"]
+
+    def test_creates_meta_sidecar_when_absent(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "iron", with_cfg=False)
+        set_tags(str(tmp_path), "iron", ["new"])
+        meta = tmp_path / "iron.meta.json"
+        assert meta.exists()
+        assert json.loads(meta.read_text())["tags"] == ["new"]
+
+    def test_raises_when_blueprint_not_found(self, tmp_path: Path) -> None:
+        with pytest.raises(BlueprintNotFoundError):
+            set_tags(str(tmp_path), "missing", ["x"])
+
+
+class TestUpdateDescription:
+    def test_updates_description_in_existing_cfg(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "iron", with_cfg=True)
+        result = update_description(str(tmp_path), "iron", "New desc")
+        assert result.description == "New desc"
+
+    def test_creates_cfg_when_absent(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "iron", with_cfg=False)
+        result = update_description(str(tmp_path), "iron", "Created desc")
+        assert result.description == "Created desc"
+        cfg_path = tmp_path / "iron.sbpcfg"
+        assert cfg_path.exists()
+        assert json.loads(cfg_path.read_text())["description"] == "Created desc"
+
+    def test_preserves_existing_cfg_fields(self, tmp_path: Path) -> None:
+        cfg = {"description": "old", "iconID": 42, "color": {"R": 1, "G": 0, "B": 0, "A": 1}}
+        (tmp_path / "iron.sbp").write_bytes(b"SBP")
+        (tmp_path / "iron.sbpcfg").write_text(json.dumps(cfg), encoding="utf-8")
+        update_description(str(tmp_path), "iron", "new desc")
+        data = json.loads((tmp_path / "iron.sbpcfg").read_text())
+        assert data["iconID"] == 42
+        assert data["description"] == "new desc"
+
+    def test_raises_when_blueprint_not_found(self, tmp_path: Path) -> None:
+        with pytest.raises(BlueprintNotFoundError):
+            update_description(str(tmp_path), "ghost", "x")

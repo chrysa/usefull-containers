@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import type { Blueprint } from "../../domain/blueprints/types";
 import { TagEditor } from "./TagEditor";
 import styles from "./BlueprintCard.module.scss";
@@ -23,7 +24,9 @@ export default function BlueprintCard({ blueprint, onDelete }: Props) {
   return (
     <article className={styles.card}>
       <header className={styles.header}>
-        <span className={styles.name}>{blueprint.name}</span>
+        <Link to={`/blueprints/${encodeURIComponent(blueprint.name)}`} className={styles.name}>
+          {blueprint.name}
+        </Link>
         {blueprint.color && (
           <span
             className={styles.colorDot}

@@ -4,6 +4,8 @@
 
 Factory planning tool for [Satisfactory](https://www.satisfactorygame.com/) — replaces spreadsheets with an interactive production chain optimizer, resource flow visualizer, and AI-powered assistant.
 
+![Preview](docs/screenshots/preview.png)
+
 ## Stack
 
 | Layer     | Tech                                                          |

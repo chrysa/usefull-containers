@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../api/http/client";
-import type { BatchUploadResult, Blueprint, BlueprintList, BlueprintTagsUpdate, BlueprintUploadResult } from "./types";
+import type { BatchUploadResult, Blueprint, BlueprintDescriptionUpdate, BlueprintList, BlueprintTagsUpdate, BlueprintUploadResult } from "./types";
 
 const QUERY_KEY = "blueprints";
 const API_BASE = "/v1/blueprints";
@@ -106,5 +106,19 @@ export function useSetTagsMutation(name: string) {
         tags,
       } satisfies BlueprintTagsUpdate),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  });
+}
+
+export function useUpdateBlueprintDescriptionMutation(name: string) {
+  const queryClient = useQueryClient();
+  return useMutation<Blueprint, Error, string>({
+    mutationFn: (description: string) =>
+      http.patch<Blueprint>(`${API_BASE}/${encodeURIComponent(name)}`, {
+        description,
+      } satisfies BlueprintDescriptionUpdate),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY, name] });
+    },
   });
 }

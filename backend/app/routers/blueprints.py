@@ -9,6 +9,7 @@ from app.config import settings
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
 from app.models.blueprint import (
     BatchUploadResult,
+    BlueprintDescriptionUpdate,
     BlueprintList,
     BlueprintRead,
     BlueprintTagsUpdate,
@@ -28,6 +29,7 @@ from app.services.blueprint_service import (
     save_blueprint,
     save_blueprint_batch,
     set_tags,
+    update_description,
 )
 
 router = APIRouter(prefix="/blueprints", tags=["blueprints"])
@@ -190,6 +192,19 @@ async def remove_blueprint(name: str) -> None:
     """Delete a blueprint's .sbp and .sbpcfg files."""
     try:
         delete_blueprint(settings.blueprints_dir, name)
+    except BlueprintNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except BlueprintDirectoryError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.patch("/{name}", response_model=BlueprintRead, status_code=200)
+async def update_blueprint_description(
+    name: str, body: BlueprintDescriptionUpdate
+) -> BlueprintRead:
+    """Update the description of a blueprint (writes into the .sbpcfg sidecar)."""
+    try:
+        return update_description(settings.blueprints_dir, name, body.description)
     except BlueprintNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except BlueprintDirectoryError as exc:

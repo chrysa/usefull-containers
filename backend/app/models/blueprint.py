@@ -29,6 +29,10 @@ class BlueprintTagsUpdate(BaseModel):
     tags: list[str] = Field(default_factory=list)
 
 
+class BlueprintDescriptionUpdate(BaseModel):
+    description: str
+
+
 class BlueprintList(BaseModel):
     blueprints: list[BlueprintRead]
     total: int

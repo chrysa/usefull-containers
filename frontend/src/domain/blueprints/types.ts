@@ -40,3 +40,7 @@ export interface BatchUploadResult {
 export interface BlueprintTagsUpdate {
   tags: string[];
 }
+
+export interface BlueprintDescriptionUpdate {
+  description: string;
+}

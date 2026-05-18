@@ -397,3 +397,31 @@ class TestDownloadBlueprintCfgEndpoint:
         client = TestClient(create_app())
         resp = client.get("/api/v1/blueprints/solo/download-cfg")
         assert resp.status_code == 404
+
+
+class TestPatchBlueprintDescriptionEndpoint:
+    def test_update_description_returns_200(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, _ = populated_client
+        resp = client.patch(
+            "/api/v1/blueprints/alpha",
+            json={"description": "Updated desc"},
+        )
+        assert resp.status_code == 200
+        assert resp.json()["description"] == "Updated desc"
+
+    def test_update_description_404_when_missing(self, patched_client: TestClient) -> None:
+        resp = patched_client.patch(
+            "/api/v1/blueprints/ghost",
+            json={"description": "x"},
+        )
+        assert resp.status_code == 404
+
+    def test_update_description_persists_to_cfg(
+        self, populated_client: tuple[TestClient, Path]
+    ) -> None:
+        client, directory = populated_client
+        client.patch("/api/v1/blueprints/alpha", json={"description": "Persisted"})
+        cfg_data = json.loads((directory / "alpha.sbpcfg").read_text())
+        assert cfg_data["description"] == "Persisted"

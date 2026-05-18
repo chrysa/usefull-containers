@@ -75,8 +75,22 @@
     "go_gamedata": "Game Data",
     "go_calculator": "Calculator"
   },
-  "plans": {
-    "title": "Factory Plans",
+  "blueprint_detail": {
+    "back": "Back to Blueprints",
+    "description": "Description",
+    "description_empty": "No description. Click Edit to add one.",
+    "description_placeholder": "Describe this blueprint…",
+    "edit": "Edit",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "tags": "Tags",
+    "size": "File size",
+    "modified": "Last modified",
+    "files": "Available files",
+    "delete": "Delete"
+  },
+  "plans": {    "title": "Factory Plans",
     "create": "New Plan",
     "empty": "No plans yet. Create a plan to start organising your production.",
     "error": "Failed to load plans.",

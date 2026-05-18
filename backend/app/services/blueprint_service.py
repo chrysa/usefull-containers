@@ -284,3 +284,30 @@ def set_tags(blueprints_dir: str, name: str, tags: list[str]) -> BlueprintRead:
     meta_path.write_text(json.dumps(existing, ensure_ascii=False), encoding="utf-8")
 
     return get_blueprint(blueprints_dir, name)
+
+
+def update_description(blueprints_dir: str, name: str, description: str) -> BlueprintRead:
+    """
+    Update the description field in the .sbpcfg JSON file for *name*.
+
+    If no .sbpcfg exists, a minimal one is created.  Raises
+    :exc:`BlueprintNotFoundError` when neither .sbp nor .sbpcfg are present.
+    """
+    directory = Path(blueprints_dir)
+    sbp_path = directory / f"{name}{BLUEPRINT_FILE_EXT}"
+    cfg_path = directory / f"{name}{BLUEPRINT_CFG_EXT}"
+
+    if not sbp_path.exists() and not cfg_path.exists():
+        raise BlueprintNotFoundError(f"Blueprint '{name}' not found")
+
+    try:
+        existing: dict = (
+            json.loads(cfg_path.read_text(encoding="utf-8")) if cfg_path.exists() else {}
+        )
+    except (json.JSONDecodeError, OSError):
+        existing = {}
+
+    existing["description"] = description
+    cfg_path.write_text(json.dumps(existing, ensure_ascii=False), encoding="utf-8")
+
+    return get_blueprint(blueprints_dir, name)

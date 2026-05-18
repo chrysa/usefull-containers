@@ -75,6 +75,21 @@
     "go_gamedata": "Données du jeu",
     "go_calculator": "Calculateur"
   },
+  "blueprint_detail": {
+    "back": "Retour aux blueprints",
+    "description": "Description",
+    "description_empty": "Pas de description. Cliquez sur Modifier pour en ajouter une.",
+    "description_placeholder": "Décrivez ce blueprint…",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "tags": "Tags",
+    "size": "Taille du fichier",
+    "modified": "Dernière modification",
+    "files": "Fichiers disponibles",
+    "delete": "Supprimer"
+  },
   "plans": {
     "title": "Plans de production",
     "create": "Nouveau plan",
