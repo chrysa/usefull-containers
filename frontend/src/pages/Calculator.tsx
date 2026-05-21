@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import { useItemsQuery, useRecipesQuery, useGameDataStatsQuery } from "../domain/gamedata/queries";
 import { calculateProduction, flattenRequirements } from "../domain/gamedata/calculator";
 import type { CalculationNode } from "../domain/gamedata/calculator";
+import ProductionGraph from "../features/calculator/ProductionGraph";
 import styles from "./Calculator.module.scss";
+
+type ViewMode = "tree" | "graph";
 
 // ── Tree node (recursive) ────────────────────────────────────────────────────
 
@@ -45,9 +48,10 @@ export default function CalculatorPage() {
   const [targetItemId, setTargetItemId] = useState("");
   const [quantityRaw, setQuantityRaw] = useState("1");
   const [submitted, setSubmitted] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("tree");
 
-  const items = itemsQuery.data ?? [];
-  const recipes = recipesQuery.data ?? [];
+  const items = useMemo(() => itemsQuery.data ?? [], [itemsQuery.data]);
+  const recipes = useMemo(() => recipesQuery.data ?? [], [recipesQuery.data]);
 
   // keep items sorted by name for the select list
   const sortedItems = useMemo(
@@ -127,14 +131,35 @@ export default function CalculatorPage() {
 
       {tree && (
         <div className={styles.results}>
-          <section className={styles.section}>
-            <h2>{t("calculator.production_tree")}</h2>
-            <ul className={styles.treeList}>
-              <TreeNode node={tree} depth={0} />
-            </ul>
-          </section>
+          <div className={styles.viewToggle}>
+            <button
+              type="button"
+              className={`${styles.toggleBtn} ${viewMode === "tree" ? styles.active : ""}`}
+              onClick={() => { setViewMode("tree"); }}
+            >
+              {t("calculator.view_tree")}
+            </button>
+            <button
+              type="button"
+              className={`${styles.toggleBtn} ${viewMode === "graph" ? styles.active : ""}`}
+              onClick={() => { setViewMode("graph"); }}
+            >
+              {t("calculator.view_graph")}
+            </button>
+          </div>
 
-          {flatReqs.length > 0 && (
+          {viewMode === "graph" && <ProductionGraph tree={tree} />}
+
+          {viewMode === "tree" && (
+            <section className={styles.section}>
+              <h2>{t("calculator.production_tree")}</h2>
+              <ul className={styles.treeList}>
+                <TreeNode node={tree} depth={0} />
+              </ul>
+            </section>
+          )}
+
+          {viewMode === "tree" && flatReqs.length > 0 && (
             <section className={styles.section}>
               <h2>{t("calculator.raw_requirements")}</h2>
               <table className={styles.table}>

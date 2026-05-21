@@ -7,6 +7,7 @@ import {
   useDeleteBlueprintMutation,
   useUpdateBlueprintDescriptionMutation,
 } from "../domain/blueprints/queries";
+import Skeleton from "../components/ui/Skeleton";
 import styles from "./BlueprintDetail.module.scss";
 
 function formatBytes(bytes: number): string {
@@ -56,7 +57,48 @@ export default function BlueprintDetail() {
   if (isLoading) {
     return (
       <main className={styles.page}>
-        <p className={styles.loading}>{t("loading")}</p>
+        <div className={styles.breadcrumb}>
+          <Skeleton width="80px" height="14px" />
+          <span className={styles.sep} aria-hidden="true">/</span>
+          <Skeleton width="140px" height="14px" />
+        </div>
+
+        <header className={styles.header}>
+          <div className={styles.titleRow}>
+            <Skeleton width="20px" height="20px" radius="50%" />
+            <Skeleton width="240px" height="32px" />
+          </div>
+          <div className={styles.actions}>
+            <Skeleton width="96px" height="36px" radius="6px" />
+            <Skeleton width="80px" height="36px" radius="6px" />
+          </div>
+        </header>
+
+        <div className={styles.meta}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className={styles.metaItem}>
+              <Skeleton width="60px" height="11px" />
+              <Skeleton width="100px" height="14px" />
+            </div>
+          ))}
+        </div>
+
+        <section className={styles.section}>
+          <Skeleton width="90px" height="16px" />
+          <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <Skeleton width="100%" height="14px" />
+            <Skeleton width="80%" height="14px" />
+            <Skeleton width="60%" height="14px" />
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <Skeleton width="60px" height="16px" />
+          <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.5rem" }}>
+            <Skeleton width="56px" height="24px" radius="999px" />
+            <Skeleton width="72px" height="24px" radius="999px" />
+          </div>
+        </section>
       </main>
     );
   }

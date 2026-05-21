@@ -125,6 +125,8 @@
     "col_quantity": "Quantité",
     "col_type": "Type",
     "type_raw": "Ressource brute",
-    "type_intermediate": "Intermédiaire"
+    "type_intermediate": "Intermédiaire",
+    "view_tree": "Vue arbre",
+    "view_graph": "Vue graphe"
   }
 }

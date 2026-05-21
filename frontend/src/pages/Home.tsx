@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useBlueprintsQuery } from "../domain/blueprints/queries";
 import { useHealthQuery } from "../api/health/queries";
+import Skeleton from "../components/ui/Skeleton";
 import styles from "./Home.module.scss";
 
 function formatDate(iso: string | null): string {
@@ -47,14 +48,14 @@ export default function Home() {
       <section className={styles.stats} aria-label={t("home.title")}>
         <div className={styles.statCard}>
           <span className={styles.statValue}>
-            {bpLoading ? "—" : blueprintCount}
+            {bpLoading ? <Skeleton width="40px" height="28px" radius="4px" /> : blueprintCount}
           </span>
           <span className={styles.statLabel}>{t("home.stat_blueprints")}</span>
         </div>
 
         <div className={styles.statCard}>
           <span className={styles.statValue}>
-            {bpLoading ? "—" : uniqueTags}
+            {bpLoading ? <Skeleton width="32px" height="28px" radius="4px" /> : uniqueTags}
           </span>
           <span className={styles.statLabel}>{t("home.stat_tags")}</span>
         </div>
@@ -70,7 +71,16 @@ export default function Home() {
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>{t("home.recent_title")}</h2>
-        {recent.length === 0 ? (
+        {bpLoading ? (
+          <ul className={styles.recentList}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <li key={i} className={styles.recentItem}>
+                <Skeleton width="180px" height="14px" />
+                <Skeleton width="72px" height="12px" />
+              </li>
+            ))}
+          </ul>
+        ) : recent.length === 0 ? (
           <p className={styles.empty}>{t("home.recent_empty")}</p>
         ) : (
           <ul className={styles.recentList}>
