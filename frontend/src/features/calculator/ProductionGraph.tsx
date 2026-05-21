@@ -6,6 +6,7 @@ import {
   MiniMap,
   Handle,
   Position,
+  type Node,
   type NodeTypes,
   type NodeProps,
 } from "@xyflow/react";
@@ -16,11 +17,13 @@ import styles from "./ProductionGraph.module.scss";
 
 // ── Custom node ───────────────────────────────────────────────────────────────
 
+type ProductionNodeType = Node<GraphNodeData, "productionNode">;
+
 function formatQty(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(2);
 }
 
-function ProductionNode({ data }: NodeProps<{ data: GraphNodeData }>) {
+function ProductionNode({ data }: NodeProps<ProductionNodeType>) {
   return (
     <div className={`${styles.node} ${data.isRaw ? styles.nodeRaw : ""}`}>
       <Handle type="target" position={Position.Top} className={styles.handle} />
