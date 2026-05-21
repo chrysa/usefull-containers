@@ -24,3 +24,6 @@ sonar-project.properties
 .sonar/
 .ci-backup-*/
 .gitnexus
+
+# CodeGraph (local index — never commit)
+.codegraph/
