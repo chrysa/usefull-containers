@@ -26,3 +26,6 @@ frontend/coverage/
 
 # CodeGraph (local index — never commit)
 .codegraph/
+
+# Local dev override
+docker-compose.override.yml

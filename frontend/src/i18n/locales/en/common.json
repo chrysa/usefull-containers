@@ -128,5 +128,29 @@
     "type_intermediate": "Intermediate",
     "view_tree": "Tree view",
     "view_graph": "Graph view"
+  },
+  "plan_detail": {
+    "back": "← Back to Plans",
+    "edit": "Edit",
+    "edit_name": "Edit plan name",
+    "edit_desc": "Edit description",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm_delete": "Delete plan \"{{name}}\"? This cannot be undone.",
+    "no_description": "No description.",
+    "target_items": "Target production",
+    "add_item": "Add item",
+    "select_item": "Select an item…",
+    "quantity": "Quantity (per min)",
+    "add": "Add",
+    "remove_item": "Remove {{name}}",
+    "no_items": "No production targets yet. Add an item to define what this factory produces.",
+    "linked_blueprints": "Linked blueprints",
+    "link_blueprint": "Link blueprint",
+    "select_blueprint": "Select a blueprint…",
+    "link": "Link",
+    "unlink_blueprint": "Unlink {{name}}",
+    "no_blueprints": "No blueprints linked. Associate blueprints needed to build this factory."
   }
 }

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Plan } from "../../domain/plans/types";
 import styles from "./PlanCard.module.scss";
@@ -38,6 +39,12 @@ export default function PlanCard({ plan, onEdit, onDelete }: Props) {
       <footer className={styles.footer}>
         <span className={styles.meta}>{updatedDate}</span>
         <div className={styles.actions}>
+          <Link
+            to={`/plans/${plan.id}`}
+            className={styles.btnOpen}
+          >
+            {t("plans.open")}
+          </Link>
           <button
             type="button"
             className={styles.btnEdit}

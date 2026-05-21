@@ -101,6 +101,7 @@
     "blueprints_count": "{{count}} blueprint(s)",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "open": "Ouvrir",
     "form": {
       "create_title": "Nouveau plan de production",
       "edit_title": "Modifier le plan",
@@ -128,5 +129,29 @@
     "type_intermediate": "Intermédiaire",
     "view_tree": "Vue arbre",
     "view_graph": "Vue graphe"
+  },
+  "plan_detail": {
+    "back": "← Retour aux plans",
+    "edit": "Modifier",
+    "edit_name": "Modifier le nom du plan",
+    "edit_desc": "Modifier la description",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm_delete": "Supprimer le plan \"{{name}}\" ? Cette action est irréversible.",
+    "no_description": "Aucune description.",
+    "target_items": "Production cible",
+    "add_item": "Ajouter un objet",
+    "select_item": "Sélectionner un objet…",
+    "quantity": "Quantité (par min)",
+    "add": "Ajouter",
+    "remove_item": "Retirer {{name}}",
+    "no_items": "Aucune cible de production. Ajoutez un objet pour définir ce que cette usine produit.",
+    "linked_blueprints": "Blueprints liés",
+    "link_blueprint": "Lier un blueprint",
+    "select_blueprint": "Sélectionner un blueprint…",
+    "link": "Lier",
+    "unlink_blueprint": "Délier {{name}}",
+    "no_blueprints": "Aucun blueprint lié. Associez les blueprints nécessaires à la construction de cette usine."
   }
 }
