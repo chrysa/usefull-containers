@@ -4,6 +4,7 @@ import { useItemsQuery, useRecipesQuery, useGameDataStatsQuery } from "../domain
 import { calculateProduction, flattenRequirements } from "../domain/gamedata/calculator";
 import type { CalculationNode } from "../domain/gamedata/calculator";
 import ProductionGraph from "../features/calculator/ProductionGraph";
+import SaveToPlanPanel from "../features/calculator/SaveToPlanPanel";
 import styles from "./Calculator.module.scss";
 
 type ViewMode = "tree" | "graph";
@@ -182,6 +183,12 @@ export default function CalculatorPage() {
               </table>
             </section>
           )}
+
+          <SaveToPlanPanel
+            itemId={targetItemId}
+            itemName={items.find((i) => i.id === targetItemId)?.name ?? targetItemId}
+            quantity={Number.parseFloat(quantityRaw)}
+          />
         </div>
       )}
     </div>

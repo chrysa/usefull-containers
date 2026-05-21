@@ -127,7 +127,16 @@
     "type_raw": "Raw resource",
     "type_intermediate": "Intermediate",
     "view_tree": "Tree view",
-    "view_graph": "Graph view"
+    "view_graph": "Graph view",
+    "save_to_plan": "Save to Plan",
+    "save_new_plan": "New plan",
+    "save_existing_plan": "Existing plan",
+    "plan_name_placeholder": "Plan name…",
+    "create_and_save": "Create & Save",
+    "add_to_plan": "Add to Plan",
+    "select_plan": "Select a plan…",
+    "saving": "Saving…",
+    "save_error": "Failed to save. Please try again."
   },
   "plan_detail": {
     "back": "← Back to Plans",

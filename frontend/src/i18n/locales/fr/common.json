@@ -128,7 +128,16 @@
     "type_raw": "Ressource brute",
     "type_intermediate": "Intermédiaire",
     "view_tree": "Vue arbre",
-    "view_graph": "Vue graphe"
+    "view_graph": "Vue graphe",
+    "save_to_plan": "Sauvegarder dans un plan",
+    "save_new_plan": "Nouveau plan",
+    "save_existing_plan": "Plan existant",
+    "plan_name_placeholder": "Nom du plan…",
+    "create_and_save": "Créer & Sauvegarder",
+    "add_to_plan": "Ajouter au plan",
+    "select_plan": "Sélectionner un plan…",
+    "saving": "Sauvegarde…",
+    "save_error": "Échec de la sauvegarde. Veuillez réessayer."
   },
   "plan_detail": {
     "back": "← Retour aux plans",

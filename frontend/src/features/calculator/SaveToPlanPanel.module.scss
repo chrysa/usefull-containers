@@ -1,0 +1,125 @@
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent, #7c3aed);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-accent, #7c3aed);
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.previewItem {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.previewQty {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #888);
+  background: var(--color-bg, #0f0f0f);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+}
+
+.modeToggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modeBtn {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary, #888);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-hover, rgba(255, 255, 255, 0.05));
+    color: var(--color-text);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    background: rgba(124, 58, 237, 0.15);
+    border-color: var(--color-accent, #7c3aed);
+    color: var(--color-accent, #7c3aed);
+    font-weight: 500;
+  }
+}
+
+.form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.input,
+.select {
+  flex: 1;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg, #0f0f0f);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  min-width: 0;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-accent, #7c3aed);
+  }
+
+  option {
+    background: var(--color-bg, #1a1a1a);
+  }
+}
+
+.btnSave {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-accent, #7c3aed);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.error {
+  font-size: 0.85rem;
+  color: var(--color-danger, #dc2626);
+  margin: 0;
+}
