@@ -59,7 +59,7 @@ export default function PlansPage() {
       {isLoading && (
         <div className={styles.grid}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} height={140} />
+            <Skeleton key={i} height="140px" />
           ))}
         </div>
       )}

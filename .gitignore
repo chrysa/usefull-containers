@@ -23,3 +23,6 @@ frontend/coverage/
 
 # Docker
 .docker/
+
+# CodeGraph (local index — never commit)
+.codegraph/
