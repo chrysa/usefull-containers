@@ -102,6 +102,8 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "open": "Ouvrir",
+    "search_placeholder": "Rechercher des plans\u2026",
+    "no_results": "Aucun plan ne correspond \u00e0 votre recherche.",
     "form": {
       "create_title": "Nouveau plan de production",
       "edit_title": "Modifier le plan",

@@ -19,6 +19,13 @@ export default function PlansPage() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPlans = (plans ?? []).filter((p) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
+  });
 
   const updateMutation = useUpdatePlanMutation(editingPlan?.id ?? "");
 
@@ -56,6 +63,17 @@ export default function PlansPage() {
         </button>
       </header>
 
+      <div className={styles.toolbar}>
+        <input
+          className={styles.searchInput}
+          type="search"
+          placeholder={t("plans.search_placeholder")}
+          value={searchQuery}
+          onChange={(e) => { setSearchQuery(e.target.value); }}
+          aria-label={t("plans.search_placeholder")}
+        />
+      </div>
+
       {isLoading && (
         <div className={styles.grid}>
           {Array.from({ length: 3 }).map((_, i) => (
@@ -70,9 +88,13 @@ export default function PlansPage() {
         <p className={styles.empty}>{t("plans.empty")}</p>
       )}
 
-      {!isLoading && !isError && plans && plans.length > 0 && (
+      {!isLoading && !isError && plans && plans.length > 0 && filteredPlans.length === 0 && (
+        <p className={styles.empty}>{t("plans.no_results")}</p>
+      )}
+
+      {!isLoading && !isError && filteredPlans.length > 0 && (
         <div className={styles.grid}>
-          {plans.map((plan) => (
+          {filteredPlans.map((plan) => (
             <PlanCard
               key={plan.id}
               plan={plan}

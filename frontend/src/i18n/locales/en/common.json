@@ -101,6 +101,9 @@
     "blueprints_count": "{{count}} blueprint(s)",
     "edit": "Edit",
     "delete": "Delete",
+    "open": "Open",
+    "search_placeholder": "Search plans\u2026",
+    "no_results": "No plans match your search.",
     "form": {
       "create_title": "New Factory Plan",
       "edit_title": "Edit Factory Plan",
