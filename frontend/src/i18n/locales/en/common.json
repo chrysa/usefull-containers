@@ -106,7 +106,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "open": "Open",
-    "search_placeholder": "Search plans\u2026",
+    "search_placeholder": "Search plans…",
     "no_results": "No plans match your search.",
     "form": {
       "create_title": "New Factory Plan",
@@ -168,5 +168,14 @@
     "link": "Link",
     "unlink_blueprint": "Unlink {{name}}",
     "no_blueprints": "No blueprints linked. Associate blueprints needed to build this factory."
+  },
+  "assistant": {
+    "title": "Factory Assistant",
+    "toggle_label": "Open assistant",
+    "close": "Close",
+    "welcome": "Hi! I'm your Factory Manager assistant. How can I help you?",
+    "placeholder": "Ask me anything…",
+    "send": "Send",
+    "error": "An error occurred. Please try again."
   }
 }

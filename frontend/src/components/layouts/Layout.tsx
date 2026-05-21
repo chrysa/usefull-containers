@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import AssistantWidget from "../Assistant/AssistantWidget";
 import styles from "./Layout.module.scss";
 
 export default function Layout() {
@@ -13,6 +14,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      <AssistantWidget />
     </div>
   );
 }
