@@ -68,12 +68,16 @@
     "hub_online": "En ligne",
     "hub_offline": "Hors ligne",
     "hub_checking": "Vérification…",
+    "stat_plans": "Plans",
     "recent_title": "Blueprints récents",
     "recent_empty": "Aucun blueprint.",
+    "recent_plans_title": "Plans récents",
+    "no_plans": "Aucun plan pour l'instant.",
     "quicklinks_title": "Accès rapide",
     "go_blueprints": "Gérer les blueprints",
     "go_gamedata": "Données du jeu",
-    "go_calculator": "Calculateur"
+    "go_calculator": "Calculateur",
+    "go_plans": "Plans"
   },
   "blueprint_detail": {
     "back": "Retour aux blueprints",

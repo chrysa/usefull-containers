@@ -116,6 +116,24 @@
   flex: 1 0 auto;
 }
 
+.recentLink {
+  font-weight: 500;
+  flex: 1 0 auto;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--color-accent, #7c3aed);
+  }
+}
+
+.recentMeta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #888);
+  white-space: nowrap;
+}
+
 .recentDate {
   font-size: 0.8rem;
   color: var(--color-text-secondary, #888);

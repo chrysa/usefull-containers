@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useBlueprintsQuery } from "../domain/blueprints/queries";
 import { useHealthQuery } from "../api/health/queries";
+import { usePlansQuery } from "../domain/plans/queries";
 import Skeleton from "../components/ui/Skeleton";
 import styles from "./Home.module.scss";
 
@@ -14,11 +15,19 @@ export default function Home() {
   const { t } = useTranslation();
   const { data: bpData, isLoading: bpLoading } = useBlueprintsQuery();
   const { data: health, isLoading: healthLoading, isError: healthError } = useHealthQuery();
+  const { data: plansData, isLoading: plansLoading } = usePlansQuery();
 
   const blueprintCount = bpData?.total ?? 0;
   const uniqueTags = bpData
     ? new Set(bpData.blueprints.flatMap((bp) => bp.tags)).size
     : 0;
+  const planCount = plansData?.length ?? 0;
+
+  const recentPlans = plansData
+    ? [...plansData]
+        .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+        .slice(0, 5)
+    : [];
 
   const hubLabel = healthLoading
     ? t("home.hub_checking")
@@ -58,6 +67,13 @@ export default function Home() {
             {bpLoading ? <Skeleton width="32px" height="28px" radius="4px" /> : uniqueTags}
           </span>
           <span className={styles.statLabel}>{t("home.stat_tags")}</span>
+        </div>
+
+        <div className={styles.statCard}>
+          <span className={styles.statValue}>
+            {plansLoading ? <Skeleton width="40px" height="28px" radius="4px" /> : planCount}
+          </span>
+          <span className={styles.statLabel}>{t("home.stat_plans")}</span>
         </div>
 
         <div className={`${styles.statCard} ${styles[`status-${hubStatus}`]}`}>
@@ -102,6 +118,36 @@ export default function Home() {
       </section>
 
       <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>{t("home.recent_plans_title")}</h2>
+        {plansLoading ? (
+          <ul className={styles.recentList}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <li key={i} className={styles.recentItem}>
+                <Skeleton width="180px" height="14px" />
+                <Skeleton width="72px" height="12px" />
+              </li>
+            ))}
+          </ul>
+        ) : recentPlans.length === 0 ? (
+          <p className={styles.empty}>{t("home.no_plans")}</p>
+        ) : (
+          <ul className={styles.recentList}>
+            {recentPlans.map((plan) => (
+              <li key={plan.id} className={styles.recentItem}>
+                <Link to={`/plans/${plan.id}`} className={styles.recentLink}>{plan.name}</Link>
+                <span className={styles.recentDate}>{formatDate(plan.updated_at)}</span>
+                {plan.target_items.length > 0 && (
+                  <span className={styles.recentMeta}>
+                    {t("plans.items_count", { count: plan.target_items.length })}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className={styles.section}>
         <h2 className={styles.sectionTitle}>{t("home.quicklinks_title")}</h2>
         <nav className={styles.quicklinks}>
           <Link to="/blueprints" className={styles.quicklink}>
@@ -112,6 +158,9 @@ export default function Home() {
           </Link>
           <Link to="/calculator" className={styles.quicklink}>
             🧮 {t("home.go_calculator")}
+          </Link>
+          <Link to="/plans" className={styles.quicklink}>
+            📋 {t("home.go_plans")}
           </Link>
         </nav>
       </section>
