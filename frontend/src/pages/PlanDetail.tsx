@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useToast } from "../context/useToast";
 import {
   usePlanQuery,
   useUpdatePlanMutation,
@@ -18,6 +19,7 @@ export default function PlanDetail() {
   const { id = "" } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { data: plan, isLoading, isError } = usePlanQuery(id);
   const statsQuery = useGameDataStatsQuery();
@@ -96,7 +98,11 @@ export default function PlanDetail() {
     updateMutation.mutate(
       { name: nameDraft.trim() },
       {
-        onSuccess: () => setEditingName(false),
+        onSuccess: () => {
+          setEditingName(false);
+          showToast(t("toast.plan_updated"));
+        },
+        onError: () => showToast(t("toast.error"), "error"),
       },
     );
   }
@@ -110,14 +116,24 @@ export default function PlanDetail() {
     updateMutation.mutate(
       { description: descDraft },
       {
-        onSuccess: () => setEditingDesc(false),
+        onSuccess: () => {
+          setEditingDesc(false);
+          showToast(t("toast.plan_updated"));
+        },
+        onError: () => showToast(t("toast.error"), "error"),
       },
     );
   }
 
   function handleRemoveItem(itemId: string) {
     const next = plan!.target_items.filter((ti) => ti.item_id !== itemId);
-    updateMutation.mutate({ target_items: next });
+    updateMutation.mutate(
+      { target_items: next },
+      {
+        onSuccess: () => showToast(t("toast.item_removed")),
+        onError: () => showToast(t("toast.error"), "error"),
+      },
+    );
   }
 
   function handleAddItem(e: React.FormEvent) {
@@ -141,14 +157,22 @@ export default function PlanDetail() {
           setAddingItem(false);
           setNewItemId("");
           setNewItemQty("1");
+          showToast(t("toast.item_added"));
         },
+        onError: () => showToast(t("toast.error"), "error"),
       },
     );
   }
 
   function handleUnlinkBp(bpName: string) {
     const next = plan!.linked_blueprints.filter((n) => n !== bpName);
-    updateMutation.mutate({ linked_blueprints: next });
+    updateMutation.mutate(
+      { linked_blueprints: next },
+      {
+        onSuccess: () => showToast(t("toast.blueprint_unlinked")),
+        onError: () => showToast(t("toast.error"), "error"),
+      },
+    );
   }
 
   function handleLinkBp(e: React.FormEvent) {
@@ -166,7 +190,9 @@ export default function PlanDetail() {
         onSuccess: () => {
           setLinkingBp(false);
           setNewBpName("");
+          showToast(t("toast.blueprint_linked"));
         },
+        onError: () => showToast(t("toast.error"), "error"),
       },
     );
   }
@@ -177,13 +203,21 @@ export default function PlanDetail() {
     )
       return;
     deleteMutation.mutate(id, {
-      onSuccess: () => navigate("/plans"),
+      onSuccess: () => {
+        showToast(t("toast.plan_deleted"));
+        navigate("/plans");
+      },
+      onError: () => showToast(t("toast.error"), "error"),
     });
   }
 
   function handleDuplicate() {
     duplicateMutation.mutate(id, {
-      onSuccess: (copy) => navigate(`/plans/${copy.id}`),
+      onSuccess: (copy) => {
+        showToast(t("toast.plan_duplicated"));
+        navigate(`/plans/${copy.id}`);
+      },
+      onError: () => showToast(t("toast.error"), "error"),
     });
   }
 
@@ -197,6 +231,7 @@ export default function PlanDetail() {
     a.download = `plan-${plan!.id}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast(t("toast.export_done"));
   }
 
   const items = itemsQuery.data ?? [];

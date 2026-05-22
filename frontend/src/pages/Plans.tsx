@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useToast } from "../context/useToast";
 import { PlanCard, PlanForm } from "../features/plans";
 import Skeleton from "../components/ui/Skeleton";
 import {
   useCreatePlanMutation,
   useDeletePlanMutation,
   useDuplicatePlanMutation,
+  useImportPlanMutation,
   usePlansQuery,
   useUpdatePlanMutation,
 } from "../domain/plans/queries";
@@ -14,10 +17,16 @@ import styles from "./Plans.module.scss";
 
 export default function PlansPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const { data: plans, isLoading, isError } = usePlansQuery();
   const createMutation = useCreatePlanMutation();
   const deleteMutation = useDeletePlanMutation();
   const duplicateMutation = useDuplicatePlanMutation();
+  const importMutation = useImportPlanMutation();
+
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | undefined>(undefined);
@@ -46,18 +55,62 @@ export default function PlansPage() {
 
   function handleDelete(id: string) {
     if (!globalThis.confirm(t("plans.confirm_delete"))) return;
-    deleteMutation.mutate(id);
+    deleteMutation.mutate(id, {
+      onSuccess: () => showToast(t("toast.plan_deleted")),
+      onError: () => showToast(t("toast.error"), "error"),
+    });
   }
 
   function handleDuplicate(id: string) {
-    duplicateMutation.mutate(id);
+    duplicateMutation.mutate(id, {
+      onSuccess: () => showToast(t("toast.plan_duplicated")),
+      onError: () => showToast(t("toast.error"), "error"),
+    });
+  }
+
+  function handleImportClick() {
+    setImportError(null);
+    importInputRef.current?.click();
+  }
+
+  function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Reset so the same file can be re-selected after an error
+    e.target.value = "";
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target?.result as string) as Plan;
+        if (!parsed.name) throw new Error("missing name field");
+        importMutation.mutate(parsed, {
+          onSuccess: (created) => navigate(`/plans/${created.id}`),
+          onError: () => setImportError(t("plans.import_error")),
+        });
+      } catch {
+        setImportError(t("plans.import_error"));
+      }
+    };
+    reader.readAsText(file);
   }
 
   function handleSubmit(data: PlanCreate) {
     if (editingPlan) {
-      updateMutation.mutate(data, { onSuccess: () => setFormOpen(false) });
+      updateMutation.mutate(data, {
+        onSuccess: () => {
+          setFormOpen(false);
+          showToast(t("toast.plan_updated"));
+        },
+        onError: () => showToast(t("toast.error"), "error"),
+      });
     } else {
-      createMutation.mutate(data, { onSuccess: () => setFormOpen(false) });
+      createMutation.mutate(data, {
+        onSuccess: () => {
+          setFormOpen(false);
+          showToast(t("toast.plan_created"));
+        },
+        onError: () => showToast(t("toast.error"), "error"),
+      });
     }
   }
 
@@ -67,10 +120,41 @@ export default function PlansPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1>{t("plans.title")}</h1>
-        <button type="button" className={styles.btnCreate} onClick={openCreate}>
-          + {t("plans.create")}
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            type="button"
+            className={styles.btnImport}
+            onClick={handleImportClick}
+            disabled={importMutation.isPending}
+            title={t("plans.import_json_hint")}
+          >
+            {importMutation.isPending
+              ? t("plans.importing_json")
+              : t("plans.import_json")}
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json,application/json"
+            aria-label={t("plans.import_json_hint")}
+            className={styles.hiddenInput}
+            onChange={handleImportFile}
+          />
+          <button
+            type="button"
+            className={styles.btnCreate}
+            onClick={openCreate}
+          >
+            + {t("plans.create")}
+          </button>
+        </div>
       </header>
+
+      {importError && (
+        <p className={styles.importError} role="alert">
+          {importError}
+        </p>
+      )}
 
       <div className={styles.toolbar}>
         <input

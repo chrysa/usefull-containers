@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, status
 
 from app.config import settings
-from app.models.plan import PlanCreate, PlanRead, PlanUpdate
+from app.models.plan import PlanCreate, PlanImport, PlanRead, PlanUpdate
 from app.services import plan_service
 
 router = APIRouter(prefix="/plans", tags=["plans"])
@@ -22,6 +22,16 @@ def list_plans() -> list[PlanRead]:
 )
 def create_plan(payload: PlanCreate) -> PlanRead:
     return plan_service.create_plan(settings.data_dir, payload)
+
+
+@router.post(
+    "/import",
+    response_model=PlanRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import a plan from an exported JSON file",
+)
+def import_plan(payload: PlanImport) -> PlanRead:
+    return plan_service.import_plan(settings.data_dir, payload)
 
 
 @router.get("/{plan_id}", response_model=PlanRead, summary="Get a plan by ID")

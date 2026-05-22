@@ -109,6 +109,10 @@
     "duplicate": "Duplicate",
     "search_placeholder": "Search plans…",
     "no_results": "No plans match your search.",
+    "import_json": "Import JSON",
+    "importing_json": "Importing…",
+    "import_json_hint": "Select an exported plan JSON file",
+    "import_error": "Failed to import plan. The file may be invalid.",
     "form": {
       "create_title": "New Factory Plan",
       "edit_title": "Edit Factory Plan",
@@ -180,5 +184,17 @@
     "placeholder": "Ask me anything…",
     "send": "Send",
     "error": "An error occurred. Please try again."
+  },
+  "toast": {
+    "plan_created": "Plan created successfully.",
+    "plan_updated": "Plan updated.",
+    "plan_deleted": "Plan deleted.",
+    "plan_duplicated": "Plan duplicated successfully.",
+    "export_done": "JSON export downloaded.",
+    "item_added": "Item added to production targets.",
+    "item_removed": "Item removed from production targets.",
+    "blueprint_linked": "Blueprint linked successfully.",
+    "blueprint_unlinked": "Blueprint unlinked.",
+    "error": "An error occurred."
   }
 }

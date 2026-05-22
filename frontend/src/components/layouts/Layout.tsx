@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import AssistantWidget from "../Assistant/AssistantWidget";
+import ToastContainer from "../ui/Toast/Toast";
 import styles from "./Layout.module.scss";
 
 export default function Layout() {
@@ -15,6 +16,7 @@ export default function Layout() {
         </main>
       </div>
       <AssistantWidget />
+      <ToastContainer />
     </div>
   );
 }

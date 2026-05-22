@@ -154,3 +154,56 @@ class TestDeletePlanEndpoint:
     def test_delete_when_missing_should_return_404(self, plan_client: TestClient) -> None:
         resp = plan_client.delete("/api/v1/plans/ghost")
         assert resp.status_code == 404
+
+
+class TestImportPlanEndpoint:
+    def test_import_minimal_should_return_201_with_new_id(self, plan_client: TestClient) -> None:
+        resp = plan_client.post("/api/v1/plans/import", json={"name": "Imported Plan"})
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["name"] == "Imported Plan"
+        assert data["description"] == ""
+        assert data["target_items"] == []
+        assert data["linked_blueprints"] == []
+        assert "id" in data
+        assert "created_at" in data
+
+    def test_import_full_export_should_create_new_plan(self, plan_client: TestClient) -> None:
+        original = plan_client.post(
+            "/api/v1/plans",
+            json={
+                "name": "Iron Factory",
+                "description": "Iron plate production",
+                "target_items": [{"item_id": "Desc_IronPlate_C", "quantity": 60.0}],
+                "linked_blueprints": ["iron-smelter"],
+            },
+        ).json()
+        # Import the full exported structure (as produced by Export JSON)
+        resp = plan_client.post("/api/v1/plans/import", json=original)
+        assert resp.status_code == 201
+        imported = resp.json()
+        # Fresh identity
+        assert imported["id"] != original["id"]
+        assert imported["created_at"] != original["created_at"]
+        # Content preserved
+        assert imported["name"] == "Iron Factory"
+        assert imported["description"] == "Iron plate production"
+        assert imported["target_items"] == [{"item_id": "Desc_IronPlate_C", "quantity": 60.0}]
+        assert imported["linked_blueprints"] == ["iron-smelter"]
+
+    def test_import_appears_in_list(self, plan_client: TestClient) -> None:
+        plan_client.post("/api/v1/plans/import", json={"name": "Visible Plan"})
+        resp = plan_client.get("/api/v1/plans")
+        names = [p["name"] for p in resp.json()]
+        assert "Visible Plan" in names
+
+    def test_import_with_empty_name_should_return_422(self, plan_client: TestClient) -> None:
+        resp = plan_client.post("/api/v1/plans/import", json={"name": ""})
+        assert resp.status_code == 422
+
+    def test_import_with_invalid_quantity_should_return_422(self, plan_client: TestClient) -> None:
+        resp = plan_client.post(
+            "/api/v1/plans/import",
+            json={"name": "Bad", "target_items": [{"item_id": "x", "quantity": 0}]},
+        )
+        assert resp.status_code == 422

@@ -54,3 +54,11 @@ export function useDeletePlanMutation() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 }
+
+export function useImportPlanMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<Plan, Error, Plan>({
+    mutationFn: (payload: Plan) => http.post<Plan>(`${API_BASE}/import`, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  });
+}

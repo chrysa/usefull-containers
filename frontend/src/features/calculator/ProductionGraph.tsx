@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -12,7 +12,11 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { CalculationNode } from "../../domain/gamedata/calculator";
-import { buildGraph, type GraphNodeData } from "./graphLayout";
+import {
+  buildGraph,
+  getDescendantIds,
+  type GraphNodeData,
+} from "./graphLayout";
 import styles from "./ProductionGraph.module.scss";
 
 // ── Custom node ───────────────────────────────────────────────────────────────
@@ -54,12 +58,44 @@ interface Props {
 
 export default function ProductionGraph({ tree }: Props) {
   const { nodes, edges } = useMemo(() => buildGraph(tree), [tree]);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const highlightedIds = useMemo(
+    () => (hoveredId !== null ? getDescendantIds(hoveredId, edges) : null),
+    [hoveredId, edges],
+  );
+
+  const displayEdges = useMemo(
+    () =>
+      highlightedIds === null
+        ? edges
+        : edges.map((e) => ({
+            ...e,
+            className:
+              highlightedIds.has(e.source) || highlightedIds.has(e.target)
+                ? ""
+                : styles.edgeDimmed,
+          })),
+    [edges, highlightedIds],
+  );
+
+  const displayNodes = useMemo(
+    () =>
+      highlightedIds === null
+        ? nodes
+        : nodes.map((n) => ({
+            ...n,
+            className:
+              highlightedIds.has(n.id) ? "" : styles.nodeDimmed,
+          })),
+    [nodes, highlightedIds],
+  );
 
   return (
     <div className={styles.container}>
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={displayNodes}
+        edges={displayEdges}
         nodeTypes={NODE_TYPES}
         fitView
         fitViewOptions={{ padding: 0.15 }}
@@ -68,6 +104,8 @@ export default function ProductionGraph({ tree }: Props) {
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
+        onNodeMouseEnter={(_evt, node) => setHoveredId(node.id)}
+        onNodeMouseLeave={() => setHoveredId(null)}
       >
         <Background gap={20} size={1} color="var(--color-border, #333)" />
         <Controls showInteractive={false} />

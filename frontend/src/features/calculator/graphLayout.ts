@@ -94,8 +94,31 @@ export function buildGraph(tree: CalculationNode): {
   return {
     nodes: nodes.map((n) => {
       const { x, y } = g.node(n.id);
-      return { ...n, position: { x: x - NODE_WIDTH / 2, y: y - NODE_HEIGHT / 2 } };
+      return {
+        ...n,
+        position: { x: x - NODE_WIDTH / 2, y: y - NODE_HEIGHT / 2 },
+      };
     }),
     edges,
   };
+}
+
+/**
+ * BFS from nodeId following edge.source → edge.target direction.
+ * Returns the set of IDs for the node and all its descendants.
+ */
+export function getDescendantIds(nodeId: string, edges: Edge[]): Set<string> {
+  const result = new Set<string>();
+  const queue = [nodeId];
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    if (result.has(id)) continue;
+    result.add(id);
+    for (const e of edges) {
+      if (e.source === id && !result.has(e.target)) {
+        queue.push(e.target);
+      }
+    }
+  }
+  return result;
 }

@@ -109,6 +109,10 @@
     "duplicate": "Dupliquer",
     "search_placeholder": "Rechercher des plans…",
     "no_results": "Aucun plan ne correspond à votre recherche.",
+    "import_json": "Importer JSON",
+    "importing_json": "Importation…",
+    "import_json_hint": "Sélectionner un fichier JSON de plan exporté",
+    "import_error": "Impossible d'importer le plan. Le fichier est peut-être invalide.",
     "form": {
       "create_title": "Nouveau plan de production",
       "edit_title": "Modifier le plan",
@@ -180,5 +184,17 @@
     "placeholder": "Posez votre question…",
     "send": "Envoyer",
     "error": "Une erreur est survenue. Veuillez réessayer."
+  },
+  "toast": {
+    "plan_created": "Plan créé avec succès.",
+    "plan_updated": "Plan mis à jour.",
+    "plan_deleted": "Plan supprimé.",
+    "plan_duplicated": "Plan dupliqué avec succès.",
+    "export_done": "Export JSON téléchargé.",
+    "item_added": "Objet ajouté aux cibles de production.",
+    "item_removed": "Objet retiré des cibles de production.",
+    "blueprint_linked": "Blueprint lié avec succès.",
+    "blueprint_unlinked": "Blueprint délié.",
+    "error": "Une erreur est survenue."
   }
 }

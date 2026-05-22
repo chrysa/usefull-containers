@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from app.constants import PLANS_FILENAME
-from app.models.plan import PlanCreate, PlanRead, PlanUpdate
+from app.models.plan import PlanCreate, PlanImport, PlanRead, PlanUpdate
 
 
 def _plans_path(data_dir: str) -> Path:
@@ -105,3 +105,13 @@ def delete_plan(data_dir: str, plan_id: str) -> bool:
         return False
     _save_plans(data_dir, filtered)
     return True
+
+
+def import_plan(data_dir: str, payload: PlanImport) -> PlanRead:
+    create_payload = PlanCreate(
+        name=payload.name,
+        description=payload.description,
+        target_items=payload.target_items,
+        linked_blueprints=payload.linked_blueprints,
+    )
+    return create_plan(data_dir, create_payload)

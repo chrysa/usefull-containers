@@ -19,6 +19,45 @@
   }
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.btnImport {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-accent, #3b82f6);
+  background: transparent;
+  border: 1px solid var(--color-accent, #3b82f6);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent, #3b82f6);
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.importError {
+  color: var(--color-danger, #dc2626);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
 .btnCreate {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
