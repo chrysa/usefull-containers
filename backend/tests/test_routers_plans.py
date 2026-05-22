@@ -108,6 +108,34 @@ class TestUpdatePlanEndpoint:
         assert resp.status_code == 404
 
 
+class TestDuplicatePlanEndpoint:
+    def test_duplicate_returns_201_with_copy_suffix(self, plan_client: TestClient) -> None:
+        create = plan_client.post(
+            "/api/v1/plans",
+            json={"name": "Iron Plan", "description": "desc"},
+        )
+        plan_id = create.json()["id"]
+        resp = plan_client.post(f"/api/v1/plans/{plan_id}/duplicate")
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["name"] == "Iron Plan (copy)"
+        assert data["description"] == "desc"
+        assert data["id"] != plan_id
+
+    def test_duplicate_appears_in_list(self, plan_client: TestClient) -> None:
+        create = plan_client.post("/api/v1/plans", json={"name": "Plan A"})
+        plan_id = create.json()["id"]
+        plan_client.post(f"/api/v1/plans/{plan_id}/duplicate")
+        resp = plan_client.get("/api/v1/plans")
+        names = [p["name"] for p in resp.json()]
+        assert "Plan A" in names
+        assert "Plan A (copy)" in names
+
+    def test_duplicate_when_missing_should_return_404(self, plan_client: TestClient) -> None:
+        resp = plan_client.post("/api/v1/plans/nonexistent-id/duplicate")
+        assert resp.status_code == 404
+
+
 class TestDeletePlanEndpoint:
     def test_delete_when_exists_should_return_204(self, plan_client: TestClient) -> None:
         create = plan_client.post("/api/v1/plans", json={"name": "To Delete"})

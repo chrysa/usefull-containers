@@ -39,6 +39,14 @@ export function useUpdatePlanMutation(id: string) {
   });
 }
 
+export function useDuplicatePlanMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<Plan, Error, string>({
+    mutationFn: (id: string) => http.post<Plan>(`${API_BASE}/${id}/duplicate`, {}),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  });
+}
+
 export function useDeletePlanMutation() {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({

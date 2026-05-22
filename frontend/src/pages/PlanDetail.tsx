@@ -5,6 +5,7 @@ import {
   usePlanQuery,
   useUpdatePlanMutation,
   useDeletePlanMutation,
+  useDuplicatePlanMutation,
 } from "../domain/plans/queries";
 import { useItemsQuery } from "../domain/gamedata/queries";
 import { useBlueprintsQuery } from "../domain/blueprints/queries";
@@ -26,6 +27,7 @@ export default function PlanDetail() {
 
   const updateMutation = useUpdatePlanMutation(id);
   const deleteMutation = useDeletePlanMutation();
+  const duplicateMutation = useDuplicatePlanMutation();
 
   // Inline name/description editing
   const [editingName, setEditingName] = useState(false);
@@ -179,6 +181,24 @@ export default function PlanDetail() {
     });
   }
 
+  function handleDuplicate() {
+    duplicateMutation.mutate(id, {
+      onSuccess: (copy) => navigate(`/plans/${copy.id}`),
+    });
+  }
+
+  function handleExportJson() {
+    const blob = new Blob([JSON.stringify(plan, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `plan-${plan!.id}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const items = itemsQuery.data ?? [];
   const blueprints = blueprintsQuery.data?.blueprints ?? [];
   const availableBps = blueprints.filter(
@@ -240,6 +260,21 @@ export default function PlanDetail() {
               aria-label={t("plan_detail.edit_name")}
             >
               {t("plan_detail.edit")}
+            </button>
+            <button
+              type="button"
+              className={styles.btnDuplicate}
+              onClick={handleDuplicate}
+              disabled={duplicateMutation.isPending}
+            >
+              {t("plan_detail.duplicate")}
+            </button>
+            <button
+              type="button"
+              className={styles.btnExport}
+              onClick={handleExportJson}
+            >
+              {t("plan_detail.export_json")}
             </button>
             <button
               type="button"

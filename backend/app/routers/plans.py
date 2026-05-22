@@ -40,6 +40,19 @@ def update_plan(plan_id: str, payload: PlanUpdate) -> PlanRead:
     return plan
 
 
+@router.post(
+    "/{plan_id}/duplicate",
+    response_model=PlanRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Duplicate a plan",
+)
+def duplicate_plan(plan_id: str) -> PlanRead:
+    copy = plan_service.duplicate_plan(settings.data_dir, plan_id)
+    if copy is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
+    return copy
+
+
 @router.delete("/{plan_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete a plan")
 def delete_plan(plan_id: str) -> None:
     deleted = plan_service.delete_plan(settings.data_dir, plan_id)

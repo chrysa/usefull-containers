@@ -78,6 +78,26 @@ def update_plan(data_dir: str, plan_id: str, payload: PlanUpdate) -> PlanRead | 
     return None
 
 
+def duplicate_plan(data_dir: str, plan_id: str) -> PlanRead | None:
+    original = get_plan(data_dir, plan_id)
+    if original is None:
+        return None
+    now = datetime.now(UTC)
+    copy = PlanRead(
+        id=str(uuid.uuid4()),
+        name=f"{original.name} (copy)",
+        description=original.description,
+        target_items=original.target_items,
+        linked_blueprints=original.linked_blueprints,
+        created_at=now,
+        updated_at=now,
+    )
+    raw = _load_plans(data_dir)
+    raw.append(copy.model_dump(mode="json"))
+    _save_plans(data_dir, raw)
+    return copy
+
+
 def delete_plan(data_dir: str, plan_id: str) -> bool:
     raw = _load_plans(data_dir)
     filtered = [r for r in raw if r["id"] != plan_id]

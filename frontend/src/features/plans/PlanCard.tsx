@@ -7,9 +7,10 @@ interface Props {
   readonly plan: Plan;
   readonly onEdit: (plan: Plan) => void;
   readonly onDelete: (id: string) => void;
+  readonly onDuplicate: (id: string) => void;
 }
 
-export default function PlanCard({ plan, onEdit, onDelete }: Props) {
+export default function PlanCard({ plan, onEdit, onDelete, onDuplicate }: Props) {
   const { t } = useTranslation();
   const updatedDate = new Date(plan.updated_at).toLocaleDateString();
 
@@ -52,6 +53,14 @@ export default function PlanCard({ plan, onEdit, onDelete }: Props) {
             aria-label={`Edit ${plan.name}`}
           >
             {t("plans.edit")}
+          </button>
+          <button
+            type="button"
+            className={styles.btnDuplicate}
+            onClick={() => onDuplicate(plan.id)}
+            aria-label={`Duplicate ${plan.name}`}
+          >
+            {t("plans.duplicate")}
           </button>
           <button
             type="button"
