@@ -10,4 +10,4 @@ name: Dependabot Auto-merge
 jobs:
   auto-merge:
     uses: chrysa/github-actions/.github/workflows/dependabot-auto-merge.yml@main
-    secrets: inherit
+    secrets: inherit  # pragma: allowlist secret
