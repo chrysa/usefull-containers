@@ -85,8 +85,7 @@ export default function ProductionGraph({ tree }: Props) {
         ? nodes
         : nodes.map((n) => ({
             ...n,
-            className:
-              highlightedIds.has(n.id) ? "" : styles.nodeDimmed,
+            className: highlightedIds.has(n.id) ? "" : styles.nodeDimmed,
           })),
     [nodes, highlightedIds],
   );

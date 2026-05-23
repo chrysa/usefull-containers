@@ -21,9 +21,15 @@ Factory planning tool for [Satisfactory](https://www.satisfactorygame.com/) — 
 
 ## Status
 
-> Early stage — no application code yet. Scaffold to be generated from:
-> - Backend: `chrysa/project-init` Python template
-> - Frontend: `Forge-Stack-Workshop/react-app-generator`
+**Active development — V1 feature-complete.** All core features implemented and merged.
+
+| Sprint | Features |
+|--------|----------|
+| SFM-1→5 | Scaffold, CI/CD, blueprints list + search, tag system |
+| SFM-6→9 | Blueprint tags, tag filter, local sync agent (file watcher) |
+| SFM-10→13 | Home dashboard + stats, calculator, factory plans CRUD, ReactFlow production graph |
+| SFM-14→17 | Plan detail + target items, save calc result to plan, search/filter plans, home stats |
+| SFM-18→20 | Floating AI assistant widget, plan duplicate + export, toast notification system |
 
 ## Quickstart
 
