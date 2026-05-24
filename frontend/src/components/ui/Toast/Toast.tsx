@@ -1,5 +1,5 @@
-import type { Toast } from "../../context/ToastContext";
-import { useToast } from "../../context/useToast";
+import type { Toast } from "../../../context/ToastContext";
+import { useToast } from "../../../context/useToast";
 import styles from "./Toast.module.scss";
 
 function ToastItem({ toast }: { toast: Toast }) {
