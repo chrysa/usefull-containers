@@ -22,6 +22,8 @@ repos:
           - id: env-file-check
           - id: yaml-sorter
             exclude: ^(\.github/|pre-commit/|\.pre-commit-config\.yaml|\.hadolint\.yaml|\.yamllint\.yaml|\.markdownlint\.yml|GitVersion\.yml)
+          - id: regression-gate
+            stages: [pre-push]
     - repo: https://github.com/AleksaC/hadolint-py
       rev: v2.14.0
       hooks:
@@ -52,3 +54,10 @@ repos:
           - id: detect-secrets
             args: [--baseline, .secrets.baseline]
             exclude: \.pre-commit-config\.yaml
+
+    - repo: https://github.com/compilerla/conventional-pre-commit
+      rev: v4.4.0
+      hooks:
+          - id: conventional-pre-commit
+            stages: [commit-msg]
+            args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
