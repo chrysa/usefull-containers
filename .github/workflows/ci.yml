@@ -6,6 +6,11 @@ on:
     branches:
       - main
       - develop
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".gitignore"
   push:
     branches:
       - main
@@ -15,6 +20,11 @@ on:
       - "chore/**"
       - "ci/**"
       - "docs/**"
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".gitignore"
   workflow_dispatch:
 
 concurrency:
