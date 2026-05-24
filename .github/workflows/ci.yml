@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v6
+      - uses: chrysa/github-actions/python-setup@v1
         with:
           python-version: "3.12"
           cache: pip
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1.0.8
+      - uses: chrysa/github-actions/python-setup@v1
         with:
           python-version: "3.12"
 
@@ -77,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1.0.8
+      - uses: chrysa/github-actions/python-setup@v1
         with:
           python-version: "3.12"
 
