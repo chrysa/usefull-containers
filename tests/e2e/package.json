@@ -1,13 +1,13 @@
 {
+  "devDependencies": {
+    "@playwright/test": "1.52.0"
+  },
   "name": "sfm-e2e",
   "private": true,
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report"
-  },
-  "devDependencies": {
-    "@playwright/test": "1.52.0"
+    "test:report": "playwright show-report",
+    "test:ui": "playwright test --ui"
   }
 }
