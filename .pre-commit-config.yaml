@@ -67,3 +67,25 @@ repos:
     id: actionlint
   repo: https://github.com/rhysd/actionlint
   rev: v1.7.12
+- hooks:
+  - id: debugger-detection
+  - id: python-print-detection
+  - id: python-pprint-detection
+    exclude: 'tests?/'
+  - id: no-bare-except
+  - id: python-logger-detection
+  - id: dockerfile-no-latest
+  - id: console-log-detection
+  - id: console-debug-detection
+  - id: react-console-error-detection
+  - id: no-console-warn
+  - id: import-no-relative-parent
+  - id: yaml-sorter
+    exclude: '^(\.github/workflows/|\.github/ISSUE_TEMPLATE/|GitVersion\.yml)'
+  - id: json-sorter
+  - id: adr-gate
+  - id: regression-gate
+    stages:
+    - pre-push
+  repo: https://github.com/chrysa/pre-commit-tools
+  rev: v0.1.1-76
