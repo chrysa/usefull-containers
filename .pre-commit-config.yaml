@@ -22,6 +22,14 @@ repos:
           - id: env-file-check
           - id: yaml-sorter
             exclude: ^(\.github/|pre-commit/|\.pre-commit-config\.yaml|\.hadolint\.yaml|\.yamllint\.yaml|\.markdownlint\.yml|GitVersion\.yml)
+          - id: adr-gate
+          - id: python-print-detection
+          - id: python-pprint-detection
+          - id: no-bare-except
+          - id: python-logger-detection
+          - id: no-sync-in-async
+          - id: debugger-detection
+          - id: env-example-sync
           - id: regression-gate
             stages: [pre-push]
     - repo: https://github.com/AleksaC/hadolint-py
