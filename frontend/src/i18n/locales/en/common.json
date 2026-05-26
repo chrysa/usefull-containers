@@ -182,6 +182,48 @@
     "title": "Factory Plans"
   },
   "retry": "Retry",
+  "setup": {
+    "back": "Back",
+    "backend": {
+      "checking": "Checking…",
+      "lead": "The frontend talks to a local API for storing plans and blueprints.",
+      "offline": "Backend offline — the app will run in degraded mode.",
+      "online": "Backend online (v{{version}})",
+      "title": "Backend connection"
+    },
+    "done": {
+      "backend_label": "Backend",
+      "backend_ok": "Connected",
+      "backend_skipped": "Unavailable",
+      "lead_no_plan": "You can create a plan from the Plans page any time.",
+      "lead_with_plan": "Plan \"{{name}}\" was created. You'll be redirected to its page.",
+      "plan_label": "Plan created",
+      "title": "All set"
+    },
+    "finish": "Finish",
+    "first_plan": {
+      "create": "Create plan",
+      "creating": "Creating…",
+      "error": "Creation failed. Check the backend connection.",
+      "lead": "A plan groups the production targets of a factory. You can add recipes and blueprints later.",
+      "name_label": "Plan name",
+      "name_placeholder": "e.g. Steel Foundry",
+      "skip": "Later",
+      "title": "Create your first plan"
+    },
+    "next": "Next",
+    "skip": "Skip",
+    "skip_aria": "Skip the setup wizard",
+    "start": "Get started",
+    "title": "Welcome to Factory Manager",
+    "welcome": {
+      "bullet_backend": "Verify the backend connection",
+      "bullet_explore": "Discover the key views (Plans, Calculator, Blueprints)",
+      "bullet_plan": "Create your first production plan",
+      "lead": "This short walkthrough configures the essentials so you can start planning your Satisfactory production.",
+      "title": "Let's set up your first factory"
+    }
+  },
   "theme": {
     "toggle": "Toggle theme"
   },

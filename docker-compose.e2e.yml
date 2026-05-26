@@ -10,11 +10,12 @@ services:
       interval: 5s
       retries: 12
       start_period: 10s
+      # NOTE: keep this 2-element form so pre-commit yaml-sorter cannot reorder
+      # the CMD prefix out of position. Single-string form is treated as
+      # CMD-SHELL by Docker.
       test:
-      - -c
-      - CMD
-      - import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')
-      - python
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"
       timeout: 5s
   frontend:
     build:

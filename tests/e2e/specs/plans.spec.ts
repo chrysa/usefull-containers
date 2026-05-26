@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./_setup-bypass";
 
 const TEST_PLAN_NAME = "E2E Test Plan";
 const TEST_PLAN_DESC = "Created by Playwright E2E test suite";

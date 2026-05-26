@@ -182,6 +182,48 @@
     "title": "Plans de production"
   },
   "retry": "Réessayer",
+  "setup": {
+    "back": "Retour",
+    "backend": {
+      "checking": "Vérification…",
+      "lead": "Le frontend s'appuie sur une API locale pour stocker plans et blueprints.",
+      "offline": "Backend hors ligne — l'app fonctionnera en mode dégradé.",
+      "online": "Backend en ligne (v{{version}})",
+      "title": "Connexion au backend"
+    },
+    "done": {
+      "backend_label": "Backend",
+      "backend_ok": "Connecté",
+      "backend_skipped": "Indisponible",
+      "lead_no_plan": "Vous pouvez créer un plan depuis la page Plans à tout moment.",
+      "lead_with_plan": "Le plan « {{name}} » a été créé. Vous allez être redirigé vers sa page.",
+      "plan_label": "Plan créé",
+      "title": "Tout est prêt"
+    },
+    "finish": "Terminer",
+    "first_plan": {
+      "create": "Créer le plan",
+      "creating": "Création…",
+      "error": "Échec de la création. Vérifiez la connexion au backend.",
+      "lead": "Un plan regroupe les cibles de production d'une usine. Vous pourrez ajouter recettes et blueprints après.",
+      "name_label": "Nom du plan",
+      "name_placeholder": "Ex : Steel Foundry",
+      "skip": "Plus tard",
+      "title": "Créer votre premier plan"
+    },
+    "next": "Suivant",
+    "skip": "Passer",
+    "skip_aria": "Passer le wizard d'installation",
+    "start": "Commencer",
+    "title": "Bienvenue dans Factory Manager",
+    "welcome": {
+      "bullet_backend": "Vérifier la connexion au backend",
+      "bullet_explore": "Découvrir les vues clés (Plans, Calculateur, Blueprints)",
+      "bullet_plan": "Créer votre premier plan de production",
+      "lead": "Ce court parcours configure l'essentiel pour planifier votre production Satisfactory.",
+      "title": "Démarrons votre première usine"
+    }
+  },
   "theme": {
     "toggle": "Changer le thème"
   },

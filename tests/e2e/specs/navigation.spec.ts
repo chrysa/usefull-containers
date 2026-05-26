@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./_setup-bypass";
 
 test.describe("Navigation", () => {
   test("home page loads with Dashboard heading", async ({ page }) => {
