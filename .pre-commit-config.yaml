@@ -81,7 +81,7 @@ repos:
   - id: no-console-warn
   - id: import-no-relative-parent
   - id: yaml-sorter
-    exclude: '^(\.github/workflows/|\.github/ISSUE_TEMPLATE/|GitVersion\.yml)'
+    exclude: '^(\.github/workflows/|\.github/ISSUE_TEMPLATE/|GitVersion\.yml|docker-compose.*\.yml)'
   - id: json-sorter
   - id: adr-gate
   - id: regression-gate
