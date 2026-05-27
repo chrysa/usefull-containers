@@ -1,6 +1,5 @@
 // Lightweight fetch wrapper — no external dependency
-// Replace BASE_URL or read it from import.meta.env as needed
-const BASE_URL = "/api";
+const BASE_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:9009") + "/api";
 const TIMEOUT = 8000;
 
 type RequestOptions = RequestInit & { timeout?: number };
