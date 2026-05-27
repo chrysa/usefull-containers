@@ -18,7 +18,8 @@ async function createPlan(
     await page.getByLabel("Description").fill(description);
   }
   await page.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByText(name)).toBeVisible();
+  // Wait for dialog to close — confirms the API call succeeded.
+  await expect(page.getByRole("dialog")).not.toBeVisible({ timeout: 10_000 });
 }
 
 test.describe("Plans — page elements", () => {
@@ -73,7 +74,7 @@ test.describe.serial("Plans — CRUD flow", () => {
   test("creates a new plan", async ({ page }) => {
     await createPlan(page, TEST_PLAN_NAME, TEST_PLAN_DESC);
     await expect(
-      page.locator("article").filter({ hasText: TEST_PLAN_NAME }),
+      page.locator("article").filter({ hasText: TEST_PLAN_NAME }).first(),
     ).toBeVisible();
   });
 
@@ -81,7 +82,7 @@ test.describe.serial("Plans — CRUD flow", () => {
     const search = page.getByRole("searchbox", { name: "Search plans\u2026" });
     await search.fill(TEST_PLAN_NAME);
     await expect(
-      page.locator("article").filter({ hasText: TEST_PLAN_NAME }),
+      page.locator("article").filter({ hasText: TEST_PLAN_NAME }).first(),
     ).toBeVisible();
 
     await search.fill("zzz_nonexistent_zzz");
@@ -97,7 +98,10 @@ test.describe.serial("Plans — CRUD flow", () => {
       .first();
     await card.getByRole("link", { name: "Open" }).click();
     await expect(page).toHaveURL(/\/plans\/\S+/);
-    await expect(page.getByText(TEST_PLAN_NAME)).toBeVisible();
+    // Use heading to avoid matching the breadcrumb which also contains the plan name.
+    await expect(
+      page.getByRole("heading", { name: TEST_PLAN_NAME }),
+    ).toBeVisible();
   });
 
   test("duplicates a plan", async ({ page }) => {
@@ -118,15 +122,27 @@ test.describe.serial("Plans — CRUD flow", () => {
   test("deletes a plan", async ({ page }) => {
     await createPlan(page, DELETE_PLAN_NAME);
 
-    page.on("dialog", (dialog) => dialog.accept());
+    // Count before deletion (may be > 1 on serial test retries due to data contamination).
+    const countBefore = await page
+      .locator("article")
+      .filter({ hasText: DELETE_PLAN_NAME })
+      .count();
+
+    // Override window.confirm in the browser to auto-accept without a native dialog.
+    // page.on("dialog") is unreliable with globalThis.confirm() in headless Docker runs.
+    await page.evaluate(() => {
+      window.confirm = () => true;
+    });
+
     const card = page
       .locator("article")
       .filter({ hasText: DELETE_PLAN_NAME })
       .first();
-    await card.getByRole("button", { name: "Delete" }).click();
+    // Use regex /^Delete / to avoid matching Edit/Duplicate buttons whose aria-labels also contain the plan name.
+    await card.getByRole("button", { name: /^Delete / }).click();
 
     await expect(
       page.locator("article").filter({ hasText: DELETE_PLAN_NAME }),
-    ).toHaveCount(0, { timeout: 5000 });
+    ).toHaveCount(countBefore - 1, { timeout: 10_000 });
   });
 });

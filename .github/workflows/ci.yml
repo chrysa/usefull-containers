@@ -48,7 +48,7 @@ jobs:
 
       - uses: chrysa/github-actions/python-setup@v1
         with:
-          python-version: "3.12"
+          python-version: "3.14"
           cache: pip
 
       - name: Run pre-commit
@@ -66,7 +66,7 @@ jobs:
 
       - uses: chrysa/github-actions/python-setup@v1
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
         working-directory: backend
@@ -74,8 +74,8 @@ jobs:
 
       - uses: chrysa/github-actions/ruff-check@v1.0.8
         with:
-          python-version: "3.12"
-          latest-python: "3.12"
+          python-version: "3.14"
+          latest-python: "3.14"
           config: backend/pyproject.toml
           sources: backend
 
@@ -89,7 +89,7 @@ jobs:
 
       - uses: chrysa/github-actions/python-setup@v1
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
         working-directory: backend
@@ -97,8 +97,8 @@ jobs:
 
       - uses: chrysa/github-actions/mypy-check@v1.0.8
         with:
-          python-version: "3.12"
-          latest-python: "3.12"
+          python-version: "3.14"
+          latest-python: "3.14"
           config-file: backend/pyproject.toml
           sources: app
 

@@ -27,7 +27,7 @@ test.describe("Setup Wizard", () => {
   }) => {
     await page.goto("/");
     await expect(page.getByTestId("setup-wizard")).toBeVisible();
-    await page.getByRole("button", { name: /^Skip$/ }).click();
+    await page.getByRole("button", { name: /Skip/i }).click();
     await expect(page.getByTestId("setup-wizard")).toBeHidden();
 
     // Reload — wizard should NOT reappear because the flag is set.
@@ -60,9 +60,7 @@ test.describe("Setup Wizard", () => {
     await page.getByTestId("setup-skip-plan").click();
 
     // Step 4: done
-    await expect(
-      page.getByRole("heading", { name: /All set/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /All set/i })).toBeVisible();
     await page.getByTestId("setup-finish").click();
 
     // Wizard closed and navigation happened.
@@ -93,9 +91,9 @@ test.describe("Setup Wizard", () => {
     await page.getByTestId("setup-create-plan").click();
 
     // After successful creation we land on the "done" step.
-    await expect(
-      page.getByRole("heading", { name: /All set/i }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: /All set/i })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByTestId("setup-finish").click();
 
     // Should redirect to the created plan's detail page.

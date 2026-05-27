@@ -32,8 +32,9 @@ test.describe("Blueprints", () => {
   });
 
   test("import from zip button is present", async ({ page }) => {
+    // The import-from-zip element is a <label> wrapping <input type="file">, not a <button>.
     await expect(
-      page.getByRole("button", { name: /Import from ZIP/i }),
+      page.locator("label").filter({ hasText: /Import from ZIP/i }),
     ).toBeVisible();
   });
 });

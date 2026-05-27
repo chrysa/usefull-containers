@@ -23,7 +23,7 @@ COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.
 COPY --from=deps /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY --from=builder /app/app ./app
 
-RUN mkdir -p /data/blueprints && chown -R app:app /data/blueprints /app
+RUN mkdir -p /data/blueprints && chown -R app:app /data /app
 
 USER app
 

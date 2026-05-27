@@ -21,6 +21,8 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+    // 204/205 responses have no body — attempting res.json() would throw.
+    if (res.status === 204 || res.status === 205) return undefined as T;
     return res.json() as Promise<T>;
   } finally {
     clearTimeout(id);
