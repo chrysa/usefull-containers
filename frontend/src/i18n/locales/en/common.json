@@ -181,6 +181,15 @@
     "search_placeholder": "Search plans…",
     "title": "Factory Plans"
   },
+  "project": {
+    "confirm_delete": "Delete project \"{{name}}\"? Plans and blueprints remain on the backend.",
+    "create": "New project",
+    "delete": "Delete",
+    "delete_aria": "Delete project {{name}}",
+    "no_projects": "No projects",
+    "switch": "Switch project",
+    "unnamed": "Unnamed project"
+  },
   "retry": "Retry",
   "setup": {
     "back": "Back",
@@ -212,6 +221,14 @@
       "title": "Create your first plan"
     },
     "next": "Next",
+    "project": {
+      "lead": "Give this factory project a name and configure where the backend is running.",
+      "name_label": "Project name",
+      "name_placeholder": "e.g. Main Save",
+      "title": "Set up your factory",
+      "url_label": "Backend URL",
+      "url_placeholder": "http://localhost:9009"
+    },
     "skip": "Skip",
     "skip_aria": "Skip the setup wizard",
     "start": "Get started",

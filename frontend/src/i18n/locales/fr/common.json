@@ -181,6 +181,15 @@
     "search_placeholder": "Rechercher des plans…",
     "title": "Plans de production"
   },
+  "project": {
+    "confirm_delete": "Supprimer le projet \"{{name}}\" ? Les plans et blueprints restent sur le backend.",
+    "create": "Nouveau projet",
+    "delete": "Supprimer",
+    "delete_aria": "Supprimer le projet {{name}}",
+    "no_projects": "Aucun projet",
+    "switch": "Changer de projet",
+    "unnamed": "Projet sans nom"
+  },
   "retry": "Réessayer",
   "setup": {
     "back": "Retour",
@@ -212,6 +221,14 @@
       "title": "Créer votre premier plan"
     },
     "next": "Suivant",
+    "project": {
+      "lead": "Donnez un nom à ce projet d'usine et configurez l'adresse du backend.",
+      "name_label": "Nom du projet",
+      "name_placeholder": "Ex : Partie principale",
+      "title": "Configurer votre usine",
+      "url_label": "URL du backend",
+      "url_placeholder": "http://localhost:9009"
+    },
     "skip": "Passer",
     "skip_aria": "Passer le wizard d'installation",
     "start": "Commencer",

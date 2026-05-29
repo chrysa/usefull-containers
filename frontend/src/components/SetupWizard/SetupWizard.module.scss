@@ -192,6 +192,11 @@
   gap: var(--space-sm);
 }
 
+.btnGroup {
+  display: flex;
+  gap: var(--space-sm);
+}
+
 .btn {
   background: var(--bg);
   color: var(--text);

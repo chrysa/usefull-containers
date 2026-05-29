@@ -1,6 +1,27 @@
 // Lightweight fetch wrapper — no external dependency
-const BASE_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:9009") + "/api";
+import { readActiveProjectId, readProjects } from "../../domain/projects/store";
+
+const FALLBACK_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:9009") + "/api";
 const TIMEOUT = 8000;
+
+/**
+ * Resolves the API base URL from the currently active project (localStorage).
+ * Falls back to VITE_API_URL / localhost when no project is configured.
+ */
+function getBaseUrl(): string {
+  try {
+    const activeId = readActiveProjectId();
+    if (activeId) {
+      const active = readProjects().find((p) => p.id === activeId);
+      if (active?.backendUrl) {
+        return active.backendUrl.replace(/\/$/, "") + "/api";
+      }
+    }
+  } catch {
+    // localStorage unavailable — use fallback
+  }
+  return FALLBACK_URL;
+}
 
 type RequestOptions = RequestInit & { timeout?: number };
 
@@ -10,7 +31,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const id = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const res = await fetch(BASE_URL + path, {
+    const res = await fetch(getBaseUrl() + path, {
       ...init,
       signal: controller.signal,
       headers: {

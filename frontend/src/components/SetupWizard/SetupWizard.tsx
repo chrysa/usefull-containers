@@ -6,34 +6,66 @@ import { useCreatePlanMutation } from "../../domain/plans/queries";
 import styles from "./SetupWizard.module.scss";
 
 interface SetupWizardProps {
-  onClose: () => void;
-  onComplete: () => void;
+  /** null = first-run, no project created yet */
+  readonly projectId: string | null;
+  /** Called when the "project" step is completed — must create the project and return its id */
+  readonly onProjectCreate: (name: string, backendUrl: string) => string;
+  readonly onClose: (projectId: string) => void;
+  readonly onComplete: (projectId: string) => void;
 }
 
-type Step = "welcome" | "backend" | "first-plan" | "done";
+/** Steps for a first-time user (no project yet) */
+const STEPS_NEW = ["project", "backend", "first-plan", "done"] as const;
+/** Steps when a project already exists but setup was not completed */
+const STEPS_EXISTING = ["backend", "first-plan", "done"] as const;
 
-const STEPS: Step[] = ["welcome", "backend", "first-plan", "done"];
+type Step = (typeof STEPS_NEW)[number];
 
-export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
+const DEFAULT_BACKEND_URL = "http://localhost:9009";
+
+export default function SetupWizard({
+  projectId,
+  onProjectCreate,
+  onClose,
+  onComplete,
+}: SetupWizardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const health = useHealthQuery();
   const createPlan = useCreatePlanMutation();
 
-  const [step, setStep] = useState<Step>("welcome");
+  const steps: readonly Step[] = projectId ? STEPS_EXISTING : STEPS_NEW;
+  const [step, setStep] = useState<Step>(steps[0]);
+
+  // Tracks the project id once the "project" step is confirmed
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(projectId);
+
+  const [projectName, setProjectName] = useState("");
+  const [backendUrl, setBackendUrl] = useState(DEFAULT_BACKEND_URL);
   const [planName, setPlanName] = useState<string>("");
   const [createdPlanId, setCreatedPlanId] = useState<string | null>(null);
 
-  const stepIndex = STEPS.indexOf(step);
+  const stepIndex = steps.indexOf(step);
 
   const goNext = () => {
-    const next = STEPS[stepIndex + 1];
+    const next = steps[stepIndex + 1];
     if (next) setStep(next);
   };
 
   const goBack = () => {
-    const prev = STEPS[stepIndex - 1];
+    const prev = steps[stepIndex - 1];
     if (prev) setStep(prev);
+  };
+
+  const resolvedProjectId = (): string => {
+    // Guaranteed to exist after "project" step (or from props for existing projects)
+    return activeProjectId!;
+  };
+
+  const handleProjectStep = () => {
+    const id = onProjectCreate(projectName, backendUrl);
+    setActiveProjectId(id);
+    goNext();
   };
 
   const handleCreatePlan = async () => {
@@ -51,7 +83,7 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
   };
 
   const handleFinish = () => {
-    onComplete();
+    onComplete(resolvedProjectId());
     if (createdPlanId) {
       navigate(`/plans/${createdPlanId}`);
     } else {
@@ -59,17 +91,25 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
     }
   };
 
-  const healthStatus: "pending" | "online" | "offline" = health.isLoading
-    ? "pending"
-    : health.isSuccess
-      ? "online"
-      : "offline";
+  const handleSkip = () => {
+    // For new-project flow: create a project with current inputs (even if blank → defaults apply)
+    const id = activeProjectId ?? onProjectCreate(projectName, backendUrl);
+    onClose(id);
+  };
+
+  let healthStatus: "pending" | "online" | "offline";
+  if (health.isLoading) {
+    healthStatus = "pending";
+  } else if (health.isSuccess) {
+    healthStatus = "online";
+  } else {
+    healthStatus = "offline";
+  }
 
   return (
-    <div
+    <dialog
+      open
       className={styles.backdrop}
-      role="dialog"
-      aria-modal="true"
       aria-labelledby="setup-wizard-title"
       data-testid="setup-wizard"
     >
@@ -81,7 +121,7 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
           <button
             type="button"
             className={styles.skip}
-            onClick={onClose}
+            onClick={handleSkip}
             aria-label={t("setup.skip_aria")}
           >
             {t("setup.skip")}
@@ -89,7 +129,7 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
         </header>
 
         <div className={styles.steps} aria-hidden="true">
-          {STEPS.map((s, i) => (
+          {steps.map((s, i) => (
             <span
               key={s}
               className={[
@@ -104,15 +144,37 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
         </div>
 
         <div className={styles.body}>
-          {step === "welcome" && (
+          {step === "project" && (
             <>
-              <h3 className={styles.stepTitle}>{t("setup.welcome.title")}</h3>
-              <p className={styles.stepLead}>{t("setup.welcome.lead")}</p>
-              <ul className={styles.recap}>
-                <li>{t("setup.welcome.bullet_backend")}</li>
-                <li>{t("setup.welcome.bullet_plan")}</li>
-                <li>{t("setup.welcome.bullet_explore")}</li>
-              </ul>
+              <h3 className={styles.stepTitle}>{t("setup.project.title")}</h3>
+              <p className={styles.stepLead}>{t("setup.project.lead")}</p>
+              <div className={styles.field}>
+                <label htmlFor="setup-project-name">
+                  {t("setup.project.name_label")}
+                </label>
+                <input
+                  id="setup-project-name"
+                  type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder={t("setup.project.name_placeholder")}
+                  data-testid="setup-project-name-input"
+                  autoFocus
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="setup-backend-url">
+                  {t("setup.project.url_label")}
+                </label>
+                <input
+                  id="setup-backend-url"
+                  type="url"
+                  value={backendUrl}
+                  onChange={(e) => setBackendUrl(e.target.value)}
+                  placeholder={DEFAULT_BACKEND_URL}
+                  data-testid="setup-backend-url-input"
+                />
+              </div>
             </>
           )}
 
@@ -206,14 +268,14 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
             {t("setup.back")}
           </button>
 
-          {step === "welcome" && (
+          {step === "project" && (
             <button
               type="button"
               className={`${styles.btn} ${styles.primary}`}
-              onClick={goNext}
+              onClick={handleProjectStep}
               data-testid="setup-next"
             >
-              {t("setup.start")}
+              {t("setup.next")}
             </button>
           )}
 
@@ -230,7 +292,7 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
           )}
 
           {step === "first-plan" && (
-            <div style={{ display: "flex", gap: "var(--space-sm)" }}>
+            <div className={styles.btnGroup}>
               <button
                 type="button"
                 className={styles.btn}
@@ -265,6 +327,6 @@ export default function SetupWizard({ onClose, onComplete }: SetupWizardProps) {
           )}
         </footer>
       </div>
-    </div>
+    </dialog>
   );
 }
