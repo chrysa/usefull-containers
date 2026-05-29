@@ -15,21 +15,13 @@ COPY . .
 RUN npm run build
 
 # ── Stage 3 : production ──────────────────────────────────────────────────────
-FROM nginx:1.27-alpine AS production
+FROM deps AS production
 
-RUN addgroup -S app && adduser -S app -G app
+COPY --from=builder /app/dist ./dist
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-RUN chown -R app:app /usr/share/nginx/html && \
-    chown -R app:app /var/cache/nginx && \
-    chown -R app:app /var/log/nginx && \
-    touch /var/run/nginx.pid && chown app:app /var/run/nginx.pid
-
-USER app
-
-EXPOSE 80
+EXPOSE 4173
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD wget -qO- http://localhost:80/ || exit 1
+    CMD wget -qO- http://localhost:4173/ || exit 1
+
+CMD ["./node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "4173"]
