@@ -18,3 +18,13 @@
   align-items: center;
   gap: var(--space-sm);
 }
+
+.overrideDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-accent, #f97316);
+  vertical-align: super;
+  margin-left: 2px;
+}
