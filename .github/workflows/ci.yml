@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1
+      - uses: chrysa/github-actions/python-setup@v1.0.12
         with:
           python-version: "3.14"
           cache: pip
@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1
+      - uses: chrysa/github-actions/python-setup@v1.0.12
         with:
           python-version: "3.14"
 
@@ -72,7 +72,7 @@ jobs:
         working-directory: backend
         run: pip install -e '.[dev]'
 
-      - uses: chrysa/github-actions/ruff-check@v1.0.8
+      - uses: chrysa/github-actions/ruff-check@v1.0.12
         with:
           python-version: "3.14"
           latest-python: "3.14"
@@ -87,7 +87,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1
+      - uses: chrysa/github-actions/python-setup@v1.0.12
         with:
           python-version: "3.14"
 
@@ -95,7 +95,7 @@ jobs:
         working-directory: backend
         run: pip install -e '.[dev]'
 
-      - uses: chrysa/github-actions/mypy-check@v1.0.8
+      - uses: chrysa/github-actions/mypy-check@v1.0.12
         with:
           python-version: "3.14"
           latest-python: "3.14"
@@ -183,7 +183,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build backend image (no push)
-        uses: docker/build-push-action@v7.1.0
+        uses: docker/build-push-action@v7.2.0
         with:
           context: ./backend
           push: false
@@ -204,7 +204,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build frontend image (no push)
-        uses: docker/build-push-action@v7.1.0
+        uses: docker/build-push-action@v7.2.0
         with:
           context: ./frontend
           push: false
