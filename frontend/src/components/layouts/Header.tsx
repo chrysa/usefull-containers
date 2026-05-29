@@ -7,7 +7,7 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <div className={styles.logo}>sfm-frontend</div>
+      <div className={styles.logo}>Satisfactory Factory Manager</div>
       <div className={styles.actions}>
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
