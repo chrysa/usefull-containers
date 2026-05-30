@@ -4,7 +4,7 @@
 > [🏭 satisfactory-factory-manager](https://www.notion.so/35359293e35e81248b86ea438ce52995).
 > Source de vérité ticket-level : issues + PRs GitHub.
 >
-> Last updated: 2026-05-30.
+> Last updated: 2026-05-30 (auth feature added + sequencing revised).
 
 ## Statut actuel (2026-05-30)
 
@@ -14,6 +14,9 @@
 - CI org-billing blocked → merges via `gh pr merge --admin`.
 - Gate V1 (3 sessions actionnables) : **en attente déploiement** — ArgoCD appset prêt, images GHCR à pusher (besoin PAT `write:packages`).
 - **Blocker images GHCR** : token actuel manque `write:packages` → créer un PAT et pusher manuellement ou débloquer la billing CI.
+- **NOUVEAU — Auth en cours** sur `feat/auth-local-steam` (4 commits, 1461 LoC, tests + lint verts) :
+  local auth + Steam OpenID + Epic placeholder. Pas encore PR-isé.
+  → bloque maintenant le déploiement public (sans auth, sfm.ducal.me ne peut pas être exposé hors Tailscale).
 
 ---
 
@@ -47,6 +50,28 @@
 
 **Gate de sortie P1** : 3 sessions documentées avec info actionnable. Sinon à
 T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
+
+---
+
+## P1-bis — Auth (prérequis exposition publique)
+
+> **Bloquant pour exposition au-delà du Tailscale.** Branche `feat/auth-local-steam`
+> a déjà livré local auth + Steam OpenID + Epic placeholder. Reste à durcir, migrer
+> et brancher sur les endpoints.
+
+| ID    | Tâche                                                                                 | Effort | État    | Lien                    |
+|-------|---------------------------------------------------------------------------------------|--------|---------|-------------------------|
+| A-01  | PR-iser + merger `feat/auth-local-steam` (local + Steam OpenID + Epic placeholder)    | 30min  | open    | branche prête           |
+| A-02  | Alembic baseline migration (table `users`) — remplacer `create_all()` au lifespan     | 2h     | todo    | ADR à créer (cf. T-07)  |
+| A-03  | `/api/v1/auth/me` endpoint + auto-refresh côté frontend                               | 1h     | todo    | dépend A-01             |
+| A-04  | Protéger endpoints `plans` + `blueprints` avec `Depends(get_current_user)`            | 2h     | todo    | dépend A-03             |
+| A-05  | E2E Playwright : register → login → access plans page (utilise A-04)                  | 2h     | todo    | dépend A-04             |
+| A-06  | Implem réelle Epic Games OAuth (actuellement placeholder)                             | 4h     | todo    | post-V1 si pas d'usage  |
+| A-07  | Audit log côté backoffice — toutes mutations user-scoped                              | 3h     | todo    | dépend A-04             |
+| A-08  | Rate limiting sur `/auth/login` + `/auth/register` (anti-brute-force)                 | 1h     | todo    | slowapi ou nginx limit  |
+
+**Gate de sortie P1-bis** : sfm.ducal.me peut être exposé en clair (pas seulement Tailscale)
+avec auth obligatoire + plans/blueprints scopés par utilisateur.
 
 ---
 
@@ -85,33 +110,65 @@ T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
 | T-04  | SonarCloud cleanup — passer les warnings de code smell                                | 2h     | todo |
 | T-05  | mypy strict sur `backend/app/services/`                                               | 2h     | todo |
 | T-06  | ReactFlow : afficher quantité/min sur les arêtes (SFM-13 polish)                      | 2h     | todo |
+| T-07  | ADR-004 : stratégie migrations DB (Alembic vs create_all) — copie du choix discordium | 30min  | todo |
+| T-08  | Bench : remplacer bcrypt par argon2 si CPU devient un goulot                          | —      | watch |
 
 ---
 
 ## Vue Gantt — chemin critique
 
 ```
-S-01 ✅ → S-02 ✅ → S-04 ✅ ─┬→ D-01 ✅ → D-03 ✅ → D-03b 🔴 → D-04 → D-05 (T+1 mois) → L9 / L10
-                            │
-S-03 ✅ ────────────────────┘    Branche parallèle (polish): W-01..W-06
-                                                              │
-                                                              └→ (faire à la marge)
+P0 ✅ ──┬→ D-01 ✅ → D-03 ✅ → D-03b 🔴 ┐
+        │                              ├→ D-04 → D-05 (T+1 mois) → L9 / L10
+        └→ A-01 → A-02 → A-03 → A-04 ─┘
+                                  │
+                                  └→ A-05 (E2E)  ┐
+                                                 ├→ Exposition publique sfm.ducal.me
+                              D-03b débloqué ───┘
+
+Branches parallèles : W-01..W-06 (polish), T-01..T-08 (dette).
 ```
+
+**Chemin critique mis à jour** : D-03b (push images GHCR) **et** A-04 (endpoints
+protégés) doivent tous deux être verts avant l'ouverture publique. Tant que ça
+n'est pas le cas, le déploiement reste Tailscale-only.
 
 ---
 
-## Recommandation immédiate
+## Recommandation immédiate (séquence proposée)
 
-1. **Débloquer les images GHCR** — créer un PAT GitHub avec scope `write:packages` et pusher :
+**Règle 1+2** : 1 chantier principal, max 2 chantiers secondaires en parallèle.
 
-   ```bash
-   echo $NEW_PAT | docker login ghcr.io -u chrysa --password-stdin
-   docker push ghcr.io/chrysa/satisfactory-factory-manager-backend:latest
-   docker push ghcr.io/chrysa/satisfactory-factory-manager-frontend:latest
-   ```
+### Principal — A-01 PR-iser feat/auth-local-steam (30min)
+La branche est mûre, lints + tests verts, 4 commits propres. Push + PR + merge,
+sinon le diff périme et le rebase devient coûteux.
 
-2. **Ajouter `KUBECONFIG_B64`** dans `chrysa/server` → Settings → Secrets pour que ArgoCD sync fonctionne.
-3. **Démarrer D-04** (`gate-v1-sessions.md`) dès que l'instance est accessible à `https://sfm.ducal.me`.
+### Secondaire #1 — A-02 Alembic baseline migration (2h)
+`create_all()` au lifespan est fatal en prod (cf. discordium D-0005). À traiter
+avant de toucher au schéma `users` ou d'exposer la table à un vrai utilisateur.
+ADR-004 (T-07) en sortie.
+
+### Secondaire #2 — D-03b débloquer GHCR (15min utilisateur)
+Action humaine : créer un PAT GitHub avec scope `write:packages` :
+
+```bash
+echo $NEW_PAT | docker login ghcr.io -u chrysa --password-stdin
+docker push ghcr.io/chrysa/satisfactory-factory-manager-backend:latest
+docker push ghcr.io/chrysa/satisfactory-factory-manager-frontend:latest
+```
+
+Puis ajouter `KUBECONFIG_B64` dans `chrysa/server` → Settings → Secrets pour que
+ArgoCD sync passe.
+
+### Suite (sprint+1)
+A-03 (`/auth/me`) → A-04 (protect endpoints) → A-05 (E2E auth) → D-04 (log book
+sessions) → ouverture publique sfm.ducal.me.
+
+### Différer explicitement
+- P2 wizard polish (W-01..W-06) — attendre que le déploiement Kimsufi soit
+  effectif avant de polir l'UX.
+- A-06 Epic OAuth, A-07 audit log, A-08 rate limit — bonus post-déploiement.
+- L9-L10 — gelés jusqu'au passage du gate V1.
 
 ---
 
