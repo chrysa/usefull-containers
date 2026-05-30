@@ -4,15 +4,16 @@
 > [🏭 satisfactory-factory-manager](https://www.notion.so/35359293e35e81248b86ea438ce52995).
 > Source de vérité ticket-level : issues + PRs GitHub.
 >
-> Last updated: 2026-05-26.
+> Last updated: 2026-05-30.
 
-## Statut actuel (2026-05-26)
+## Statut actuel (2026-05-30)
 
 - **V1 feature-complete** (SFM-1 → SFM-21). 55+ PRs mergés sur `main`.
-- **PR #61 mergée** (`58980ae`) — setup wizard + fix Docker healthcheck.
-- E2E suite avant fixes : **13 passed / 6 failed / 4 skipped** — cf. SFM-22.
+- **PR #80 mergée** — nginx→vite preview + multi-project support (localStorage).
+- E2E suite : **23/23 passed** (après PR #68 — SFM-22 clôturée).
 - CI org-billing blocked → merges via `gh pr merge --admin`.
-- Gate V1 (3 sessions actionnables) : **non démarré** — pas d'instance déployée.
+- Gate V1 (3 sessions actionnables) : **en attente déploiement** — ArgoCD appset prêt, images GHCR à pusher (besoin PAT `write:packages`).
+- **Blocker images GHCR** : token actuel manque `write:packages` → créer un PAT et pusher manuellement ou débloquer la billing CI.
 
 ---
 
@@ -21,10 +22,10 @@
 | ID    | Tâche                                                                                 | Effort | État    | Lien                    |
 |-------|---------------------------------------------------------------------------------------|--------|---------|-------------------------|
 | S-01  | Setup wizard + healthcheck fix                                                        | 5min   | ✅ done | [PR #61](https://github.com/chrysa/satisfactory-factory-manager/pull/61) |
-| S-02  | Réparer les 6 E2E pré-existants (4 nav, plans CRUD, blueprints import)                | 2h     | open    | [#62](https://github.com/chrysa/satisfactory-factory-manager/issues/62) |
-| S-03  | Désactiver `yaml-sorter` sur `docker-compose*.yml` côté `shared-standards`            | 30min  | open    | [#63](https://github.com/chrysa/satisfactory-factory-manager/issues/63) |
-| S-04  | Valider `make docker-e2e` bout-à-bout (23/23 green)                                   | 15min  | todo    | dépend S-02             |
-| S-05  | Triage des 4 tests "did not run" (cascade vs régressions)                             | 1h     | todo    | dépend S-02             |
+| S-02  | Réparer les 6 E2E pré-existants (4 nav, plans CRUD, blueprints import)                | 2h     | ✅ done | [PR #68](https://github.com/chrysa/satisfactory-factory-manager/pull/68) |
+| S-03  | Désactiver `yaml-sorter` sur `docker-compose*.yml` côté `shared-standards`            | 30min  | ✅ done | [PR #71](https://github.com/chrysa/satisfactory-factory-manager/pull/71) |
+| S-04  | Valider `make docker-e2e` bout-à-bout (23/23 green)                                   | 15min  | ✅ done | inclus dans PR #68      |
+| S-05  | Triage des 4 tests "did not run" (cascade vs régressions)                             | 1h     | ✅ done | inclus dans PR #68      |
 
 **Gate de sortie P0** : `make docker-e2e` vert sur main, 23/23 tests passent.
 
@@ -37,9 +38,10 @@
 
 | ID    | Tâche                                                                                 | Effort | État | Lien                    |
 |-------|---------------------------------------------------------------------------------------|--------|------|-------------------------|
-| D-01  | Helm chart `apps/dev/satisfactory-factory-manager/` (server repo)                     | 2h     | open | [#64](https://github.com/chrysa/satisfactory-factory-manager/issues/64) |
-| D-02  | SealedSecrets pour SFM (AI Aggregator key, Sentry DSN)                                | 1h     | open | [#65](https://github.com/chrysa/satisfactory-factory-manager/issues/65) |
-| D-03  | Déploiement Kimsufi + Traefik route `sfm.chrysa.fr` (Tailscale-only V1)               | 1h     | open | [#66](https://github.com/chrysa/satisfactory-factory-manager/issues/66) |
+| D-01  | Helm chart `apps/dev/satisfactory-factory-manager/` (server repo)                     | 2h     | ✅ done | [server PR #135](https://github.com/chrysa/server/pull/135) |
+| D-02  | SealedSecrets README pour SFM (V1 : aucun secret requis)                              | 1h     | ✅ done | [server PR #144](https://github.com/chrysa/server/pull/144) |
+| D-03  | ArgoCD appset `apps/dev/*` + route `sfm.ducal.me` via Traefik                         | 1h     | ✅ done | [server PR #144](https://github.com/chrysa/server/pull/144) |
+| D-03b | Push images GHCR (`write:packages` PAT requis — CI billing bloquée)                  | 15min  | 🔴 bloqué | token chrysa manque scope `write:packages` |
 | D-04  | Log book sessions actionnables (`docs/gate-v1-sessions.md`)                           | 30min  | open | [#67](https://github.com/chrysa/satisfactory-factory-manager/issues/67) |
 | D-05  | Check-in T+1 mois après V1 — décider Go/Defer/Reject pour L9-L10                      | —      | todo | dépend D-04             |
 
@@ -89,20 +91,27 @@ T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
 ## Vue Gantt — chemin critique
 
 ```
-S-01 ✅ → S-02 → S-04 ─┬→ D-01 → D-03 → D-04 → D-05 (T+1 mois) → L9 / L10
-                       │
-S-03 ─────────────────┘    Branche parallèle (polish): W-01..W-06
-                                                         │
-                                                         └→ (faire à la marge)
+S-01 ✅ → S-02 ✅ → S-04 ✅ ─┬→ D-01 ✅ → D-03 ✅ → D-03b 🔴 → D-04 → D-05 (T+1 mois) → L9 / L10
+                            │
+S-03 ✅ ────────────────────┘    Branche parallèle (polish): W-01..W-06
+                                                              │
+                                                              └→ (faire à la marge)
 ```
 
 ---
 
 ## Recommandation immédiate
 
-1. **Attaquer SFM-22 (#62)** — réparer les 6 E2E. Débloque la confiance dans `make docker-e2e`.
-2. **Démarrer SFM-24 (#64)** — Helm chart. Ouvre la voie au déploiement.
-3. Le polish wizard (P2) attend — un seul utilisateur (toi) suffit pour valider le gate.
+1. **Débloquer les images GHCR** — créer un PAT GitHub avec scope `write:packages` et pusher :
+
+   ```bash
+   echo $NEW_PAT | docker login ghcr.io -u chrysa --password-stdin
+   docker push ghcr.io/chrysa/satisfactory-factory-manager-backend:latest
+   docker push ghcr.io/chrysa/satisfactory-factory-manager-frontend:latest
+   ```
+
+2. **Ajouter `KUBECONFIG_B64`** dans `chrysa/server` → Settings → Secrets pour que ArgoCD sync fonctionne.
+3. **Démarrer D-04** (`gate-v1-sessions.md`) dès que l'instance est accessible à `https://sfm.ducal.me`.
 
 ---
 
