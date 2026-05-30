@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.constants import BLUEPRINTS_DIR_DEFAULT, DATA_DIR_DEFAULT, GAMEDATA_DIR_DEFAULT
+from app.constants import (
+    AUTH_DB_FILENAME,
+    BLUEPRINTS_DIR_DEFAULT,
+    DATA_DIR_DEFAULT,
+    GAMEDATA_DIR_DEFAULT,
+)
 
 
 class Settings(BaseSettings):
@@ -13,6 +18,15 @@ class Settings(BaseSettings):
     data_dir: str = DATA_DIR_DEFAULT
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
     debug: bool = False
+
+    # Auth
+    jwt_secret_key: str = "change-me-in-production-at-least-32-chars!!"
+    steam_api_key: str = ""
+    frontend_url: str = "http://localhost:5173"
+
+    @property
+    def auth_db_path(self) -> str:
+        return f"{self.data_dir}/{AUTH_DB_FILENAME}"
 
 
 settings = Settings()

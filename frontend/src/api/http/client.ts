@@ -1,7 +1,9 @@
 // Lightweight fetch wrapper — no external dependency
 import { readActiveProjectId, readProjects } from "../../domain/projects/store";
+import { readToken } from "../../domain/auth/store";
 
-const FALLBACK_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:9009") + "/api";
+const FALLBACK_URL =
+  (import.meta.env.VITE_API_URL ?? "http://localhost:9009") + "/api";
 const TIMEOUT = 8000;
 
 /**
@@ -25,10 +27,18 @@ function getBaseUrl(): string {
 
 type RequestOptions = RequestInit & { timeout?: number };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { timeout = TIMEOUT, ...init } = options;
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
+
+  const token = readToken();
+  const authHeader: Record<string, string> = token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
 
   try {
     const res = await fetch(getBaseUrl() + path, {
@@ -36,6 +46,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
+        ...authHeader,
         ...init.headers,
       },
     });
@@ -53,11 +64,19 @@ export const http = {
   get: <T>(path: string, options?: RequestOptions) =>
     request<T>(path, { method: "GET", ...options }),
   post: <T>(path: string, body: unknown, options?: RequestOptions) =>
-    request<T>(path, { method: "POST", body: JSON.stringify(body), ...options }),
+    request<T>(path, {
+      method: "POST",
+      body: JSON.stringify(body),
+      ...options,
+    }),
   put: <T>(path: string, body: unknown, options?: RequestOptions) =>
     request<T>(path, { method: "PUT", body: JSON.stringify(body), ...options }),
   patch: <T>(path: string, body: unknown, options?: RequestOptions) =>
-    request<T>(path, { method: "PATCH", body: JSON.stringify(body), ...options }),
+    request<T>(path, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      ...options,
+    }),
   delete: <T>(path: string, options?: RequestOptions) =>
     request<T>(path, { method: "DELETE", ...options }),
 };

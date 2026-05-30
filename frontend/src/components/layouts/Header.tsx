@@ -1,3 +1,5 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 import { useTheme } from "../../hooks/useTheme";
 import LanguageSwitcher from "../languages/LanguageSwitcher";
 import ProjectSwitcher from "./ProjectSwitcher";
@@ -20,6 +22,13 @@ export default function Header({
   onNewProject,
 }: HeaderProps) {
   const { theme, setTheme, resetToSystem, isOverridden } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
 
   return (
     <header className={styles.header}>
@@ -49,6 +58,18 @@ export default function Header({
           </button>
         )}
         <LanguageSwitcher />
+        {isAuthenticated && user ? (
+          <span className={styles.userMenu}>
+            <span className={styles.username}>{user.steam_username ?? user.username}</span>
+            <button onClick={handleLogout} title="Sign out">
+              Sign out
+            </button>
+          </span>
+        ) : (
+          <Link to="/login" className={styles.loginLink}>
+            Sign in
+          </Link>
+        )}
       </div>
     </header>
   );

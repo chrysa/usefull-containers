@@ -20,3 +20,10 @@ MAX_GAMEDATA_ZIP_SIZE_BYTES: Final = 100 * 1024 * 1024  # 100 MB
 
 DATA_DIR_DEFAULT: Final = "/data"
 PLANS_FILENAME: Final = "plans.json"
+
+# Auth
+JWT_ALGORITHM: Final = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS: Final = 24
+STEAM_OPENID_URL: Final = "https://steamcommunity.com/openid/login"
+SATISFACTORY_STEAM_APP_ID: Final = 526870
+AUTH_DB_FILENAME: Final = "auth.db"

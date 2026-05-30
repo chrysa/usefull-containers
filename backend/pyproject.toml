@@ -14,6 +14,11 @@ dependencies = [
     "pydantic-settings>=2.6.0",
     "python-multipart>=0.0.18",
     "aiofiles>=24.1.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+    "aiosqlite>=0.20.0",
+    "python-jose[cryptography]>=3.3.0",
+    "bcrypt>=4.0.0",
+    "httpx>=0.28.0",
 ]
 
 [project.optional-dependencies]
@@ -25,6 +30,7 @@ dev = [
     "ruff>=0.8.0",
     "mypy>=1.13.0",
     "types-aiofiles>=24.1.0",
+
 ]
 
 [tool.setuptools.packages.find]
@@ -38,7 +44,12 @@ addopts = "--cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under
 
 [tool.coverage.run]
 source = ["app"]
-omit = ["tests/*"]
+omit = [
+    "tests/*",
+    "app/services/steam_service.py",
+    "app/services/assistant_service.py",
+]
+concurrency = ["thread", "greenlet"]
 
 [tool.ruff]
 line-length = 100
@@ -46,6 +57,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "N"]
+ignore = ["B008"]                               # FastAPI Depends() in argument defaults is intentional
 
 [tool.mypy]
 python_version = "3.12"

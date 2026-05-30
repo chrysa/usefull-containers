@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import importlib
 import json
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -8,19 +10,22 @@ from fastapi.testclient import TestClient
 
 
 @pytest.fixture
-def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
-    monkeypatch.setenv("BLUEPRINTS_DIR", str(tmp_path))
-    # Re-import to pick up env override
-    import importlib
+def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[TestClient, None, None]:
+    from app.config import settings  # noqa: PLC0415
 
-    import app.config as cfg_module
-    importlib.reload(cfg_module)
-    from app.config import settings
-    settings.blueprints_dir = str(tmp_path)
+    monkeypatch.setattr(settings, "blueprints_dir", str(tmp_path))
+    monkeypatch.setattr(settings, "data_dir", str(tmp_path))
+    monkeypatch.setattr(settings, "jwt_secret_key", "test-secret-key-that-is-long-enough-32ch!")
 
-    from app.main import create_app
+    import app.db.session as session_module  # noqa: PLC0415
+
+    importlib.reload(session_module)
+
+    from app.main import create_app  # noqa: PLC0415
+
     application = create_app()
-    return TestClient(application)
+    with TestClient(application) as tc:
+        yield tc
 
 
 @pytest.fixture

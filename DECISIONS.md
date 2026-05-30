@@ -92,3 +92,57 @@ Consequences:
   user-entered targets, not by live machine throughput).
 - If the gate passes and live ingestion is reopened, the static data layer remains
   authoritative for recipes; live data would only feed the dashboard layer.
+
+## D-0006 — Authentication: local accounts + Steam OpenID; Epic deferred
+
+**Date**: 2026-05-30
+**Status**: accepted
+
+### Context
+
+The deployed instance (Kimsufi, `sfm.ducal.me`) is protected at the infrastructure
+level by TinyAuth (Traefik ForwardAuth middleware). However, an application-level
+auth layer adds value:
+
+1. **Game platform integration** — Steam OpenID lets a user prove ownership of
+   Satisfactory (AppID 526870) and pulls profile stats (playtime, achievements)
+   without storing credentials.
+2. **Per-user identity** — multi-project support (D-0003, PR #80) becomes richer
+   when projects are associated with a user rather than a browser localStorage.
+3. **Optional** in V1 — all existing routes remain publicly accessible behind the
+   Traefik SSO wall; auth only gates the `/auth` routes themselves and enriches
+   the user experience.
+
+### Decision
+
+- **Local auth**: username + hashed password (bcrypt), JWT access token (HS256,
+  24 h expiry). No email required for V1; no refresh token (kept simple).
+- **Steam**: OpenID 2.0 login → verify via `check_authentication` POST → extract
+  SteamID64 → call Steam Web API (`GetPlayerSummaries`) → upsert user row →
+  redirect to frontend with JWT. Requires `STEAM_API_KEY` env var.
+  After link: `GET /api/v1/auth/steam/game-data` returns Satisfactory (AppID 526870)
+  playtime + achievements from Steam Web API.
+- **Epic Games**: deferred. Epic OAuth 2.0 requires a registered developer application
+  (`EPIC_CLIENT_ID`/`EPIC_CLIENT_SECRET`). A placeholder endpoint returns HTTP 501
+  until credentials are configured.
+- **Persistence**: new `users` table in `auth.db` (SQLite at `$DATA_DIR/auth.db`),
+  managed via SQLAlchemy 2.0 async + aiosqlite. `create_all` in lifespan for V1;
+  Alembic migrations are tracked as future work.
+
+### New env vars (secrets)
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `JWT_SECRET_KEY` | **yes** | Signing key for HS256 tokens (min 32 chars) |
+| `STEAM_API_KEY` | optional | Steam Web API key (profile + achievements) |
+| `FRONTEND_URL` | optional | Redirect base after Steam callback (default `http://localhost:5173`) |
+
+### Consequences
+
+- Adds deps: `sqlalchemy[asyncio]`, `aiosqlite`, `python-jose[cryptography]`,
+  `passlib[bcrypt]`, `httpx`.
+- Existing file-based services (blueprints, plans, gamedata) are unaffected.
+- `JWT_SECRET_KEY` must be added to SealedSecrets (`secrets/dev/sfm-secrets.yaml`)
+  before production deployment — update `secrets/dev/sfm-secrets.README.md` in server repo.
+- Epic auth can be activated without an ADR amendment: add `EPIC_CLIENT_ID` /
+  `EPIC_CLIENT_SECRET` env vars and the stub endpoint promotes itself.
