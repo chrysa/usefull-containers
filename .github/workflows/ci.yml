@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: chrysa/github-actions/python-setup@v1.0.12
         with:
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: chrysa/github-actions/python-setup@v1.0.12
         with:
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: chrysa/github-actions/python-setup@v1.0.12
         with:
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v6
         with:
@@ -131,7 +131,7 @@ jobs:
     timeout-minutes: 15
     needs: [lint-frontend]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v6
         with:
@@ -154,7 +154,7 @@ jobs:
     timeout-minutes: 30
     needs: [lint-backend]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -163,7 +163,7 @@ jobs:
         run: docker compose -f docker-compose.test.yml run --rm backend-test
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: backend-coverage
@@ -177,7 +177,7 @@ jobs:
     timeout-minutes: 30
     needs: [test-backend]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -198,7 +198,7 @@ jobs:
     timeout-minutes: 30
     needs: [typecheck-frontend]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -219,7 +219,7 @@ jobs:
     timeout-minutes: 30
     needs: [build-backend, build-frontend]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -231,7 +231,7 @@ jobs:
         run: make docker-e2e
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
@@ -239,7 +239,7 @@ jobs:
           retention-days: 7
 
       - name: Upload test results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e2e-test-results
