@@ -64,6 +64,10 @@ jobs:
                     - trivy
                     - actionlint
                     - yamllint
+                    - django-drf
+                    - flask
+                    - flask-db-migrations
+                    - live-platform
         steps:
             - uses: actions/checkout@v6
             - name: Run hadolint on ${{ matrix.service }}/Dockerfile
@@ -86,7 +90,7 @@ jobs:
               shell: bash
             - name: Validate service docker-compose files
               run: |
-                  for svc in black flake8 hadolint mypy pre-commit pylint pytest python-dev reorder-python-imports sphinx; do
+                  for svc in black flake8 hadolint mypy pre-commit pylint pytest python-dev reorder-python-imports sphinx ruff bandit safety trivy actionlint yamllint django-drf flask flask-db-migrations live-platform; do
                       echo "Validating ${svc}/docker-compose.yaml..."
                       docker compose -f "${svc}/docker-compose.yaml" config --quiet
                   done
