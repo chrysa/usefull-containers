@@ -3,6 +3,7 @@ services:
     build:
       context: ./backend
       target: production
+    container_name: satisfactory-fm-backend
     environment:
       BLUEPRINTS_DIR: /data/blueprints
       CORS_ORIGINS: '["http://localhost:5173","http://localhost:9109"]'
@@ -25,7 +26,8 @@ services:
       context: ./frontend
       target: production
       args:
-        VITE_API_URL: http://localhost:9009
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:9009}
+    container_name: satisfactory-fm-frontend
     depends_on:
       backend:
         condition: service_healthy
