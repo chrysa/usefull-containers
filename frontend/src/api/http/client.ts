@@ -25,6 +25,31 @@ function getBaseUrl(): string {
   return FALLBACK_URL;
 }
 
+/**
+ * Error thrown for non-2xx HTTP responses. Carries the numeric status so
+ * callers (especially the auth layer) can distinguish 401 from other failures.
+ */
+export class HttpError extends Error {
+  readonly status: number;
+  constructor(status: number, statusText: string) {
+    super(`HTTP ${status} — ${statusText}`);
+    this.name = "HttpError";
+    this.status = status;
+  }
+}
+
+/**
+ * Global 401 sink. The auth context registers a handler at mount time so any
+ * authenticated request that returns 401 (revoked / expired token) triggers
+ * an immediate logout without each call site having to special-case it.
+ */
+type AuthFailureHandler = () => void;
+let authFailureHandler: AuthFailureHandler | null = null;
+
+export function registerAuthFailureHandler(handler: AuthFailureHandler | null): void {
+  authFailureHandler = handler;
+}
+
 type RequestOptions = RequestInit & { timeout?: number };
 
 async function request<T>(
@@ -51,7 +76,18 @@ async function request<T>(
       },
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+    if (!res.ok) {
+      // 401 on an authed request means the token is no longer valid — surface
+      // it to the registered handler so the UI logs the user out promptly.
+      if (res.status === 401 && token && authFailureHandler) {
+        try {
+          authFailureHandler();
+        } catch {
+          // never let a handler crash break the request flow
+        }
+      }
+      throw new HttpError(res.status, res.statusText);
+    }
     // 204/205 responses have no body — attempting res.json() would throw.
     if (res.status === 204 || res.status === 205) return undefined as T;
     return res.json() as Promise<T>;

@@ -22,7 +22,7 @@ export default function Header({
   onNewProject,
 }: HeaderProps) {
   const { theme, setTheme, resetToSystem, isOverridden } = useTheme();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isHydrating, logout } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -58,7 +58,11 @@ export default function Header({
           </button>
         )}
         <LanguageSwitcher />
-        {isAuthenticated && user ? (
+        {isHydrating ? (
+          // Keep the auth slot reserved (no flash of "Sign in" while /auth/me
+          // is in flight on first load). aria-busy lets AT users know.
+          <span className={styles.userMenu} aria-busy="true" aria-live="polite" />
+        ) : isAuthenticated && user ? (
           <span className={styles.userMenu}>
             <span className={styles.username}>{user.steam_username ?? user.username}</span>
             <button onClick={handleLogout} title="Sign out">
