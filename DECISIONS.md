@@ -146,3 +146,50 @@ auth layer adds value:
   before production deployment — update `secrets/dev/sfm-secrets.README.md` in server repo.
 - Epic auth can be activated without an ADR amendment: add `EPIC_CLIENT_ID` /
   `EPIC_CLIENT_SECRET` env vars and the stub endpoint promotes itself.
+
+## D-0007 — Schema migrations via Alembic, not create_all()
+
+**Date**: 2026-05-31
+**Status**: accepted (supersedes "Alembic tracked as future work" in D-0006)
+
+The V1 auth feature (D-0006) bootstrapped the `users` table via
+`Base.metadata.create_all()` called from the FastAPI lifespan. This is fine
+for the very first deploy but becomes fatal as soon as the schema evolves:
+`create_all()` only adds **new** tables — it never alters existing ones,
+never drops columns, never migrates data.
+
+Discordium hit the exact same wall (D-0005 there) and committed Alembic
+later under pressure. We do it now while there is only one table and one
+user (me).
+
+### D-0007 decision
+
+- Add `alembic>=1.13.0` to backend deps.
+- Ship the Alembic env at `backend/alembic/` with an async-aware `env.py`.
+- Add `0001_baseline_users.py` capturing the V1 schema (one table: `users`).
+- Replace `init_db()` lifespan logic: in production it runs
+  `alembic upgrade head` in a worker thread; in tests it keeps using
+  `create_all()` (gated by `settings.test_mode`, set in `conftest.py`).
+- Future schema changes MUST be new revisions — **never edit existing
+  migrations**, **never reintroduce `create_all()` in production paths**.
+
+### Why a `test_mode` shortcut
+
+Running Alembic in every test would add ~200ms × N tests + a filesystem
+dependency on the alembic/ directory, breaking test isolation when tests
+relocate the data dir under `tmp_path`. `create_all()` from the model
+metadata is equivalent for tests since they always start from an empty DB.
+
+### D-0007 consequences
+
+- Adds dep: `alembic>=1.13.0`.
+- Adds files: `backend/alembic.ini`, `backend/alembic/env.py`,
+  `backend/alembic/script.py.mako`, `backend/alembic/versions/0001_*.py`.
+- New schema change workflow: `alembic revision --autogenerate -m "<msg>"`
+  → review the generated script → commit.
+- Docker images must include the `alembic/` directory and `alembic.ini`
+  (already covered by `COPY app/ ./app` ↔ no, **action item**: extend the
+  backend Dockerfile to copy `alembic/` and `alembic.ini` too).
+- Production deploy is unchanged for users: migrations run automatically on
+  pod start. Rollback uses `alembic downgrade -1` (or a deploy of the
+  previous image, which downgrades implicitly).

@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
     debug: bool = False
 
+    # When True, init_db() uses Base.metadata.create_all() instead of running
+    # Alembic migrations. Set in tests/conftest.py — never in production.
+    test_mode: bool = False
+
     # Auth
     jwt_secret_key: str = "change-me-in-production-at-least-32-chars!!"
     steam_api_key: str = ""

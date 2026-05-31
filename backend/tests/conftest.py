@@ -16,6 +16,8 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[TestCli
     monkeypatch.setattr(settings, "blueprints_dir", str(tmp_path))
     monkeypatch.setattr(settings, "data_dir", str(tmp_path))
     monkeypatch.setattr(settings, "jwt_secret_key", "test-secret-key-that-is-long-enough-32ch!")
+    # Use create_all() in tests instead of Alembic migrations (faster, no fs lookup).
+    monkeypatch.setattr(settings, "test_mode", True)
 
     import app.db.session as session_module  # noqa: PLC0415
 

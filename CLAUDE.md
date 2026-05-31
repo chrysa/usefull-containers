@@ -94,4 +94,5 @@ This project is indexed by GitNexus as **satisfactory-factory-manager** (8 symbo
 ## Skills
 
 Shared skills from `shared-standards/.claude/skills/`:
+
 - `ui-ux/SKILL.md` — UX/UI/ergonomics across ALL surfaces (web, CLI, VS Code, Discord, desktop, game, agent) + WCAG 2.1 AA + dark mode + i18n FR+EN (load when building any human-facing surface)

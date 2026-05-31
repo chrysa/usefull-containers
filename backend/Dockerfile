@@ -11,6 +11,8 @@ RUN pip install --no-cache-dir ".[dev]"
 FROM deps AS builder
 
 COPY app/ app/
+COPY alembic/ alembic/
+COPY alembic.ini ./
 
 # ── Stage 3 : production ──────────────────────────────────────────────────────
 FROM python:3.12-slim AS production
@@ -22,6 +24,8 @@ RUN addgroup --system app && adduser --system --ingroup app app
 COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=deps /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY --from=builder /app/app ./app
+COPY --from=builder /app/alembic ./alembic
+COPY --from=builder /app/alembic.ini ./alembic.ini
 
 RUN mkdir -p /data/blueprints && chown -R app:app /data /app
 
