@@ -66,6 +66,10 @@ jobs:
                     - trivy
                     - actionlint
                     - yamllint
+                    - django-drf
+                    - flask
+                    - flask-db-migrations
+                    - live-platform
         steps:
             - name: Checkout code
               uses: actions/checkout@v6
