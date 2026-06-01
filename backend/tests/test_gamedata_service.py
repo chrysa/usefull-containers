@@ -6,7 +6,6 @@ import zipfile
 from pathlib import Path
 
 import pytest
-
 from app.models.gamedata import RecipeIngredient, RecipeSummary
 from app.services.gamedata_service import (
     GameDataNotFoundError,

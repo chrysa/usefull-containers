@@ -6,7 +6,6 @@ import zipfile
 from pathlib import Path
 
 import pytest
-
 from app.models.blueprint import BlueprintRead
 from app.services.blueprint_service import (
     BlueprintDirectoryError,
