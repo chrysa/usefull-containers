@@ -128,19 +128,58 @@ def test_start_runs_initial_sync_and_stops(runner: CliRunner, bp_dir: Path) -> N
     mock_watcher.stop.assert_called_once()
 
 
+def test_sync_auto_detects_dir_when_not_given(runner: CliRunner, bp_dir: Path) -> None:
+    """Omitting --dir falls back to the per-platform default."""
+    ok = SyncResult(uploaded=[], downloaded=[], errors=[])
+    with patch("sfm_agent.cli.detect_platform", return_value="windows"), \
+         patch("sfm_agent.cli.default_blueprints_dir", return_value=bp_dir), \
+         patch("sfm_agent.cli.BlueprintSyncer") as mock_cls:
+        mock_cls.return_value.__enter__.return_value.sync.return_value = ok
+        result = runner.invoke(cli, ["sync", "--hub", "http://hub"])
+    assert result.exit_code == 0
+    assert "windows" in result.output.lower()
+
+
+def test_start_no_default_for_platform_exits_1(runner: CliRunner) -> None:
+    with patch("sfm_agent.cli.detect_platform", return_value="unknown"), \
+         patch("sfm_agent.cli.default_blueprints_dir", return_value=None):
+        result = runner.invoke(cli, ["start", "--hub", "http://hub"])
+    assert result.exit_code == 1
+    assert "no default" in result.output.lower()
+
+
+# ── detect ──────────────────────────────────────────────────────────────────────
+
+def test_detect_reports_platform_and_existing_dir(runner: CliRunner, bp_dir: Path) -> None:
+    with patch("sfm_agent.cli.detect_platform", return_value="steamdeck"), \
+         patch("sfm_agent.cli.default_blueprints_dir", return_value=bp_dir):
+        result = runner.invoke(cli, ["detect"])
+    assert result.exit_code == 0
+    assert "steamdeck" in result.output.lower()
+    assert "found" in result.output.lower()
+
+
+def test_detect_reports_missing_dir(runner: CliRunner, tmp_path: Path) -> None:
+    ghost = tmp_path / "ghost"
+    with patch("sfm_agent.cli.detect_platform", return_value="windows"), \
+         patch("sfm_agent.cli.default_blueprints_dir", return_value=ghost):
+        result = runner.invoke(cli, ["detect"])
+    assert result.exit_code == 0
+    assert "not found" in result.output.lower()
+
+
+def test_detect_no_default_platform(runner: CliRunner) -> None:
+    with patch("sfm_agent.cli.detect_platform", return_value="macos"), \
+         patch("sfm_agent.cli.default_blueprints_dir", return_value=None):
+        result = runner.invoke(cli, ["detect"])
+    assert result.exit_code == 0
+    assert "no default" in result.output.lower()
+
+
 def test_start_logs_sync_results_when_changes(runner: CliRunner, bp_dir: Path) -> None:
     """start command prints poll sync line when changes were found."""
-    import time
-
-    first = [True]
     pre_set = threading.Event()
-
-    def fake_is_set() -> bool:
-        return pre_set.is_set()
-
     ok_upload = SyncResult(uploaded=["x"], downloaded=[], errors=[])
-    ok_empty = SyncResult(uploaded=[], downloaded=[], errors=[])
-
     pre_set.set()
 
     with patch("sfm_agent.cli.threading.Event", return_value=pre_set), \

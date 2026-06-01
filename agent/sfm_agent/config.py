@@ -1,17 +1,58 @@
 from __future__ import annotations
 
+import os
+import sys
 from pathlib import Path
-from typing import Final
+from typing import Final, Literal
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Default Steam Deck blueprint path (via Proton compatibility layer)
+Platform = Literal["windows", "steamdeck", "linux", "macos", "unknown"]
+
+# Satisfactory blueprints live under <LocalAppData>/FactoryGame/Saved/SaveGames/blueprints.
+# The suffix below is appended to each platform's "Local AppData" root.
+_BP_SUFFIX: Final = "FactoryGame/Saved/SaveGames/blueprints"
+
+# Steam Deck (and native-Linux Steam) run the game through Proton, so the
+# Windows-style AppData tree lives inside the Proton prefix (app id 526870).
 DEFAULT_STEAM_DECK_BP_DIR: Final = (
     "~/.local/share/Steam/steamapps/compatdata/526870/pfx"
     "/drive_c/users/steamuser/AppData/Local"
-    "/FactoryGame/Saved/SaveGames/blueprints"
+    f"/{_BP_SUFFIX}"
 )
+
+
+def detect_platform() -> Platform:
+    """Best-effort host classification, distinguishing a Steam Deck from generic Linux."""
+    if sys.platform == "win32":
+        return "windows"
+    if sys.platform == "darwin":
+        return "macos"
+    if sys.platform.startswith("linux"):
+        try:
+            release = Path("/etc/os-release").read_text(encoding="utf-8").lower()
+        except OSError:
+            release = ""
+        if "steamos" in release or "steamdeck" in release:
+            return "steamdeck"
+        return "linux"
+    return "unknown"
+
+
+def default_blueprints_dir(platform: Platform | None = None) -> Path | None:
+    """
+    Default Satisfactory blueprints folder for the (detected) platform, or None
+    when there is no sensible default and the user must pass ``--dir`` explicitly.
+    """
+    platform = platform or detect_platform()
+    if platform == "windows":
+        local_appdata = os.environ.get("LOCALAPPDATA")
+        base = Path(local_appdata) if local_appdata else Path("~/AppData/Local").expanduser()
+        return base / _BP_SUFFIX
+    if platform in ("steamdeck", "linux"):
+        return Path(DEFAULT_STEAM_DECK_BP_DIR).expanduser()
+    return None
 
 
 class AgentConfig(BaseSettings):

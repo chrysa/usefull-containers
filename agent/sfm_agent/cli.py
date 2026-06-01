@@ -12,7 +12,7 @@ import httpx
 from rich.console import Console
 from rich.table import Table
 
-from .config import AgentConfig
+from .config import AgentConfig, default_blueprints_dir, detect_platform
 from .state import AgentState
 from .syncer import BlueprintSyncer
 from .watcher import BlueprintWatcher
@@ -28,6 +28,34 @@ def _setup_logging(verbose: bool) -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%H:%M:%S",
     )
+
+
+def _resolve_bp_dir(bp_dir: str | None) -> Path:
+    """
+    Resolve the blueprints directory: explicit ``--dir`` wins; otherwise fall
+    back to the per-platform default (Windows / Steam Deck / Linux). Exits with
+    a helpful message when nothing usable can be found.
+    """
+    if bp_dir:
+        path = Path(bp_dir).expanduser().resolve()
+    else:
+        platform = detect_platform()
+        default = default_blueprints_dir(platform)
+        if default is None:
+            console.print(
+                f"[red]No default blueprints directory for platform '{platform}'. "
+                "Pass --dir explicitly.[/red]"
+            )
+            sys.exit(1)
+        path = default.expanduser().resolve()
+        console.print(f"[dim]Auto-detected {platform} blueprints dir: {path}[/dim]")
+    if not path.exists():
+        console.print(
+            f"[red]Blueprint directory not found: {path}[/red]\n"
+            "[yellow]Start Satisfactory at least once, or pass --dir.[/yellow]"
+        )
+        sys.exit(1)
+    return path
 
 
 @click.group()
@@ -54,9 +82,9 @@ def cli() -> None:
     "--dir",
     "bp_dir",
     envvar="SFM_BLUEPRINTS_DIR",
-    required=True,
+    default=None,
     type=click.Path(),
-    help="Local blueprints directory",
+    help="Local blueprints directory (auto-detected per platform if omitted)",
 )
 @click.option(
     "--poll",
@@ -67,13 +95,10 @@ def cli() -> None:
     help="Poll interval (seconds)",
 )
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logging")
-def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
+def start(hub: str, bp_dir: str | None, poll: int, verbose: bool) -> None:
     """Start the sync daemon (file watcher + periodic poll)."""
     _setup_logging(verbose)
-    bp_path = Path(bp_dir).expanduser().resolve()
-    if not bp_path.exists():
-        console.print(f"[red]Blueprint directory not found: {bp_path}[/red]")
-        sys.exit(1)
+    bp_path = _resolve_bp_dir(bp_dir)
 
     cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, poll_interval=poll)
     state = AgentState(cfg.state_file)
@@ -123,12 +148,12 @@ def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
 
 @cli.command()
 @click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
-@click.option("--dir", "bp_dir", envvar="SFM_BLUEPRINTS_DIR", required=True, type=click.Path())
+@click.option("--dir", "bp_dir", envvar="SFM_BLUEPRINTS_DIR", default=None, type=click.Path())
 @click.option("--verbose", "-v", is_flag=True)
-def sync(hub: str, bp_dir: str, verbose: bool) -> None:
+def sync(hub: str, bp_dir: str | None, verbose: bool) -> None:
     """Run a one-shot bidirectional sync and exit."""
     _setup_logging(verbose)
-    bp_path = Path(bp_dir).expanduser().resolve()
+    bp_path = _resolve_bp_dir(bp_dir)
     cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path)
     state = AgentState(cfg.state_file)
 
@@ -169,3 +194,20 @@ def status(hub: str) -> None:
         console.print(f"  Blueprints on hub: {data.get('total', '?')}")
     except (httpx.HTTPError, ValueError):
         pass
+
+
+@cli.command()
+def detect() -> None:
+    """Show the detected platform and its default blueprints directory."""
+    platform = detect_platform()
+    console.print(f"Platform: [cyan]{platform}[/cyan]")
+    path = default_blueprints_dir(platform)
+    if path is None:
+        console.print(
+            "[yellow]No default blueprints directory for this platform — "
+            "pass --dir explicitly.[/yellow]"
+        )
+        return
+    found = path.expanduser().exists()
+    state = "[green]found[/green]" if found else "[yellow]not found[/yellow]"
+    console.print(f"Blueprints dir: [cyan]{path}[/cyan] ({state})")
