@@ -13,6 +13,8 @@ class ItemSummary(BaseModel):
     name: str
     description: str = ""
     stack_size: int = 0
+    #: True for liquids/gases (RF_LIQUID / RF_GAS). Drives pipe vs conveyor sizing.
+    is_fluid: bool = False
 
 
 class RecipeSummary(BaseModel):
@@ -21,6 +23,10 @@ class RecipeSummary(BaseModel):
     ingredients: list[RecipeIngredient]
     products: list[RecipeIngredient]
     produced_in: list[str] = []
+    #: Craft duration in seconds at 100% clock. Needed to derive a single
+    #: machine's per-minute output (amount * 60 / time) and thus machine counts.
+    #: 0 means "unknown" (legacy data) — consumers must treat it as not computable.
+    time: float = 0
 
 
 class GameDataStats(BaseModel):
