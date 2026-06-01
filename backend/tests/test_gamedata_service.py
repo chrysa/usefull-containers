@@ -39,6 +39,7 @@ RECIPES_DICT = {
         "ingredients": [{"item": "Desc_IronOre_C", "amount": 1}],
         "products": [{"item": "Desc_IronIngot_C", "amount": 1}],
         "producedIn": ["Desc_Smelter_C"],
+        "time": 2,
     }
 }
 
@@ -66,6 +67,49 @@ class TestImportGamedataZip:
         zip_bytes = _make_zip({"items": {}, "recipes": RECIPES_DICT})
         _, recipes = import_gamedata_zip(str(tmp_path), zip_bytes, "data.zip")
         assert recipes[0].ingredients[0] == RecipeIngredient(item_id="Desc_IronOre_C", amount=1.0)
+
+    def test_recipe_time_is_parsed(self, tmp_path: Path) -> None:
+        zip_bytes = _make_zip({"items": {}, "recipes": RECIPES_DICT})
+        _, recipes = import_gamedata_zip(str(tmp_path), zip_bytes, "data.zip")
+        assert recipes[0].time == 2.0
+
+    def test_recipe_time_defaults_to_zero_when_absent(self, tmp_path: Path) -> None:
+        recipes_no_time = {
+            "Recipe_X_C": {
+                "name": "X",
+                "ingredients": [],
+                "products": [{"item": "Desc_X_C", "amount": 1}],
+            }
+        }
+        zip_bytes = _make_zip({"items": {}, "recipes": recipes_no_time})
+        _, recipes = import_gamedata_zip(str(tmp_path), zip_bytes, "data.zip")
+        assert recipes[0].time == 0.0
+
+    def test_recipe_time_accepts_manufactoring_duration_alias(self, tmp_path: Path) -> None:
+        recipes = {
+            "Recipe_Y_C": {
+                "name": "Y",
+                "ingredients": [],
+                "products": [{"item": "Desc_Y_C", "amount": 1}],
+                "manufactoringDuration": 6,
+            }
+        }
+        zip_bytes = _make_zip({"items": {}, "recipes": recipes})
+        _, parsed = import_gamedata_zip(str(tmp_path), zip_bytes, "data.zip")
+        assert parsed[0].time == 6.0
+
+    def test_fluid_items_are_flagged(self, tmp_path: Path) -> None:
+        items = {
+            "Desc_Water_C": {"name": "Water", "form": "RF_LIQUID"},
+            "Desc_IronIngot_C": {"name": "Iron Ingot", "stackSize": 100},
+            "Desc_NitrogenGas_C": {"name": "Nitrogen Gas", "liquid": True},
+        }
+        zip_bytes = _make_zip({"items": items, "recipes": {}})
+        parsed, _ = import_gamedata_zip(str(tmp_path), zip_bytes, "data.zip")
+        by_name = {i.name: i.is_fluid for i in parsed}
+        assert by_name["Water"] is True
+        assert by_name["Nitrogen Gas"] is True
+        assert by_name["Iron Ingot"] is False
 
     def test_list_format_items_are_accepted(self, tmp_path: Path) -> None:
         items_list = [{"id": "iron-ingot", "name": "Iron Ingot", "stackSize": 100}]
@@ -170,6 +214,7 @@ class TestListRecipes:
             ingredients=[RecipeIngredient(item_id="Desc_IronOre_C", amount=1.0)],
             products=[RecipeIngredient(item_id="Desc_IronIngot_C", amount=1.0)],
             produced_in=["Desc_Smelter_C"],
+            time=2.0,
         )]
 
     def test_list_recipes_raises_when_no_data(self, tmp_path: Path) -> None:

@@ -55,9 +55,18 @@ def _normalize_items(raw: dict[str, Any] | list[Any]) -> list[ItemSummary]:
                 name=str(name),
                 description=str(entry.get("description") or ""),
                 stack_size=int(entry.get("stackSize") or entry.get("stack_size") or 0),
+                is_fluid=_is_fluid(entry),
             )
         )
     return result
+
+
+def _is_fluid(entry: dict[str, Any]) -> bool:
+    """Detect liquids/gases across the Satisfactory Tools data variants."""
+    if entry.get("liquid") is True or entry.get("is_fluid") is True:
+        return True
+    form = str(entry.get("form") or entry.get("stackType") or "").upper()
+    return form in {"RF_LIQUID", "RF_GAS", "LIQUID", "GAS"}
 
 
 def _parse_ingredient(raw: dict[str, Any]) -> RecipeIngredient:
@@ -79,6 +88,13 @@ def _normalize_recipes(raw: dict[str, Any] | list[Any]) -> list[RecipeSummary]:
         products = [_parse_ingredient(p) for p in (entry.get("products") or [])]
         produced_in_raw = entry.get("producedIn") or entry.get("produced_in") or []
         produced_in = [str(b) for b in produced_in_raw]
+        # Satisfactory Tools uses "time"; some exports use manufacto(u)ringDuration.
+        time = float(
+            entry.get("time")
+            or entry.get("manufactoringDuration")
+            or entry.get("manufacturingDuration")
+            or 0
+        )
         result.append(
             RecipeSummary(
                 id=str(recipe_id),
@@ -86,6 +102,7 @@ def _normalize_recipes(raw: dict[str, Any] | list[Any]) -> list[RecipeSummary]:
                 ingredients=ingredients,
                 products=products,
                 produced_in=produced_in,
+                time=time,
             )
         )
     return result

@@ -2,12 +2,13 @@ import { http, HttpResponse, delay } from "msw";
 import type { GameDataStats, GameDataImportResult, ItemSummary, RecipeSummary } from "../../../domain/gamedata/types";
 
 const mockItems: ItemSummary[] = [
-  { id: "Desc_IronIngot_C", name: "Iron Ingot", description: "A basic ingot smelted from iron ore.", stack_size: 100 },
-  { id: "Desc_CopperIngot_C", name: "Copper Ingot", description: "A basic ingot smelted from copper ore.", stack_size: 100 },
-  { id: "Desc_IronOre_C", name: "Iron Ore", description: "Raw iron ore extracted from the ground.", stack_size: 100 },
-  { id: "Desc_CopperOre_C", name: "Copper Ore", description: "Raw copper ore extracted from the ground.", stack_size: 100 },
-  { id: "Desc_IronPlate_C", name: "Iron Plate", description: "A flat iron plate.", stack_size: 200 },
-  { id: "Desc_Wire_C", name: "Wire", description: "Thin copper wire.", stack_size: 500 },
+  { id: "Desc_IronIngot_C", name: "Iron Ingot", description: "A basic ingot smelted from iron ore.", stack_size: 100, is_fluid: false },
+  { id: "Desc_CopperIngot_C", name: "Copper Ingot", description: "A basic ingot smelted from copper ore.", stack_size: 100, is_fluid: false },
+  { id: "Desc_IronOre_C", name: "Iron Ore", description: "Raw iron ore extracted from the ground.", stack_size: 100, is_fluid: false },
+  { id: "Desc_CopperOre_C", name: "Copper Ore", description: "Raw copper ore extracted from the ground.", stack_size: 100, is_fluid: false },
+  { id: "Desc_IronPlate_C", name: "Iron Plate", description: "A flat iron plate.", stack_size: 200, is_fluid: false },
+  { id: "Desc_Wire_C", name: "Wire", description: "Thin copper wire.", stack_size: 500, is_fluid: false },
+  { id: "Desc_Water_C", name: "Water", description: "Extracted water.", stack_size: 0, is_fluid: true },
 ];
 
 const mockRecipes: RecipeSummary[] = [
@@ -17,6 +18,7 @@ const mockRecipes: RecipeSummary[] = [
     ingredients: [{ item_id: "Desc_IronOre_C", amount: 1 }],
     products: [{ item_id: "Desc_IronIngot_C", amount: 1 }],
     produced_in: ["Desc_Smelter_C"],
+    time: 2,
   },
   {
     id: "Recipe_IngotCopper_C",
@@ -24,6 +26,7 @@ const mockRecipes: RecipeSummary[] = [
     ingredients: [{ item_id: "Desc_CopperOre_C", amount: 1 }],
     products: [{ item_id: "Desc_CopperIngot_C", amount: 1 }],
     produced_in: ["Desc_Smelter_C"],
+    time: 2,
   },
   {
     id: "Recipe_IronPlate_C",
@@ -31,6 +34,7 @@ const mockRecipes: RecipeSummary[] = [
     ingredients: [{ item_id: "Desc_IronIngot_C", amount: 3 }],
     products: [{ item_id: "Desc_IronPlate_C", amount: 2 }],
     produced_in: ["Desc_ConstructorMk1_C"],
+    time: 6,
   },
   {
     id: "Recipe_Wire_C",
@@ -38,6 +42,7 @@ const mockRecipes: RecipeSummary[] = [
     ingredients: [{ item_id: "Desc_CopperIngot_C", amount: 1 }],
     products: [{ item_id: "Desc_Wire_C", amount: 2 }],
     produced_in: ["Desc_ConstructorMk1_C"],
+    time: 4,
   },
 ];
 
