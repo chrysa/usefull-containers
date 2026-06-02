@@ -104,7 +104,7 @@ async def download_blueprint_cfg(name: str) -> FileResponse:
 
 @router.post("/upload-batch", response_model=BatchUploadResult, status_code=207)
 async def upload_blueprint_batch(
-    files: Annotated[list[UploadFile], File()] = None,
+    files: Annotated[list[UploadFile] | None, File()] = None,
 ) -> BatchUploadResult:
     """
     Upload multiple blueprints at once (multi-file form upload).

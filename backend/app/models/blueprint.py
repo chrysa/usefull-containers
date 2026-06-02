@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -21,7 +22,7 @@ class BlueprintRead(BaseModel):
     has_cfg: bool
     size_bytes: int = 0
     modified_at: datetime | None = None
-    cfg_raw: dict | None = None  # raw .sbpcfg content
+    cfg_raw: dict[str, Any] | None = None  # raw .sbpcfg content
     tags: list[str] = Field(default_factory=list)
 
 

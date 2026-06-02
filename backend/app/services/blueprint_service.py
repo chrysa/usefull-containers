@@ -5,6 +5,7 @@ import json
 import zipfile
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from app.constants import BLUEPRINT_CFG_EXT, BLUEPRINT_FILE_EXT, BLUEPRINT_META_EXT
 from app.models.blueprint import BatchUploadResult, BlueprintColor, BlueprintRead
@@ -18,10 +19,10 @@ class BlueprintDirectoryError(Exception):
     pass
 
 
-def _parse_cfg(cfg_path: Path) -> tuple[str, int, BlueprintColor | None, dict]:
+def _parse_cfg(cfg_path: Path) -> tuple[str, int, BlueprintColor | None, dict[str, Any]]:
     """Parse a .sbpcfg JSON file. Returns (description, icon_id, color, raw)."""
     try:
-        raw: dict = json.loads(cfg_path.read_text(encoding="utf-8"))
+        raw: dict[str, Any] = json.loads(cfg_path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return "", 0, None, {}
 
@@ -275,7 +276,7 @@ def set_tags(blueprints_dir: str, name: str, tags: list[str]) -> BlueprintRead:
     meta_path = directory / f"{name}{BLUEPRINT_META_EXT}"
     # Read existing sidecar to preserve future fields, then update tags
     try:
-        existing: dict = (
+        existing: dict[str, Any] = (
             json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
         )
     except (json.JSONDecodeError, OSError):
@@ -301,7 +302,7 @@ def update_description(blueprints_dir: str, name: str, description: str) -> Blue
         raise BlueprintNotFoundError(f"Blueprint '{name}' not found")
 
     try:
-        existing: dict = (
+        existing: dict[str, Any] = (
             json.loads(cfg_path.read_text(encoding="utf-8")) if cfg_path.exists() else {}
         )
     except (json.JSONDecodeError, OSError):
