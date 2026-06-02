@@ -273,6 +273,13 @@
   }
 }
 
+.estimateNote {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-text-secondary, #888);
+  margin: 0 0 0.75rem;
+}
+
 // ── Empty states ──────────────────────────────────────────────────────────────
 
 .noData {
