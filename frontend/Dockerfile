@@ -1,5 +1,5 @@
 # ── Stage 1 : deps ────────────────────────────────────────────────────────────
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 
 WORKDIR /app
 COPY package.json package-lock.json ./
