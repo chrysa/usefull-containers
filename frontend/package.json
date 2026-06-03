@@ -21,7 +21,7 @@
     "eslint": "^10.4.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
-    "globals": "^16.5.0",
+    "globals": "^17.6.0",
     "msw": "^2.12.10",
     "sass-embedded": "^1.100.0",
     "typescript": "~6.0.3",
