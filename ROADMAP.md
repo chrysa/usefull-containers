@@ -4,9 +4,9 @@
 > [🏭 satisfactory-factory-manager](https://www.notion.so/35359293e35e81248b86ea438ce52995).
 > Source de vérité ticket-level : issues + PRs GitHub.
 >
-> Last updated: 2026-06-03 (realign on merged auth/alembic work; A-04 split).
+> Last updated: 2026-06-04 (A-04 merged via #117; Dependabot queue drained).
 
-## Statut actuel (2026-06-03)
+## Statut actuel (2026-06-04)
 
 - **V1 feature-complete** (SFM-1 → SFM-21). 90+ PRs mergés sur `main` (`cca81c7`).
 - **PR #80 mergée** — nginx→vite preview + multi-project support (localStorage).
@@ -18,12 +18,13 @@
   Alembic baseline, fin de `create_all()` au lifespan), A-03 (#88 `/auth/me` +
   auto-refresh / 401 logout) sont **mergés sur `main`**. La branche
   `feat/auth-local-steam` est obsolète (squash-mergée).
-- **Reste avant exposition publique** : A-04 (rendre l'auth obligatoire sur
-  `plans` + `blueprints`) — en cours — et A-04b (scoping réel par `user_id`,
-  follow-up). Sans ça, `sfm.ducal.me` reste Tailscale-only.
-- **15 PRs Dependabot ouvertes** (#97→#111) : npm/pip/docker. Plusieurs bumps
-  **majeurs** (python 3.12→3.14, node 22→26, eslint 9→10, lucide 0→1,
-  i18next 25→26, @types/node 24→25) → à trier, pas de merge aveugle.
+- **A-04 mergée (#117)** : auth **obligatoire** sur `plans` + `blueprints`
+  (router `Depends(get_current_user)` + tests 401/200, couverture 91 %).
+- **Reste avant exposition publique** : A-04b (scoping réel par `user_id`,
+  follow-up [#113]) + A-05 (E2E auth). Sans ça, `sfm.ducal.me` reste Tailscale-only.
+- **Dependabot : file vidée** — bumps mineurs/patch mergés (#103/#106/#107/#108/#110
+  + autres) ; aucun PR Dependabot ouvert. Bumps **majeurs** (python 3.12→3.14,
+  node 22→26, eslint 9→10, lucide 0→1, i18next 25→26) restent à trier manuellement.
 
 ---
 
@@ -128,7 +129,7 @@ avec auth obligatoire + plans/blueprints scopés par utilisateur.
 ```
 P0 ✅ ──┬→ D-01 ✅ → D-03 ✅ → D-03b 🔴 ┐
         │                              ├→ D-04 → D-05 (T+1 mois) → L9 / L10
-        └→ A-01 ✅ → A-02 ✅ → A-03 ✅ → A-04 🚧 → A-04b ─┘
+        └→ A-01 ✅ → A-02 ✅ → A-03 ✅ → A-04 ✅ → A-04b 🚧 ─┘
                                   │
                                   └→ A-05 (E2E)  ┐
                                                  ├→ Exposition publique sfm.ducal.me
