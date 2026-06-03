@@ -1,5 +1,5 @@
 # ── Stage 1 : deps ────────────────────────────────────────────────────────────
-FROM python:3.12-slim AS deps
+FROM python:3.14-slim AS deps
 
 WORKDIR /app
 RUN pip install --no-cache-dir "setuptools>=70" wheel
@@ -15,7 +15,7 @@ COPY alembic/ alembic/
 COPY alembic.ini ./
 
 # ── Stage 3 : production ──────────────────────────────────────────────────────
-FROM python:3.12-slim AS production
+FROM python:3.14-slim AS production
 
 WORKDIR /app
 
