@@ -43,8 +43,9 @@ async def init_db() -> None:
     # Production / dev: run Alembic migrations.
     from pathlib import Path
 
-    from alembic import command
     from alembic.config import Config
+
+    from alembic import command
 
     backend_root = Path(__file__).resolve().parent.parent.parent
     cfg = Config(str(backend_root / "alembic.ini"))
