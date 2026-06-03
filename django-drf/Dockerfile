@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM python:3.11-alpine
+FROM python:3.14-alpine
 
 ARG TARGET_FOLDER=/app
 
