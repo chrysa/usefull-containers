@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM    pyfound/black:26.3.1
+FROM    pyfound/black:26.5.1
 
 WORKDIR /app
 
