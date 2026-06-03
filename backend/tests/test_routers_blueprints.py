@@ -16,14 +16,28 @@ def _write_blueprint(directory: Path, name: str, *, with_cfg: bool = True) -> No
         (directory / f"{name}.sbpcfg").write_text(json.dumps(cfg), encoding="utf-8")
 
 
+def _build_authed_app() -> TestClient:
+    """Create the app with the auth dependency (A-04) bypassed by a fake user.
+
+    These router tests exercise the file-based blueprint behaviour, not auth.
+    """
+    from app.db.models import User
+    from app.dependencies.auth import get_current_user
+    from app.main import create_app
+
+    app = create_app()
+    app.dependency_overrides[get_current_user] = lambda: User(
+        id=1, username="test-user", is_active=True
+    )
+    return TestClient(app)
+
+
 @pytest.fixture
 def patched_client(tmp_path: Path) -> TestClient:
     from app import config as cfg_module
 
     cfg_module.settings.blueprints_dir = str(tmp_path)
-    from app.main import create_app
-
-    return TestClient(create_app())
+    return _build_authed_app()
 
 
 @pytest.fixture
@@ -33,9 +47,7 @@ def populated_client(tmp_path: Path) -> tuple[TestClient, Path]:
     from app import config as cfg_module
 
     cfg_module.settings.blueprints_dir = str(tmp_path)
-    from app.main import create_app
-
-    return TestClient(create_app()), tmp_path
+    return _build_authed_app(), tmp_path
 
 
 class TestListBlueprintsEndpoint:
@@ -392,9 +404,8 @@ class TestDownloadBlueprintCfgEndpoint:
 
         cfg_module.settings.blueprints_dir = str(tmp_path)
         (tmp_path / "solo.sbp").write_bytes(b"SBP_FAKE_DATA")
-        from app.main import create_app
 
-        client = TestClient(create_app())
+        client = _build_authed_app()
         resp = client.get("/api/v1/blueprints/solo/download-cfg")
         assert resp.status_code == 404
 

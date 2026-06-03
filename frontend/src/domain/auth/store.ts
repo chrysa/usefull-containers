@@ -48,3 +48,13 @@ export function clearAuth(): void {
 export function readAuthState(): AuthState {
   return { token: readToken(), user: readUser() };
 }
+
+/**
+ * Authorization header for requests that bypass the shared `http` client
+ * (FormData uploads, blob downloads). Returns an empty object when no token is
+ * stored so the caller can spread it unconditionally.
+ */
+export function authHeaders(): Record<string, string> {
+  const token = readToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}

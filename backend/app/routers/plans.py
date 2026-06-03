@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.config import settings
+from app.dependencies.auth import get_current_user
 from app.models.plan import PlanCreate, PlanImport, PlanRead, PlanUpdate
 from app.services import plan_service
 
-router = APIRouter(prefix="/plans", tags=["plans"])
+router = APIRouter(
+    prefix="/plans",
+    tags=["plans"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.get("", response_model=list[PlanRead], summary="List all factory plans")

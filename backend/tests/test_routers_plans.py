@@ -11,9 +11,17 @@ def plan_client(tmp_path: Path) -> TestClient:
     from app import config as cfg_module
 
     cfg_module.settings.data_dir = str(tmp_path)
+    from app.db.models import User
+    from app.dependencies.auth import get_current_user
     from app.main import create_app
 
-    return TestClient(create_app())
+    app = create_app()
+    # Plans endpoints are auth-gated (A-04). These router tests exercise the
+    # file-based behaviour, not auth, so bypass the dependency with a fake user.
+    app.dependency_overrides[get_current_user] = lambda: User(
+        id=1, username="test-user", is_active=True
+    )
+    return TestClient(app)
 
 
 class TestListPlansEndpoint:

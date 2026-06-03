@@ -71,8 +71,8 @@ T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
 | A-01  | PR-iser + merger `feat/auth-local-steam` (local + Steam OpenID + Epic placeholder)    | 30min  | ✅ done | [PR #81](https://github.com/chrysa/satisfactory-factory-manager/pull/81) |
 | A-02  | Alembic baseline migration (table `users`) — remplacer `create_all()` au lifespan     | 2h     | ✅ done | [PR #85](https://github.com/chrysa/satisfactory-factory-manager/pull/85) |
 | A-03  | `/api/v1/auth/me` endpoint + auto-refresh côté frontend                               | 1h     | ✅ done | [PR #88](https://github.com/chrysa/satisfactory-factory-manager/pull/88) |
-| A-04  | Auth **obligatoire** sur `plans` + `blueprints` (`Depends(get_current_user)`) + réparer fixtures tests / 4 fetch frontend / setup E2E login | 3h | 🚧 wip | dépend A-03             |
-| A-04b | Scoping réel par `user_id` : `user_id` dans models plan/blueprint + storage par user + filtrage service | 4h | todo | dépend A-04             |
+| A-04  | Auth **obligatoire** sur `plans` + `blueprints` (`Depends(get_current_user)`) + fixtures tests / 4 fetch frontend / `.sbp` download authentifié / E2E login | 3h | ✅ done | router deps + tests 401/200 |
+| A-04b | Scoping réel par `user_id` : `user_id` dans models plan/blueprint + storage par user + filtrage service | 4h | todo | [#113](https://github.com/chrysa/satisfactory-factory-manager/issues/113) — dépend A-04 |
 | A-05  | E2E Playwright : register → login → access plans page (utilise A-04)                  | 2h     | todo    | dépend A-04             |
 | A-06  | Implem réelle Epic Games OAuth (actuellement placeholder)                             | 4h     | todo    | post-V1 si pas d'usage  |
 | A-07  | Audit log côté backoffice — toutes mutations user-scoped                              | 3h     | todo    | dépend A-04             |

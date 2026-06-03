@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 
 from app.config import settings
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
+from app.dependencies.auth import get_current_user
 from app.models.blueprint import (
     BatchUploadResult,
     BlueprintDescriptionUpdate,
@@ -32,7 +33,11 @@ from app.services.blueprint_service import (
     update_description,
 )
 
-router = APIRouter(prefix="/blueprints", tags=["blueprints"])
+router = APIRouter(
+    prefix="/blueprints",
+    tags=["blueprints"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.get("", response_model=BlueprintList, status_code=200)
