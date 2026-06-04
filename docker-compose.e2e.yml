@@ -6,6 +6,10 @@ services:
     environment:
       BLUEPRINTS_DIR: /tmp/blueprints
       CORS_ORIGINS: '["http://frontend:4173", "http://localhost:9109"]'
+      # E2E hammers /auth/register + /login from a single IP across many specs;
+      # the suite isn't testing rate limiting (backend unit tests cover A-08),
+      # so lift the cap to avoid spurious 429s.
+      AUTH_RATE_LIMIT_MAX: "100000"
     healthcheck:
       interval: 5s
       retries: 12

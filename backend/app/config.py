@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     steam_api_key: str = ""
     frontend_url: str = "http://localhost:5173"
 
+    # Rate limiting for the auth endpoints (A-08): max requests per window per
+    # client IP+route. In-memory, single-instance (see dependencies/rate_limit).
+    auth_rate_limit_max: int = 5
+    auth_rate_limit_window_seconds: int = 60
+
     @property
     def auth_db_path(self) -> str:
         return f"{self.data_dir}/{AUTH_DB_FILENAME}"
