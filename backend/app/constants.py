@@ -20,6 +20,10 @@ MAX_GAMEDATA_ZIP_SIZE_BYTES: Final = 100 * 1024 * 1024  # 100 MB
 
 DATA_DIR_DEFAULT: Final = "/data"
 PLANS_FILENAME: Final = "plans.json"
+# Per-user storage layout (A-04b): plans live under
+# {data_dir}/{USERS_SUBDIR}/{user_id}/plans.json and blueprints under
+# {blueprints_dir}/{user_id}/. The path partitioning *is* the scoping.
+USERS_SUBDIR: Final = "users"
 
 # Auth
 JWT_ALGORITHM: Final = "HS256"

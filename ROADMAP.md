@@ -4,7 +4,7 @@
 > [🏭 satisfactory-factory-manager](https://www.notion.so/35359293e35e81248b86ea438ce52995).
 > Source de vérité ticket-level : issues + PRs GitHub.
 >
-> Last updated: 2026-06-04 (A-04 merged via #117; Dependabot queue drained).
+> Last updated: 2026-06-04 (A-04b per-user scoping implemented; only A-05 left before public exposure).
 
 ## Statut actuel (2026-06-04)
 
@@ -20,8 +20,13 @@
   `feat/auth-local-steam` est obsolète (squash-mergée).
 - **A-04 mergée (#117)** : auth **obligatoire** sur `plans` + `blueprints`
   (router `Depends(get_current_user)` + tests 401/200, couverture 91 %).
-- **Reste avant exposition publique** : A-04b (scoping réel par `user_id`,
-  follow-up [#113]) + A-05 (E2E auth). Sans ça, `sfm.ducal.me` reste Tailscale-only.
+- **A-04b implémentée** : storage partitionné par utilisateur
+  (`{data_dir}/users/<id>/plans.json`, `{blueprints_dir}/<id>/`) — le chemin
+  *est* le scoping, pas de FK ajoutée aux modèles. Migration one-shot du store
+  global legacy vers le propriétaire (lowest-id user) au démarrage. Tests
+  d'isolation 2-users + migration (162 tests verts, couverture 91 %).
+- **Reste avant exposition publique** : A-05 (E2E auth) + D-03b (push images
+  GHCR). Sans ça, `sfm.ducal.me` reste Tailscale-only.
 - **Dependabot : file vidée** — bumps mineurs/patch mergés (#103/#106/#107/#108/#110
   + autres) ; aucun PR Dependabot ouvert. Bumps **majeurs** (python 3.12→3.14,
   node 22→26, eslint 9→10, lucide 0→1, i18next 25→26) restent à trier manuellement.
@@ -73,7 +78,7 @@ T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
 | A-02  | Alembic baseline migration (table `users`) — remplacer `create_all()` au lifespan     | 2h     | ✅ done | [PR #85](https://github.com/chrysa/satisfactory-factory-manager/pull/85) |
 | A-03  | `/api/v1/auth/me` endpoint + auto-refresh côté frontend                               | 1h     | ✅ done | [PR #88](https://github.com/chrysa/satisfactory-factory-manager/pull/88) |
 | A-04  | Auth **obligatoire** sur `plans` + `blueprints` (`Depends(get_current_user)`) + fixtures tests / 4 fetch frontend / `.sbp` download authentifié / E2E login | 3h | ✅ done | router deps + tests 401/200 |
-| A-04b | Scoping réel par `user_id` : `user_id` dans models plan/blueprint + storage par user + filtrage service | 4h | todo | [#113](https://github.com/chrysa/satisfactory-factory-manager/issues/113) — dépend A-04 |
+| A-04b | Scoping réel par user : storage partitionné par `user_id` (sous-dossier) + migration du store global legacy + tests d'isolation | 4h | ✅ done | [#113](https://github.com/chrysa/satisfactory-factory-manager/issues/113) — le chemin `users/<id>/` *est* le scoping |
 | A-05  | E2E Playwright : register → login → access plans page (utilise A-04)                  | 2h     | todo    | dépend A-04             |
 | A-06  | Implem réelle Epic Games OAuth (actuellement placeholder)                             | 4h     | todo    | post-V1 si pas d'usage  |
 | A-07  | Audit log côté backoffice — toutes mutations user-scoped                              | 3h     | todo    | dépend A-04             |
@@ -129,7 +134,7 @@ avec auth obligatoire + plans/blueprints scopés par utilisateur.
 ```
 P0 ✅ ──┬→ D-01 ✅ → D-03 ✅ → D-03b 🔴 ┐
         │                              ├→ D-04 → D-05 (T+1 mois) → L9 / L10
-        └→ A-01 ✅ → A-02 ✅ → A-03 ✅ → A-04 ✅ → A-04b 🚧 ─┘
+        └→ A-01 ✅ → A-02 ✅ → A-03 ✅ → A-04 ✅ → A-04b ✅ ─┘
                                   │
                                   └→ A-05 (E2E)  ┐
                                                  ├→ Exposition publique sfm.ducal.me
