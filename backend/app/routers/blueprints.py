@@ -4,9 +4,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
 from app.db.models import User
+from app.db.session import get_session
 from app.dependencies.auth import get_current_user
 from app.models.blueprint import (
     BatchUploadResult,
@@ -16,6 +18,7 @@ from app.models.blueprint import (
     BlueprintTagsUpdate,
     BlueprintUploadResult,
 )
+from app.services import audit_service
 from app.services.blueprint_service import (
     BlueprintDirectoryError,
     BlueprintNotFoundError,
@@ -174,6 +177,7 @@ async def upload_blueprint(
     sbp_file: UploadFile,
     cfg_file: UploadFile | None = None,
     current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ) -> BlueprintUploadResult:
     """
     Upload a blueprint (.sbp required, .sbpcfg optional).
@@ -204,11 +208,22 @@ async def upload_blueprint(
     except BlueprintDirectoryError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    await audit_service.record_event(
+        session,
+        user_id=current_user.id,
+        action="create" if is_new else "update",
+        resource_type="blueprint",
+        resource_id=name,
+    )
     return BlueprintUploadResult(name=name, created=is_new)
 
 
 @router.delete("/{name}", status_code=204)
-async def remove_blueprint(name: str, current_user: User = Depends(get_current_user)) -> None:
+async def remove_blueprint(
+    name: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> None:
     """Delete a blueprint's .sbp and .sbpcfg files."""
     try:
         delete_blueprint(user_blueprints_dir(current_user.id), name)
@@ -216,6 +231,13 @@ async def remove_blueprint(name: str, current_user: User = Depends(get_current_u
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except BlueprintDirectoryError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+    await audit_service.record_event(
+        session,
+        user_id=current_user.id,
+        action="delete",
+        resource_type="blueprint",
+        resource_id=name,
+    )
 
 
 @router.patch("/{name}", response_model=BlueprintRead, status_code=200)
@@ -223,22 +245,42 @@ async def update_blueprint_description(
     name: str,
     body: BlueprintDescriptionUpdate,
     current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ) -> BlueprintRead:
     """Update the description of a blueprint (writes into the .sbpcfg sidecar)."""
     try:
-        return update_description(user_blueprints_dir(current_user.id), name, body.description)
+        result = update_description(user_blueprints_dir(current_user.id), name, body.description)
     except BlueprintNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except BlueprintDirectoryError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+    await audit_service.record_event(
+        session,
+        user_id=current_user.id,
+        action="update",
+        resource_type="blueprint",
+        resource_id=name,
+    )
+    return result
 
 
 @router.patch("/{name}/tags", response_model=BlueprintRead, status_code=200)
 async def update_blueprint_tags(
-    name: str, body: BlueprintTagsUpdate, current_user: User = Depends(get_current_user)
+    name: str,
+    body: BlueprintTagsUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ) -> BlueprintRead:
     """Replace the tag list for a blueprint. Creates or overwrites the .meta.json sidecar."""
     try:
-        return set_tags(user_blueprints_dir(current_user.id), name, body.tags)
+        result = set_tags(user_blueprints_dir(current_user.id), name, body.tags)
     except BlueprintNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    await audit_service.record_event(
+        session,
+        user_id=current_user.id,
+        action="update",
+        resource_type="blueprint",
+        resource_id=name,
+    )
+    return result
