@@ -16,6 +16,28 @@ export interface GraphNodeData extends Record<string, unknown> {
 
 let _counter = 0;
 
+function formatRate(n: number): string {
+  const v = n % 1 === 0 ? String(n) : n.toFixed(2);
+  return `${v}/min`;
+}
+
+// Build a parent → target edge carrying the item flow rate (items/min) as a
+// mid-edge label (T-06 / SFM-13).
+function pushEdge(edges: Edge[], parentId: string, targetId: string, rate: number): void {
+  edges.push({
+    id: `e-${parentId}-${targetId}`,
+    source: parentId,
+    target: targetId,
+    animated: true,
+    label: formatRate(rate),
+    labelStyle: { fill: "var(--color-text-muted, #aaa)", fontSize: 11 },
+    labelBgStyle: { fill: "var(--color-bg, #1a1a1a)", fillOpacity: 0.85 },
+    labelBgPadding: [4, 2],
+    labelBgBorderRadius: 3,
+    style: { stroke: "var(--color-border, #555)" },
+  });
+}
+
 function walkTree(
   node: CalculationNode,
   parentId: string | null,
@@ -26,13 +48,7 @@ function walkTree(
   const existing = visited.get(node.item_id);
   if (existing !== undefined) {
     if (parentId !== null) {
-      edges.push({
-        id: `e-${parentId}-${existing}`,
-        source: parentId,
-        target: existing,
-        animated: true,
-        style: { stroke: "var(--color-border, #555)" },
-      });
+      pushEdge(edges, parentId, existing, node.quantity);
     }
     return existing;
   }
@@ -54,13 +70,7 @@ function walkTree(
   });
 
   if (parentId !== null) {
-    edges.push({
-      id: `e-${parentId}-${id}`,
-      source: parentId,
-      target: id,
-      animated: true,
-      style: { stroke: "var(--color-border, #555)" },
-    });
+    pushEdge(edges, parentId, id, node.quantity);
   }
 
   for (const child of node.children) {
