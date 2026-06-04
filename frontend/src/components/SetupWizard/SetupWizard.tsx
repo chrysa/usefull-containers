@@ -21,7 +21,9 @@ const STEPS_EXISTING = ["backend", "first-plan", "done"] as const;
 
 type Step = (typeof STEPS_NEW)[number];
 
-const DEFAULT_BACKEND_URL = "http://localhost:9009";
+// Default to the app's build-time API URL so the wizard pre-fills the backend
+// the app is wired to (public API in prod, in-network backend in E2E).
+const DEFAULT_BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost:9009";
 
 export default function SetupWizard({
   projectId,

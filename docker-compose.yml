@@ -32,6 +32,6 @@ services:
       backend:
         condition: service_healthy
     ports:
-    - 9109:80
+    - 9109:4173
 volumes:
   blueprints_data: null

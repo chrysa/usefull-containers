@@ -21,7 +21,7 @@ WORKDIR /app
 
 RUN addgroup --system app && adduser --system --ingroup app app
 
-COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=deps /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=deps /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/alembic ./alembic

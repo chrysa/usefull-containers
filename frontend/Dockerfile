@@ -18,6 +18,11 @@ RUN npm run build
 FROM deps AS production
 
 COPY --from=builder /app/dist ./dist
+# `vite preview` reads vite.config.ts at startup for the preview server options
+# (notably preview.allowedHosts). Without it, preview falls back to defaults and
+# rejects requests proxied under a non-localhost Host (Traefik / the `frontend`
+# service name in E2E).
+COPY --from=builder /app/vite.config.ts ./
 
 EXPOSE 4173
 

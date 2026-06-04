@@ -1,0 +1,17 @@
+# Never copy the host's node_modules into the image: the builder stage runs
+# `COPY . .` on top of the deps stage, and a host-built node_modules (e.g. the
+# glibc/darwin rollup binary) would clobber the alpine/musl one installed by
+# `npm ci`, breaking the build with:
+#   Cannot find module @rollup/rollup-linux-x64-musl
+node_modules
+
+# Build artifacts and local-only files — irrelevant to the image build.
+dist
+.vite
+playwright-report
+test-results
+coverage
+*.log
+.env
+.env.*
+.DS_Store

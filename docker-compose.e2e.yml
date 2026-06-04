@@ -5,7 +5,7 @@ services:
       target: production
     environment:
       BLUEPRINTS_DIR: /tmp/blueprints
-      CORS_ORIGINS: '["http://frontend:80", "http://localhost:9109"]'
+      CORS_ORIGINS: '["http://frontend:4173", "http://localhost:9109"]'
     healthcheck:
       interval: 5s
       retries: 12
@@ -21,16 +21,23 @@ services:
     build:
       context: ./frontend
       target: production
+      args:
+        # The SPA calls the API cross-origin (no proxy since the nginx->vite
+        # preview switch). In the compose network the browser runs inside the
+        # playwright container, so the backend is reachable by service name.
+        # Without this, VITE_API_URL is empty and the client falls back to a
+        # relative "/api", which vite preview answers with 404.
+        VITE_API_URL: http://backend:8000
     depends_on:
       backend:
         condition: service_healthy
   playwright:
-    command: "sh -c \"npm ci &&\n       timeout 90 sh -c 'until curl -sf http://frontend:80\
+    command: "sh -c \"npm ci &&\n       timeout 90 sh -c 'until curl -sf http://frontend:4173\
       \ > /dev/null; do sleep 2; done' &&\n       npx playwright test\"\n"
     depends_on:
     - frontend
     environment:
-      BASE_URL: http://frontend:80
+      BASE_URL: http://frontend:4173
       CI: 'true'
     image: mcr.microsoft.com/playwright:v1.52.0-noble
     volumes:
