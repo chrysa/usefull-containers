@@ -226,7 +226,9 @@
       "name_label": "Plan name",
       "name_placeholder": "e.g. Steel Foundry",
       "skip": "Later",
-      "title": "Create your first plan"
+      "title": "Create your first plan",
+      "auth_required": "Sign in to create your first plan — or skip and do it later.",
+      "sign_in": "Sign in"
     },
     "next": "Next",
     "project": {

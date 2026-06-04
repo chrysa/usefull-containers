@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GlobalLoader from "./components/loaders/GlobalLoader";
 import Layout from "./components/layouts/Layout";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import AuthCallback from "./pages/AuthCallback";
 
@@ -24,13 +25,17 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route element={<Layout />}>
+              {/* Public: browsing tools that hold no per-user data. */}
               <Route path="/" element={<Home />} />
-              <Route path="/blueprints" element={<Blueprints />} />
-              <Route path="/blueprints/:name" element={<BlueprintDetail />} />
               <Route path="/gamedata" element={<GameData />} />
               <Route path="/calculator" element={<Calculator />} />
-              <Route path="/plans" element={<Plans />} />
-              <Route path="/plans/:id" element={<PlanDetail />} />
+              {/* Protected: per-user data, auth-mandatory since A-04. */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/blueprints" element={<Blueprints />} />
+                <Route path="/blueprints/:name" element={<BlueprintDetail />} />
+                <Route path="/plans" element={<Plans />} />
+                <Route path="/plans/:id" element={<PlanDetail />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

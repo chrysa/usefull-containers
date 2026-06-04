@@ -63,44 +63,38 @@ test.describe("Setup Wizard", () => {
     await expect(page.getByRole("heading", { name: /All set/i })).toBeVisible();
     await page.getByTestId("setup-finish").click();
 
-    // Wizard closed and navigation happened.
+    // Wizard closed; with the plan skipped we land on the public dashboard
+    // (the /plans route is auth-guarded since A-04 / the login-first model).
     await expect(page.getByTestId("setup-wizard")).toBeHidden();
-    await expect(page).toHaveURL(/\/plans/);
+    await expect(
+      page.getByRole("heading", { name: "Dashboard" }),
+    ).toBeVisible();
   });
 
-  // FIXME: the onboarding wizard creates a plan while unauthenticated, but
-  // A-04 made the plans endpoint auth-mandatory, so the POST returns 401 and
-  // the wizard never reaches the "All set" step. Needs a product decision
-  // (authenticate before/within the wizard, or defer plan creation).
-  test.fixme("creates a plan when a name is provided", async ({ page }) => {
+  // The onboarding wizard runs unauthenticated; A-04 made plans auth-mandatory
+  // and we adopted a login-first model, so the first-plan step offers a sign-in
+  // prompt instead of creating a plan (which would 401). Creating a plan from
+  // the wizard while authenticated is covered indirectly by the plans specs.
+  test("first-plan step prompts sign-in when unauthenticated", async ({
+    page,
+  }) => {
     await page.goto("/");
-    await page.getByTestId("setup-next").click(); // welcome → backend
+    await page.getByTestId("setup-next").click(); // project → backend
 
     const status = page.getByTestId("setup-backend-status");
     await expect(status).toHaveAttribute("data-status", /online|offline/, {
       timeout: 10_000,
     });
-
-    // If backend is offline, skip the create-plan branch — it can't succeed.
-    const backendStatus = await status.getAttribute("data-status");
-    test.skip(
-      backendStatus !== "online",
-      "Backend not online — cannot create a plan",
-    );
-
     await page.getByTestId("setup-next").click(); // backend → first-plan
 
-    const planName = `Setup Wizard Plan ${Date.now()}`;
-    await page.getByTestId("setup-plan-name-input").fill(planName);
-    await page.getByTestId("setup-create-plan").click();
-
-    // After successful creation we land on the "done" step.
-    await expect(page.getByRole("heading", { name: /All set/i })).toBeVisible({
-      timeout: 10_000,
-    });
-    await page.getByTestId("setup-finish").click();
-
-    // Should redirect to the created plan's detail page.
-    await expect(page).toHaveURL(/\/plans\/[^/]+/);
+    await expect(
+      page.getByRole("heading", { name: /Create your first plan/i }),
+    ).toBeVisible();
+    // Unauthenticated: a sign-in prompt replaces the create-plan control.
+    const prompt = page.getByTestId("setup-plan-auth-required");
+    await expect(prompt).toBeVisible();
+    // Scope to the prompt: the header also has a "Sign in" link.
+    await expect(prompt.getByRole("link", { name: /Sign in/i })).toBeVisible();
+    await expect(page.getByTestId("setup-create-plan")).toHaveCount(0);
   });
 });

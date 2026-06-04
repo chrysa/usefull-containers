@@ -77,4 +77,16 @@ test.describe("Auth flow (A-05)", () => {
     await page.goto("/plans");
     await expect(page.getByRole("heading", { name: "Factory Plans" })).toBeVisible();
   });
+
+  test("unauthenticated access to a protected route redirects to /login", async ({
+    page,
+  }) => {
+    await page.goto("/plans");
+    await expect(page).toHaveURL(/\/login$/);
+  });
+
+  test("public routes stay reachable without auth", async ({ page }) => {
+    await page.goto("/calculator");
+    await expect(page).toHaveURL(/\/calculator$/);
+  });
 });

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useHealthQuery } from "../../api/health/queries";
 import { useCreatePlanMutation } from "../../domain/plans/queries";
+import { useAuth } from "../../context/useAuth";
 import styles from "./SetupWizard.module.scss";
 
 interface SetupWizardProps {
@@ -35,6 +36,7 @@ export default function SetupWizard({
   const navigate = useNavigate();
   const health = useHealthQuery();
   const createPlan = useCreatePlanMutation();
+  const { isAuthenticated } = useAuth();
 
   const steps: readonly Step[] = projectId ? STEPS_EXISTING : STEPS_NEW;
   const [step, setStep] = useState<Step>(steps[0]);
@@ -89,7 +91,9 @@ export default function SetupWizard({
     if (createdPlanId) {
       navigate(`/plans/${createdPlanId}`);
     } else {
-      navigate("/plans");
+      // No plan created (e.g. skipped or signed-out): land on the public
+      // dashboard rather than the now auth-guarded /plans.
+      navigate("/");
     }
   };
 
@@ -212,23 +216,35 @@ export default function SetupWizard({
                 {t("setup.first_plan.title")}
               </h3>
               <p className={styles.stepLead}>{t("setup.first_plan.lead")}</p>
-              <div className={styles.field}>
-                <label htmlFor="setup-plan-name">
-                  {t("setup.first_plan.name_label")}
-                </label>
-                <input
-                  id="setup-plan-name"
-                  type="text"
-                  value={planName}
-                  onChange={(e) => setPlanName(e.target.value)}
-                  placeholder={t("setup.first_plan.name_placeholder")}
-                  data-testid="setup-plan-name-input"
-                  autoFocus
-                />
-              </div>
-              {createPlan.isError && (
-                <p className={styles.stepLead} role="alert">
-                  {t("setup.first_plan.error")}
+              {isAuthenticated ? (
+                <>
+                  <div className={styles.field}>
+                    <label htmlFor="setup-plan-name">
+                      {t("setup.first_plan.name_label")}
+                    </label>
+                    <input
+                      id="setup-plan-name"
+                      type="text"
+                      value={planName}
+                      onChange={(e) => setPlanName(e.target.value)}
+                      placeholder={t("setup.first_plan.name_placeholder")}
+                      data-testid="setup-plan-name-input"
+                      autoFocus
+                    />
+                  </div>
+                  {createPlan.isError && (
+                    <p className={styles.stepLead} role="alert">
+                      {t("setup.first_plan.error")}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p
+                  className={styles.stepLead}
+                  data-testid="setup-plan-auth-required"
+                >
+                  {t("setup.first_plan.auth_required")}{" "}
+                  <Link to="/login">{t("setup.first_plan.sign_in")}</Link>
                 </p>
               )}
             </>
@@ -303,17 +319,19 @@ export default function SetupWizard({
               >
                 {t("setup.first_plan.skip")}
               </button>
-              <button
-                type="button"
-                className={`${styles.btn} ${styles.primary}`}
-                onClick={handleCreatePlan}
-                disabled={!planName.trim() || createPlan.isPending}
-                data-testid="setup-create-plan"
-              >
-                {createPlan.isPending
-                  ? t("setup.first_plan.creating")
-                  : t("setup.first_plan.create")}
-              </button>
+              {isAuthenticated && (
+                <button
+                  type="button"
+                  className={`${styles.btn} ${styles.primary}`}
+                  onClick={handleCreatePlan}
+                  disabled={!planName.trim() || createPlan.isPending}
+                  data-testid="setup-create-plan"
+                >
+                  {createPlan.isPending
+                    ? t("setup.first_plan.creating")
+                    : t("setup.first_plan.create")}
+                </button>
+              )}
             </div>
           )}
 
