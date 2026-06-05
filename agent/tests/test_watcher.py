@@ -26,6 +26,7 @@ def config(tmp_path: Path) -> AgentConfig:
 
 # ── _DebounceTimer ────────────────────────────────────────────────────────────
 
+
 def test_debounce_fires_callback() -> None:
     called = threading.Event()
     timer = _DebounceTimer(0.05, called.set)
@@ -62,12 +63,14 @@ def test_debounce_cancel_when_no_timer_is_noop() -> None:
 
 # ── WATCHED_EXTS ──────────────────────────────────────────────────────────────
 
+
 def test_watched_exts_contains_sbp_and_sbpcfg() -> None:
     assert ".sbp" in WATCHED_EXTS
     assert ".sbpcfg" in WATCHED_EXTS
 
 
 # ── BlueprintEventHandler ─────────────────────────────────────────────────────
+
 
 def test_handler_ignores_directory_events(config: AgentConfig) -> None:
     syncer = MagicMock()
@@ -122,6 +125,7 @@ def test_handler_debounces_rapid_events(config: AgentConfig) -> None:
 
 
 # ── BlueprintWatcher ──────────────────────────────────────────────────────────
+
 
 def test_watcher_start_stop(config: AgentConfig) -> None:
     syncer = MagicMock()
