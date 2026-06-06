@@ -1,4 +1,5 @@
 #!make
+# makefile-tier: infra
 ifneq (,)
 	$(error This Makefile requires GNU Make)
 endif
@@ -59,7 +60,6 @@ format: ## Run formatters (ruff + prettier via Docker)
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps backend-test sh -c "ruff format ."
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint sh -c "npm run format"
 
-type-check: typecheck ## Legacy alias
 
 # ─── Tests ────────────────────────────────────────────────────────────────────
 
