@@ -1,6 +1,6 @@
 ---
 default_language_version:
-    python: python3.14
+  python: python3.14
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
@@ -14,8 +14,14 @@ repos:
           - id: check-merge-conflict
           - id: check-added-large-files
           - id: mixed-line-ending
+          - id: check-json
+          - id: detect-private-key
+          - args:
+                - --branch
+                - main
+            id: no-commit-to-branch
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: v0.1.1-92
+      rev: v0.1.1-93
       hooks:
           - id: format-dockerfiles
           - id: dockerfile-no-latest
@@ -32,6 +38,7 @@ repos:
           - id: env-example-sync
           - id: regression-gate
             stages: [pre-push]
+          - id: json-sorter
     - repo: https://github.com/AleksaC/hadolint-py
       rev: v2.14.0
       hooks:
@@ -69,3 +76,7 @@ repos:
           - id: conventional-pre-commit
             stages: [commit-msg]
             args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
+    - repo: https://github.com/gitleaks/gitleaks
+      rev: v8.30.0
+      hooks:
+          - id: gitleaks
