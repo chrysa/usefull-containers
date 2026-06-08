@@ -3,9 +3,11 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.db.models import User
 from app.db.session import get_session
 from app.dependencies.auth import get_current_user
+from app.fixtures import demo_plan, demo_plans
 from app.models.plan import PlanCreate, PlanImport, PlanRead, PlanUpdate
 from app.services import audit_service, plan_service
 from app.services.user_storage import user_data_dir
@@ -19,6 +21,8 @@ router = APIRouter(
 
 @router.get("", response_model=list[PlanRead], summary="List all factory plans")
 def list_plans(current_user: User = Depends(get_current_user)) -> list[PlanRead]:
+    if settings.demo_mode:
+        return demo_plans()
     return plan_service.list_plans(user_data_dir(current_user.id))
 
 
@@ -60,6 +64,11 @@ async def import_plan(
 
 @router.get("/{plan_id}", response_model=PlanRead, summary="Get a plan by ID")
 def get_plan(plan_id: str, current_user: User = Depends(get_current_user)) -> PlanRead:
+    if settings.demo_mode:
+        plan = demo_plan(plan_id)
+        if plan is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
+        return plan
     plan = plan_service.get_plan(user_data_dir(current_user.id), plan_id)
     if plan is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")

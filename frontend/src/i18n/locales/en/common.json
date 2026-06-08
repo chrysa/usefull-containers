@@ -82,6 +82,10 @@
     "view_graph": "Graph view",
     "view_tree": "Tree view"
   },
+  "demo": {
+    "label": "Demo",
+    "message": "Exploring fixture data — no real credentials are used."
+  },
   "error": "An error occurred",
   "gamedata": {
     "count_items": "{{count}} item(s)",

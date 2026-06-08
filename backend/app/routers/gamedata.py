@@ -4,6 +4,11 @@ from fastapi import APIRouter, HTTPException, Query, UploadFile
 
 from app.config import settings
 from app.constants import MAX_GAMEDATA_ZIP_SIZE_BYTES
+from app.fixtures import (
+    demo_gamedata_stats,
+    demo_items_filtered,
+    demo_recipes_filtered,
+)
 from app.models.gamedata import GameDataImportResult, GameDataStats, ItemSummary, RecipeSummary
 from app.services.gamedata_service import (
     GameDataNotFoundError,
@@ -45,6 +50,8 @@ async def import_gamedata(file: UploadFile) -> GameDataImportResult:
 @router.get("/stats", response_model=GameDataStats)
 def gamedata_stats() -> GameDataStats:
     """Return item/recipe counts for the currently imported data set."""
+    if settings.demo_mode:
+        return demo_gamedata_stats()
     return get_stats(settings.gamedata_dir)
 
 
@@ -53,6 +60,8 @@ def gamedata_items(
     q: str = Query(default="", description="Filter by name or id (case-insensitive)"),
 ) -> list[ItemSummary]:
     """List all imported items, optionally filtered by a search query."""
+    if settings.demo_mode:
+        return demo_items_filtered(q)
     try:
         return list_items(settings.gamedata_dir, q)
     except GameDataNotFoundError as exc:
@@ -64,6 +73,8 @@ def gamedata_recipes(
     q: str = Query(default="", description="Filter by name or id (case-insensitive)"),
 ) -> list[RecipeSummary]:
     """List all imported recipes, optionally filtered by a search query."""
+    if settings.demo_mode:
+        return demo_recipes_filtered(q)
     try:
         return list_recipes(settings.gamedata_dir, q)
     except GameDataNotFoundError as exc:

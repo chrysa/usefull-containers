@@ -82,6 +82,10 @@
     "view_graph": "Vue graphe",
     "view_tree": "Vue arbre"
   },
+  "demo": {
+    "label": "Démo",
+    "message": "Données fictives explorées — aucune information réelle n'est utilisée."
+  },
   "error": "Une erreur est survenue",
   "gamedata": {
     "count_items": "{{count}} objet(s)",

@@ -4,6 +4,8 @@ import { http } from "../../api/http/client";
 export interface HealthResponse {
   status: string;
   version: string;
+  /** True when the backend serves fixture data (demo mode). Drives the banner. */
+  demo_mode?: boolean;
 }
 
 export function useHealthQuery() {

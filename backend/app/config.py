@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     # Alembic migrations. Set in tests/conftest.py — never in production.
     test_mode: bool = False
 
+    # Demo mode: the read endpoints serve a coherent set of fixtures and the
+    # auth-gated routers fall back to a demo user, so the whole app is
+    # explorable without a real database, imported game data, or any
+    # credentials. /health reports the flag so the frontend can show a banner.
+    # Off by default; never enable in production.
+    demo_mode: bool = False
+
     # Auth
     jwt_secret_key: str = "change-me-in-production-at-least-32-chars!!"
     steam_api_key: str = ""

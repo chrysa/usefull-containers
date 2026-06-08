@@ -6,10 +6,12 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
 from app.db.models import User
 from app.db.session import get_session
 from app.dependencies.auth import get_current_user
+from app.fixtures import demo_blueprint, demo_blueprints
 from app.models.blueprint import (
     BatchUploadResult,
     BlueprintDescriptionUpdate,
@@ -49,6 +51,9 @@ async def list_all_blueprints(
     current_user: User = Depends(get_current_user),
 ) -> BlueprintList:
     """List all blueprints owned by the current user."""
+    if settings.demo_mode:
+        demo = demo_blueprints()
+        return BlueprintList(blueprints=demo, total=len(demo))
     try:
         blueprints = list_blueprints(user_blueprints_dir(current_user.id))
     except BlueprintDirectoryError as exc:
@@ -81,6 +86,11 @@ async def get_blueprint_detail(
     name: str, current_user: User = Depends(get_current_user)
 ) -> BlueprintRead:
     """Return metadata for a single blueprint."""
+    if settings.demo_mode:
+        bp = demo_blueprint(name)
+        if bp is None:
+            raise HTTPException(status_code=404, detail=f"Blueprint '{name}' not found")
+        return bp
     try:
         return get_blueprint(user_blueprints_dir(current_user.id), name)
     except BlueprintNotFoundError as exc:

@@ -4,11 +4,17 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.db.models import User
 from app.db.session import get_session
 from app.services import auth_service
 
 _bearer = HTTPBearer(auto_error=False)
+
+#: Synthetic user returned by the auth dependencies while demo mode is on, so
+#: the auth-gated routers are reachable without any real credentials. It is
+#: never persisted; the read endpoints serve fixtures instead of real storage.
+DEMO_USER = User(id=0, username="demo", is_active=True)
 
 
 async def get_current_user_optional(
@@ -16,6 +22,8 @@ async def get_current_user_optional(
     session: AsyncSession = Depends(get_session),
 ) -> User | None:
     """Return the authenticated user or None if no valid token is provided."""
+    if settings.demo_mode:
+        return DEMO_USER
     if credentials is None:
         return None
     token_data = auth_service.decode_access_token(credentials.credentials)
