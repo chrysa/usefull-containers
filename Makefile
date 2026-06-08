@@ -1,4 +1,5 @@
 #!make
+# makefile-tier: infra
 ifneq (,)
 	$(error This Makefile requires GNU Make)
 endif
