@@ -6,7 +6,14 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-chrysa-blue?logo=docker)](https://hub.docker.com/u/chrys4)
 
-> A collection of ready-to-use Docker containers for Python code quality, testing, and development tooling.
+> A collection of ready-to-use Docker containers for Python code quality, testing, and application runtime — drop them into any project, no local toolchain to install.
+
+**Who it's for:** Python developers and CI pipelines that want lint/type/security/test tooling and application base images as disposable containers, run against the current working directory (`${PWD}:/app`) instead of being installed on the host.
+
+The repo splits into two groups:
+
+- **Quality & tooling containers** — published to Docker Hub under [`chrys4`](https://hub.docker.com/u/chrys4), run one-shot against your code (black, ruff, mypy, pytest, trivy, …).
+- **Application & runtime containers** — local build images for running apps (Django/DRF, Flask, Alembic migrations, the live-platform dashboard API).
 
 ---
 
@@ -15,6 +22,8 @@
 - [Requirements](#requirements)
 - [Quick Start](#quick-start)
 - [Containers](#containers)
+  - [Quality & tooling](#containers)
+  - [Application & runtime](#application--runtime-containers)
 - [Makefile reference](#makefile-reference)
 - [CI/CD](#cicd)
 - [Contributing](#contributing)
@@ -305,6 +314,73 @@ alias my_yamllint="docker run --rm -ti \
   --name=yamllint \
   --volume ${PWD}:/app \
   chrys4/yamllint:latest"
+```
+
+---
+
+## Application & runtime containers
+
+These are **build images** (not published to Docker Hub). They are defined in the root [`docker-compose.yaml`](docker-compose.yaml) and built locally via `make build service=<name>`. Image names use `${DOCKER_REPO}` from `.env` (defaults to `local`).
+
+| Service | Base Image | Purpose |
+|---|---|---|
+| [django-drf](#django-drf) | `python:3.14-alpine` | Django + Django REST Framework app base (uWSGI, socket-based) |
+| [flask](#flask) | `python:3.14-alpine` | Flask app base (flask-restx, marshmallow, WTForms, uWSGI) |
+| [flask-db-migrations](#flask-db-migrations) | `python:3.14-alpine` | Alembic / SQLAlchemy database migration runner (PostgreSQL) |
+| [live-platform](#live-platform) | `python:3.14-slim` | Real-time operational dashboard — backend API + SSE |
+
+---
+
+### django-drf
+
+Base image for Django + Django REST Framework services. Runs behind uWSGI exposing a Unix socket (`/socket/drf-app.socket`) via the entrypoint `cmd.sh`; the bundled `django-drf-dev` service runs the Django dev server on port `8080` instead.
+
+**Packages:** `django==4.1.7`, `djangorestframework==3.14.0`, `requests==2.28.2`, `uWSGI==2.0.21`
+
+> Note: the built image name is `dango-drf` (matches the source files / `DANGO_DRF_CONTAINER_VERSION`).
+
+```bash
+make build service=django-drf      # build
+make up service=django-drf-dev     # run dev server on :8080
+```
+
+---
+
+### flask
+
+Base image for Flask services, served by uWSGI on port `5000` using `/conf/setup.cfg`.
+
+**Packages:** `flask-restx==0.5.0`, `flask-marshmallow==0.14.0`, `Flask-WTF==0.15.1`, `marshmallow-sqlalchemy==0.26.1`, `wtforms==2.3.3`, `PyYAML==5.4.1`, `requests==2.26.0`, `uwsgi==2.0.19.1`
+
+```bash
+make build service=flask
+```
+
+---
+
+### flask-db-migrations
+
+One-shot container that applies Alembic migrations against a PostgreSQL database. Default command: `alembic -x data=true upgrade head`.
+
+**Packages:** `alembic==1.6.5`, `SQLAlchemy==1.4.22`, `psycopg2==2.9.1`, `PyYAML==6.0.2`
+
+```bash
+make build service=flask-db-migrations
+make up service=flask-db-migrations
+```
+
+---
+
+### live-platform
+
+Real-time operational dashboard backend (REST API + Server-Sent Events) aggregating data from GitHub and Notion. Multi-stage build, runs as non-root, exposes port `7891` with a `/health` healthcheck. Mounts your projects root read-only.
+
+**Environment:** `GITHUB_TOKEN`, `GITHUB_ORGS` (default `chrysa`), `NOTION_TOKEN`, `PORT` (default `7891`), `PROJECTS_ROOT` (default `/projects`)
+
+```bash
+make live-platform-build           # build
+make live-platform-up              # start on :7891 (detached)
+make live-platform-logs            # follow logs
 ```
 
 ---
