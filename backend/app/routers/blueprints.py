@@ -10,13 +10,15 @@ from app.config import settings
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
 from app.db.models import User
 from app.db.session import get_session
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user, get_sync_user
 from app.fixtures import demo_blueprint, demo_blueprints
 from app.models.blueprint import (
     BatchUploadResult,
     BlueprintDescriptionUpdate,
     BlueprintList,
     BlueprintRead,
+    BlueprintSyncRequest,
+    BlueprintSyncResponse,
     BlueprintTagsUpdate,
     BlueprintUploadResult,
 )
@@ -26,6 +28,7 @@ from app.services.blueprint_service import (
     BlueprintNotFoundError,
     InvalidZipError,
     build_blueprints_zip,
+    compute_sync_diff,
     delete_blueprint,
     extract_zip_to_batch,
     get_blueprint,
@@ -44,6 +47,48 @@ router = APIRouter(
     tags=["blueprints"],
     dependencies=[Depends(get_current_user)],
 )
+
+# Separate router for the headless sync endpoint: it must accept the agent key
+# *or* a JWT, so it can't inherit the JWT-only router-level dependency above.
+sync_router = APIRouter(prefix="/blueprints", tags=["blueprints"])
+
+
+@sync_router.post("/sync", response_model=BlueprintSyncResponse, status_code=200)
+async def sync_blueprints(
+    body: BlueprintSyncRequest,
+    current_user: User = Depends(get_sync_user),
+    session: AsyncSession = Depends(get_session),
+) -> BlueprintSyncResponse:
+    """Reconcile the agent's local blueprint inventory with the server store.
+
+    Returns the names the agent must upload, and deletes server-side any
+    blueprint the agent no longer has locally (game-authoritative), reporting
+    those in ``to_delete``. A no-op in demo mode (fixtures are never mutated).
+    """
+    if settings.demo_mode:
+        return BlueprintSyncResponse()
+
+    blueprints_dir = user_blueprints_dir(current_user.id)
+    diff = compute_sync_diff(blueprints_dir, body.blueprints)
+
+    deleted: list[str] = []
+    for name in diff.to_delete:
+        try:
+            delete_blueprint(blueprints_dir, name)
+        except BlueprintNotFoundError:
+            continue
+        except BlueprintDirectoryError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+        await audit_service.record_event(
+            session,
+            user_id=current_user.id,
+            action="delete",
+            resource_type="blueprint",
+            resource_id=name,
+        )
+        deleted.append(name)
+
+    return BlueprintSyncResponse(to_upload=diff.to_upload, to_delete=deleted)
 
 
 @router.get("", response_model=BlueprintList, status_code=200)

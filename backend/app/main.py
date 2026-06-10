@@ -39,6 +39,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(blueprints.router, prefix=API_PREFIX)
+    app.include_router(blueprints.sync_router, prefix=API_PREFIX)
     app.include_router(gamedata.router, prefix=API_PREFIX)
     app.include_router(plans.router, prefix=API_PREFIX)
     app.include_router(assistant.router, prefix=API_PREFIX)

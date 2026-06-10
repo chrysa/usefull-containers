@@ -1,8 +1,15 @@
 # sfm-agent
 
 Local sync daemon for **Satisfactory Factory Manager**. It watches your
-Satisfactory blueprints folder and keeps it in sync (bidirectionally) with the
-hub. Runs on **Windows** (desktop PC) and **Steam Deck** / Linux.
+Satisfactory blueprints folder and mirrors it to the hub: the local game folder
+is authoritative, so a blueprint you add in-game is uploaded within ~2s, and one
+you delete in-game is removed from the hub. Runs on **Windows** (desktop PC) and
+**Steam Deck** / Linux.
+
+Sync uses the hub's delta endpoint (`POST /api/v1/blueprints/sync`): the agent
+sends its local inventory, the hub answers with the blueprints to upload and the
+ones it deleted (gone locally). Against an older hub without that endpoint, the
+agent falls back to the legacy bidirectional list-and-diff sync.
 
 ## Install
 
@@ -38,19 +45,38 @@ sfm-agent detect
 
 ```bash
 # Long-running daemon: initial sync + file watcher + periodic poll
-sfm-agent start --hub https://sfm.ducal.me            # dir auto-detected
+sfm-agent start --hub https://sfm.ducal.me --key <agent-key>   # dir auto-detected
 sfm-agent start --hub https://sfm.ducal.me --dir /custom/path --poll 30
 
-# One-shot bidirectional sync, then exit
-sfm-agent sync --hub https://sfm.ducal.me
+# One-shot delta sync (push local changes, mirror deletions), then exit
+sfm-agent sync --hub https://sfm.ducal.me --key <agent-key>
 
-# Hub reachability + blueprint count
+# Connection state + last successful sync time
 sfm-agent status --hub https://sfm.ducal.me
 ```
 
 All options have `SFM_`-prefixed environment-variable equivalents
-(`SFM_HUB_URL`, `SFM_BLUEPRINTS_DIR`, `SFM_POLL_INTERVAL`) and can be set in a
-`.env` file.
+(`SFM_HUB_URL`, `SFM_BLUEPRINTS_DIR`, `SFM_POLL_INTERVAL`, `SFM_API_KEY`) and can
+be set in a `.env` file.
+
+### Authentication
+
+The agent authenticates to the hub with a shared secret sent in the
+`X-SFM-Agent-Key` header. Set it with `--key` or, preferably, `SFM_API_KEY` so
+the secret never lands in your shell history:
+
+```bash
+export SFM_API_KEY="$(cat ~/.config/sfm-agent/key)"
+sfm-agent start --hub https://sfm.ducal.me
+```
+
+The hub side enables this by setting `AGENT_API_KEY` to the same value; the key
+authorises as the owner (first) account. When you store the secret in a `.env`
+or config file, lock it down so only your user can read it:
+
+```bash
+chmod 600 ~/.config/sfm-agent/key   # or the .env file holding SFM_API_KEY
+```
 
 ### Running as a background service
 

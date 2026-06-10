@@ -64,6 +64,7 @@ class AgentConfig(BaseSettings):
     api_prefix: str = "/api/v1"
     state_file: Path = Path(".sfm-agent-state.json")
     debounce_seconds: float = 2.0  # seconds to wait after last file event
+    api_key: str = ""  # shared secret sent as X-SFM-Agent-Key (SFM_API_KEY)
 
     model_config = SettingsConfigDict(env_prefix="SFM_", env_file=".env")
 

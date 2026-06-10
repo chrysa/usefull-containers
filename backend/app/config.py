@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     steam_api_key: str = ""
     frontend_url: str = "http://localhost:5173"
 
+    # Local sync agent (SFM-7a): a shared secret the headless sfm-agent presents
+    # in the X-SFM-Agent-Key header to authenticate against POST /blueprints/sync
+    # without a browser JWT. Empty string disables agent-key auth entirely; the
+    # key then maps to the owner (lowest-id) user. Set via AGENT_API_KEY in prod.
+    agent_api_key: str = ""
+
     # Rate limiting for the auth endpoints (A-08): max requests per window per
     # client IP+route. In-memory, single-instance (see dependencies/rate_limit).
     auth_rate_limit_max: int = 5

@@ -5,6 +5,7 @@ import signal
 import sys
 import threading
 import time
+from datetime import datetime
 from pathlib import Path
 
 import click
@@ -94,13 +95,19 @@ def cli() -> None:
     type=int,
     help="Poll interval (seconds)",
 )
+@click.option(
+    "--key",
+    envvar="SFM_API_KEY",
+    default="",
+    help="Agent API key sent as X-SFM-Agent-Key (or set SFM_API_KEY)",
+)
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logging")
-def start(hub: str, bp_dir: str | None, poll: int, verbose: bool) -> None:
+def start(hub: str, bp_dir: str | None, poll: int, key: str, verbose: bool) -> None:
     """Start the sync daemon (file watcher + periodic poll)."""
     _setup_logging(verbose)
     bp_path = _resolve_bp_dir(bp_dir)
 
-    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, poll_interval=poll)
+    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, poll_interval=poll, api_key=key)
     state = AgentState(cfg.state_file)
 
     console.print("[bold green]sfm-agent starting[/bold green]")
@@ -119,7 +126,7 @@ def start(hub: str, bp_dir: str | None, poll: int, verbose: bool) -> None:
 
     with BlueprintSyncer(cfg, state) as syncer:
         console.print("[cyan]Initial sync...[/cyan]")
-        result = syncer.sync()
+        result = syncer.sync_diff()
         console.print(
             f"  ↑ {len(result.uploaded)} uploaded  "
             f"↓ {len(result.downloaded)} downloaded  "
@@ -133,7 +140,7 @@ def start(hub: str, bp_dir: str | None, poll: int, verbose: bool) -> None:
         try:
             while not stop_event.is_set():
                 if time.monotonic() - last_poll >= poll:
-                    result = syncer.sync()
+                    result = syncer.sync_diff()
                     if result.uploaded or result.downloaded:
                         console.print(
                             f"[cyan]Poll:[/cyan] ↑{len(result.uploaded)} ↓{len(result.downloaded)}"
@@ -149,16 +156,22 @@ def start(hub: str, bp_dir: str | None, poll: int, verbose: bool) -> None:
 @cli.command()
 @click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
 @click.option("--dir", "bp_dir", envvar="SFM_BLUEPRINTS_DIR", default=None, type=click.Path())
+@click.option(
+    "--key",
+    envvar="SFM_API_KEY",
+    default="",
+    help="Agent API key sent as X-SFM-Agent-Key (or set SFM_API_KEY)",
+)
 @click.option("--verbose", "-v", is_flag=True)
-def sync(hub: str, bp_dir: str | None, verbose: bool) -> None:
-    """Run a one-shot bidirectional sync and exit."""
+def sync(hub: str, bp_dir: str | None, key: str, verbose: bool) -> None:
+    """Run a one-shot delta sync (push local changes, mirror deletions) and exit."""
     _setup_logging(verbose)
     bp_path = _resolve_bp_dir(bp_dir)
-    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path)
+    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, api_key=key)
     state = AgentState(cfg.state_file)
 
     with BlueprintSyncer(cfg, state) as syncer:
-        result = syncer.sync()
+        result = syncer.sync_diff()
 
     t = Table(title="Sync result")
     t.add_column("Category", style="bold")
@@ -177,23 +190,25 @@ def sync(hub: str, bp_dir: str | None, verbose: bool) -> None:
 @cli.command()
 @click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
 def status(hub: str) -> None:
-    """Check hub reachability and show blueprint count."""
+    """Report hub connection state and the last successful sync time."""
     try:
         resp = httpx.get(f"{hub}/api/v1/health", timeout=5)
         if resp.status_code == 200:
-            console.print(f"[green]Hub reachable[/green]: {hub}")
+            console.print(f"[green]Connected[/green]: {hub}")
         else:
-            console.print(f"[yellow]Hub HTTP {resp.status_code}[/yellow]")
+            console.print(f"[yellow]Hub HTTP {resp.status_code}[/yellow]: {hub}")
     except httpx.HTTPError as exc:
-        console.print(f"[red]Hub unreachable: {exc}[/red]")
+        console.print(f"[red]Disconnected[/red]: {hub} ({exc})")
         sys.exit(1)
 
-    try:
-        resp = httpx.get(f"{hub}/api/v1/blueprints", timeout=5)
-        data = resp.json()
-        console.print(f"  Blueprints on hub: {data.get('total', '?')}")
-    except (httpx.HTTPError, ValueError):
-        pass
+    # Last sync time: the state file is rewritten after every successful sync, so
+    # its mtime is a reliable "last sync" marker.
+    state_file = AgentConfig().state_file
+    if state_file.exists():
+        ts = datetime.fromtimestamp(state_file.stat().st_mtime).isoformat(timespec="seconds")
+        console.print(f"  Last sync: [cyan]{ts}[/cyan]")
+    else:
+        console.print("  Last sync: [dim]never[/dim]")
 
 
 @cli.command()

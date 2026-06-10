@@ -56,3 +56,25 @@ class SyncResult(BaseModel):
     added: int
     removed: int
     unchanged: int
+
+
+class BlueprintSyncEntry(BaseModel):
+    """One local blueprint as reported by the sfm-agent (SFM-7a)."""
+
+    name: str
+    modified_at: datetime
+    size_bytes: int = Field(0, ge=0)
+
+
+class BlueprintSyncRequest(BaseModel):
+    """The agent's full local blueprint inventory for a sync reconciliation."""
+
+    blueprints: list[BlueprintSyncEntry] = Field(default_factory=list)
+
+
+class BlueprintSyncResponse(BaseModel):
+    """Reconciliation result: names the agent must push, and names the server
+    deleted because they are gone locally (game-authoritative)."""
+
+    to_upload: list[str] = Field(default_factory=list)
+    to_delete: list[str] = Field(default_factory=list)

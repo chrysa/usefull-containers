@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import Depends, HTTPException, status
+import secrets
+
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +12,9 @@ from app.db.session import get_session
 from app.services import auth_service
 
 _bearer = HTTPBearer(auto_error=False)
+
+#: Header the headless sfm-agent uses to present its shared secret (SFM-7a).
+AGENT_KEY_HEADER = "X-SFM-Agent-Key"
 
 #: Synthetic user returned by the auth dependencies while demo mode is on, so
 #: the auth-gated routers are reachable without any real credentials. It is
@@ -46,3 +51,36 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
+
+async def get_sync_user(
+    request: Request,
+    user: User | None = Depends(get_current_user_optional),
+    session: AsyncSession = Depends(get_session),
+) -> User:
+    """Authenticate the blueprint-sync endpoint via a browser JWT *or* the
+    shared agent key.
+
+    A normal JWT (or demo mode) wins first. Otherwise, when ``agent_api_key`` is
+    configured and the ``X-SFM-Agent-Key`` header matches it (constant-time), the
+    request is authorised as the owner (lowest-id) user. Raises HTTP 401 when
+    neither path succeeds.
+    """
+    if user is not None:
+        return user
+
+    api_key = request.headers.get(AGENT_KEY_HEADER)
+    if (
+        settings.agent_api_key
+        and api_key is not None
+        and secrets.compare_digest(api_key, settings.agent_api_key)
+    ):
+        owner = await auth_service.get_first_user(session)
+        if owner is not None:
+            return owner
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not authenticated",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
