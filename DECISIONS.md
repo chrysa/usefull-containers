@@ -42,7 +42,7 @@ built.** V1 (SFM-1→21) delivers:
 - ReactFlow production-chain graph with dagre layout.
 - Factory plans CRUD with target items, duplicate, import/export JSON.
 - Floating AI assistant widget routed through `ai-aggregator`.
-- Local sync agent (SFM-7) **deferred** — not part of V1.
+- Local sync agent (SFM-7) **deferred** — not part of V1. *(Delivered post-V1: see [D-0009](#d-0009--blueprint-sync-in-repo-agent-feeds-the-web-hub-syncthing-stays-separate).)*
 
 Rationale:
 
@@ -218,3 +218,63 @@ component logic, route, or `data-testid` changed.
 
 **Documented deviation.** Genuine circular elements (status dots, pill chips
 using `999px`/`50%`) keep their radius; everything else is radius 0.
+
+## D-0009 — Blueprint sync: in-repo agent feeds the web hub; Syncthing stays separate
+
+**Date**: 2026-06-10
+**Status**: accepted (lifts the "SFM-7 deferred" note in [D-0003](#d-0003--scope-pivot-offline-optimizer-not-live-monitoring))
+
+### Context
+
+Two things sync Satisfactory blueprints in the chrysa portfolio, and they were
+easy to conflate:
+
+1. **BP Sync — Syncthing** (separate Notion project, pivoted 2026-05-15 from a
+   custom hub to Syncthing 3 nodes). It replicates the raw `.sbp`/`.sbpcfg`
+   **files** peer-to-peer between PC, Steam Deck, and a Kimsufi backup node. It is
+   explicitly *independent of satisfactory-factory-manager*: no web UI, no
+   tags/metadata, no awareness of plans or the recipe graph.
+2. **The in-repo sync agent (SFM-7)** — `agent/sfm_agent/`, shipped in PR #146
+   (endpoint + API-key auth) and hardened in PR #148 (empty-inventory guard). It
+   pushes the local blueprint folder **into the factory-manager web hub** via
+   `POST /api/v1/blueprints/sync`, so blueprints surface in `/blueprints` with
+   tags, search, description editing, and the ReactFlow chain view.
+
+The canonical Notion record describes blueprint sync "via Syncthing", which read
+as if the custom agent was redundant. It is not — the two operate at different
+layers.
+
+### Decision
+
+**Keep both; they do not overlap in function.**
+
+- **Syncthing (BP Sync)** owns raw file replication and off-site backup/versioning
+  across machines. It is the source of truth for the `.sbp` files on disk.
+- **The SFM-7 agent** owns ingestion of those on-disk files into the web hub. It
+  is a one-directional mirror (local game folder is authoritative): new/changed
+  blueprints upload, locally-removed ones are pruned server-side. It does **not**
+  attempt cross-machine replication — that is Syncthing's job.
+
+A typical setup runs both: Syncthing keeps the blueprint folder identical on PC
+and Deck; the SFM-7 agent (on whichever machine) feeds that folder into the web
+tool for browsing/tagging/planning.
+
+### Why not fold the agent into Syncthing
+
+Syncthing cannot populate the web hub's per-user store, tag sidecars
+(`.meta.json`), or audit log — it only moves files between Syncthing nodes. The
+web tool's value (search, tags, recipe graph, plans) requires the blueprints to
+exist *in the hub*, which only an HTTP client (the agent, or a manual upload) can
+do.
+
+### Consequences
+
+- The agent is **not** a competitor to Syncthing and must not grow cross-machine
+  P2P features — that scope stays in BP Sync.
+- The agent's mirror semantics are safe by default: an empty/misconfigured local
+  folder never wipes the hub (the `allow_empty_prune` guard, PR #148).
+- Multi-agent / per-key ownership (an `ApiKey` table) is **out of scope** for the
+  single-user deployment; the shared `AGENT_API_KEY` maps to the owner user.
+  Revisit only if multi-user mode is opened (gated by [D-0003](#d-0003--scope-pivot-offline-optimizer-not-live-monitoring)).
+- The Notion canonical record should be read with this split in mind: "via
+  Syncthing" describes file replication, not web-hub ingestion.
