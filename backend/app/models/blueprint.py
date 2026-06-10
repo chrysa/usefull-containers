@@ -70,6 +70,9 @@ class BlueprintSyncRequest(BaseModel):
     """The agent's full local blueprint inventory for a sync reconciliation."""
 
     blueprints: list[BlueprintSyncEntry] = Field(default_factory=list)
+    # Opt-in to pruning the whole hub when the local inventory is empty. Off by
+    # default so a misconfigured/empty blueprints dir can never wipe the server.
+    allow_empty_prune: bool = False
 
 
 class BlueprintSyncResponse(BaseModel):

@@ -11,6 +11,11 @@ sends its local inventory, the hub answers with the blueprints to upload and the
 ones it deleted (gone locally). Against an older hub without that endpoint, the
 agent falls back to the legacy bidirectional list-and-diff sync.
 
+**Safety:** an *empty* local inventory never wipes the hub — if the agent points
+at a wrong or empty folder, the hub keeps its blueprints instead of deleting
+them all. Pruning a hub down to nothing requires the explicit
+`allow_empty_prune` flag on the request.
+
 ## Install
 
 ```bash

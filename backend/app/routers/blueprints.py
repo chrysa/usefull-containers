@@ -69,7 +69,9 @@ async def sync_blueprints(
         return BlueprintSyncResponse()
 
     blueprints_dir = user_blueprints_dir(current_user.id)
-    diff = compute_sync_diff(blueprints_dir, body.blueprints)
+    diff = compute_sync_diff(
+        blueprints_dir, body.blueprints, allow_empty_prune=body.allow_empty_prune
+    )
 
     deleted: list[str] = []
     for name in diff.to_delete:

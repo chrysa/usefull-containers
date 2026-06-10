@@ -50,9 +50,21 @@ class TestComputeSyncDiff:
 
     def test_server_only_blueprint_is_deleted(self, tmp_path: Path) -> None:
         _write_blueprint(tmp_path, "beta")
-        diff = compute_sync_diff(str(tmp_path), [])
+        # allow_empty_prune to bypass the empty-inventory safety guard here.
+        diff = compute_sync_diff(str(tmp_path), [], allow_empty_prune=True)
         assert diff.to_upload == []
         assert diff.to_delete == ["beta"]
+
+    def test_empty_inventory_is_guarded_against_mass_prune(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "alpha")
+        _write_blueprint(tmp_path, "beta")
+        diff = compute_sync_diff(str(tmp_path), [])  # default: guard on
+        assert diff.to_delete == []  # refuses to wipe the populated hub
+
+    def test_empty_inventory_allowed_when_opted_in(self, tmp_path: Path) -> None:
+        _write_blueprint(tmp_path, "alpha")
+        diff = compute_sync_diff(str(tmp_path), [], allow_empty_prune=True)
+        assert diff.to_delete == ["alpha"]
 
     def test_identical_blueprint_is_unchanged(self, tmp_path: Path) -> None:
         _write_blueprint(tmp_path, "gamma")
@@ -176,9 +188,15 @@ class TestSyncEndpointSideEffects:
             _write_blueprint(user_dir, "stale")
             assert (user_dir / "stale.sbp").exists()
 
+            # Local inventory is non-empty (a different blueprint), so the
+            # empty-prune guard stays out of the way and "stale" is reconciled away.
             resp = client.post(
                 "/api/v1/blueprints/sync",
-                json={"blueprints": []},
+                json={
+                    "blueprints": [
+                        {"name": "other", "modified_at": "2026-06-01T12:00:00", "size_bytes": 9}
+                    ]
+                },
                 headers={"X-SFM-Agent-Key": _AGENT_KEY},
             )
             assert resp.status_code == 200, resp.text
@@ -210,5 +228,49 @@ class TestSyncEndpointSideEffects:
             )
             assert resp.status_code == 200, resp.text
             assert resp.json()["to_upload"] == ["fresh"]
+        finally:
+            settings.agent_api_key = ""
+
+    def test_empty_inventory_does_not_wipe_hub_by_default(
+        self, client: TestClient, tmp_path: Path
+    ) -> None:
+        from app.config import settings
+
+        settings.agent_api_key = _AGENT_KEY
+        try:
+            _register(client)  # owner id=1
+            user_dir = tmp_path / "1"
+            _write_blueprint(user_dir, "keep_me")
+
+            resp = client.post(
+                "/api/v1/blueprints/sync",
+                json={"blueprints": []},  # empty inventory (e.g. wrong --dir)
+                headers={"X-SFM-Agent-Key": _AGENT_KEY},
+            )
+            assert resp.status_code == 200, resp.text
+            assert resp.json()["to_delete"] == []
+            assert (user_dir / "keep_me.sbp").exists()  # NOT wiped
+        finally:
+            settings.agent_api_key = ""
+
+    def test_empty_inventory_with_allow_empty_prune_deletes(
+        self, client: TestClient, tmp_path: Path
+    ) -> None:
+        from app.config import settings
+
+        settings.agent_api_key = _AGENT_KEY
+        try:
+            _register(client)
+            user_dir = tmp_path / "1"
+            _write_blueprint(user_dir, "purge_me")
+
+            resp = client.post(
+                "/api/v1/blueprints/sync",
+                json={"blueprints": [], "allow_empty_prune": True},
+                headers={"X-SFM-Agent-Key": _AGENT_KEY},
+            )
+            assert resp.status_code == 200, resp.text
+            assert resp.json()["to_delete"] == ["purge_me"]
+            assert not (user_dir / "purge_me.sbp").exists()
         finally:
             settings.agent_api_key = ""

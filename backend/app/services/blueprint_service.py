@@ -195,7 +195,10 @@ def _as_utc(dt: datetime) -> datetime:
 
 
 def compute_sync_diff(
-    blueprints_dir: str, local_entries: list[BlueprintSyncEntry]
+    blueprints_dir: str,
+    local_entries: list[BlueprintSyncEntry],
+    *,
+    allow_empty_prune: bool = False,
 ) -> SyncDiff:
     """Reconcile the server's stored blueprints against the agent's local list.
 
@@ -206,6 +209,12 @@ def compute_sync_diff(
       the bytes via the existing upload endpoints.
     * ``to_delete`` — present on the server but absent locally. The caller is
       expected to delete these server-side (game-authoritative removal).
+
+    Safety: an empty local inventory against a populated hub is almost always a
+    misconfigured or not-yet-scanned blueprints directory, not a deliberate
+    "delete everything". Such a mass prune is refused unless *allow_empty_prune*
+    is set, so a wrong ``--dir`` can never wipe the hub. (Propagating the removal
+    of your genuine last blueprint then needs the flag or the web UI.)
     """
     server = {bp.name: bp for bp in list_blueprints(blueprints_dir)}
     directory = Path(blueprints_dir)
@@ -225,7 +234,10 @@ def compute_sync_diff(
             if _as_utc(entry.modified_at) > remote_mtime + _MTIME_SLACK:
                 to_upload.append(name)
 
-    to_delete = [name for name in server if name not in local]
+    if not local and server and not allow_empty_prune:
+        to_delete: list[str] = []  # refuse mass wipe from an empty inventory
+    else:
+        to_delete = [name for name in server if name not in local]
     return SyncDiff(to_upload=sorted(to_upload), to_delete=sorted(to_delete))
 
 
