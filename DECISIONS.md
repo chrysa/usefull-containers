@@ -193,3 +193,28 @@ metadata is equivalent for tests since they always start from an empty DB.
 - Production deploy is unchanged for users: migrations run automatically on
   pod start. Rollback uses `alembic downgrade -1` (or a deploy of the
   previous image, which downgrades implicitly).
+
+---
+
+## D-0008 — Frontend visual identity: chrysa "Neon Brutalist" (orange)
+
+**Date**: 2026-06-10
+**Status**: accepted
+
+The factory-manager UI adopts the ecosystem Neon Brutalist design system
+(`shared-standards/docs/DESIGN-SYSTEM.md`): radius 0, 2px FG-colored borders,
+hard offset shadows (`4px 4px 0`, no blur), flat fills, mono-forward (JetBrains
+Mono + Space Grotesk display), one acid accent — **orange `#ff8a00`**.
+
+The re-skin is driven through the SCSS token layer
+(`src/styles/_theme.scss`, `_variables.scss`, `_mixins.scss`, `index.scss`): the
+CSS custom-property names (`--bg`, `--primary`, `--border`, `--radius-*`…) and
+the `html.dark` switch are preserved, so every `*.module.scss` and `@mixin card`
+inherits. Modules that hardcoded radius/blur-shadow/hex were swept onto the
+tokens, and alias tokens (`--color-primary`, `--color-accent`, `--color-danger`,
+`--color-success`…) were added so the modules that referenced those undefined
+names (with literal fallbacks) now resolve to the brutalist palette. No
+component logic, route, or `data-testid` changed.
+
+**Documented deviation.** Genuine circular elements (status dots, pill chips
+using `999px`/`50%`) keep their radius; everything else is radius 0.

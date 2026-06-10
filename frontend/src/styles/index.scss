@@ -9,12 +9,35 @@
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  /* Neon Brutalist: mono-forward UI (fonts loaded via index.html). */
+  font-family: var(--font-mono);
   background: var(--bg);
   color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: var(--border-width) solid var(--primary);
+  outline-offset: 2px;
 }
 
 ::selection {
   background: var(--primary);
-  color: white;
+  color: var(--accent-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

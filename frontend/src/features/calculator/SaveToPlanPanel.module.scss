@@ -1,7 +1,7 @@
 .panel {
   background: var(--color-surface);
   border: 1px solid var(--color-accent, #7c3aed);
-  border-radius: 10px;
+  border-radius: 0;
   padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -32,7 +32,7 @@
   color: var(--color-text-secondary, #888);
   background: var(--color-bg, #0f0f0f);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 0.1rem 0.4rem;
 }
 
@@ -44,7 +44,7 @@
 .modeBtn {
   font-size: 0.85rem;
   padding: 0.3rem 0.75rem;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-text-secondary, #888);
@@ -80,7 +80,7 @@
   flex: 1;
   padding: 0.4rem 0.65rem;
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--color-bg, #0f0f0f);
   color: var(--color-text);
   font-size: 0.875rem;
@@ -98,7 +98,7 @@
 
 .btnSave {
   padding: 0.4rem 1rem;
-  border-radius: 6px;
+  border-radius: 0;
   border: none;
   background: var(--color-accent, #7c3aed);
   color: #fff;

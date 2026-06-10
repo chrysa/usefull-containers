@@ -1,27 +1,55 @@
+/* chrysa "Neon Brutalist" palette (satisfactory-factory-manager accent = orange).
+   Token names preserved so every *.module.scss inherits. Light is the :root
+   default; dark (html.dark) is canonical per spec — both meet WCAG AA. */
+
 :root {
-  --bg: #f4f6f8;
+  --bg: #fafafa;
   --bg-secondary: #ffffff;
   --header-bg: #ffffff;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --surface-hover: #f9fafb;
-  --skeleton-base: #e5e7eb;
-  --skeleton-highlight: #f3f4f6;
+  --text: #0e0e10;
+  --text-muted: #52525b;
+  --border: #0e0e10;
+  --grid: #d4d4d8;
+  --primary: #d97400;
+  --primary-hover: #b35f00;
+  --accent-ink: #ffffff;
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --shadow-color: #0e0e10;
+  --skeleton-base: #e4e4e7;
+  --skeleton-highlight: #f4f4f5;
+
+  /* Aliases — some modules reference these names with hardcoded fallbacks.
+     Map them onto the canonical tokens so they pick up the brutalist palette
+     (resolved per active theme since --primary/--border are theme-scoped). */
+  --color-primary: var(--primary);
+  --color-accent: var(--primary);
+  --color-border: var(--border);
+  --color-text-secondary: var(--text-muted);
+  --color-code-bg: var(--bg);
+  --danger: #dc2626;
+  --success: #15803d;
+  --color-danger: var(--danger);
+  --color-success: var(--success);
 }
 
 html.dark {
-  --bg: #0f1117;
-  --bg-secondary: #1a1d27;
-  --header-bg: #1a1d27;
-  --text: #f3f4f6;
-  --text-muted: #9ca3af;
-  --border: #374151;
-  --primary: #6366f1;
-  --primary-hover: #818cf8;
-  --surface-hover: #1f2937;
-  --skeleton-base: #374151;
-  --skeleton-highlight: #4b5563;
+  --danger: #ff4d4d;
+  --success: #22c55e;
+}
+
+html.dark {
+  --bg: #0e0e10;
+  --bg-secondary: #18181b;
+  --header-bg: #18181b;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --border: #fafafa;
+  --grid: #3f3f46;
+  --primary: #ff8a00;
+  --primary-hover: #ffa333;
+  --accent-ink: #0e0e10;
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --shadow-color: #000000;
+  --skeleton-base: #18181b;
+  --skeleton-highlight: #242428;
 }
