@@ -13,7 +13,7 @@ services:
   backend-test:
     build:
       context: ./backend
-      target: deps
+      target: dev
     command: 'sh -c "pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=xml
       --cov-fail-under=85"
 

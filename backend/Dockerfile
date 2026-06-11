@@ -1,20 +1,26 @@
-# ── Stage 1 : deps ────────────────────────────────────────────────────────────
+# ── Stage 1 : deps (runtime only) ─────────────────────────────────────────────
 FROM python:3.14-slim AS deps
 
 WORKDIR /app
 RUN pip install --no-cache-dir "setuptools>=70" wheel
 
 COPY pyproject.toml .
+RUN pip install --no-cache-dir .
+
+# ── Stage 2 : dev (adds test/lint tooling) ────────────────────────────────────
+# Used by docker-compose.test.yml; never copied into the production image.
+FROM deps AS dev
+
 RUN pip install --no-cache-dir ".[dev]"
 
-# ── Stage 2 : builder ─────────────────────────────────────────────────────────
+# ── Stage 3 : builder ─────────────────────────────────────────────────────────
 FROM deps AS builder
 
 COPY app/ app/
 COPY alembic/ alembic/
 COPY alembic.ini ./
 
-# ── Stage 3 : production ──────────────────────────────────────────────────────
+# ── Stage 4 : production ──────────────────────────────────────────────────────
 FROM python:3.14-slim AS production
 
 WORKDIR /app
