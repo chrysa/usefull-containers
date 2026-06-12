@@ -59,6 +59,7 @@ export default function Layout() {
         onSwitch={handleSwitch}
         onDelete={deleteProject}
         onNewProject={handleNewProject}
+        onRestartSetup={wizard.open}
       />
       <div className={styles.body}>
         <Sidebar />
