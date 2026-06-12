@@ -33,7 +33,7 @@ jobs:
             contents: read
         steps:
             - uses: actions/checkout@v6.0.2
-            - uses: chrysa/github-actions/python-setup@v1.0.12
+            - uses: chrysa/github-actions/python-setup@v1.1.3
               with:
                   python-version: "3.14"
             - uses: pre-commit/action@v3.0.1
