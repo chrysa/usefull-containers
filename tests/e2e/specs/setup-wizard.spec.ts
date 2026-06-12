@@ -53,7 +53,11 @@ test.describe("Setup Wizard", () => {
     });
     await page.getByTestId("setup-next").click();
 
-    // Step 3: first plan — skip to keep the test resilient when the API is unavailable.
+    // Step 3: game data (optional import) — continue without importing.
+    await expect(page.getByTestId("setup-gamedata-status")).toBeVisible();
+    await page.getByTestId("setup-next").click();
+
+    // Step 4: first plan — skip to keep the test resilient when the API is unavailable.
     await expect(
       page.getByRole("heading", { name: /Create your first plan/i }),
     ).toBeVisible();
@@ -85,7 +89,10 @@ test.describe("Setup Wizard", () => {
     await expect(status).toHaveAttribute("data-status", /online|offline/, {
       timeout: 10_000,
     });
-    await page.getByTestId("setup-next").click(); // backend → first-plan
+    await page.getByTestId("setup-next").click(); // backend → game data
+
+    await expect(page.getByTestId("setup-gamedata-status")).toBeVisible();
+    await page.getByTestId("setup-next").click(); // game data → first-plan
 
     await expect(
       page.getByRole("heading", { name: /Create your first plan/i }),

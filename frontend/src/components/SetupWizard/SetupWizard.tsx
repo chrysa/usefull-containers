@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { useHealthQuery } from "../../api/health/queries";
 import { useCreatePlanMutation } from "../../domain/plans/queries";
+import { useGameDataStatsQuery, useImportGameDataMutation } from "../../domain/gamedata/queries";
 import { useAuth } from "../../context/useAuth";
+import { ImportZipButton } from "../../features/gamedata";
 import LanguageSwitcher from "../languages/LanguageSwitcher";
 import styles from "./SetupWizard.module.scss";
 
@@ -17,9 +19,9 @@ interface SetupWizardProps {
 }
 
 /** Steps for a first-time user (no project yet) */
-const STEPS_NEW = ["project", "backend", "first-plan", "done"] as const;
+const STEPS_NEW = ["project", "backend", "gamedata", "first-plan", "done"] as const;
 /** Steps when a project already exists but setup was not completed */
-const STEPS_EXISTING = ["backend", "first-plan", "done"] as const;
+const STEPS_EXISTING = ["backend", "gamedata", "first-plan", "done"] as const;
 
 type Step = (typeof STEPS_NEW)[number];
 
@@ -37,7 +39,12 @@ export default function SetupWizard({
   const navigate = useNavigate();
   const health = useHealthQuery();
   const createPlan = useCreatePlanMutation();
+  const gameStats = useGameDataStatsQuery();
+  const importGameData = useImportGameDataMutation();
   const { isAuthenticated } = useAuth();
+
+  const itemCount = gameStats.data?.item_count ?? 0;
+  const recipeCount = gameStats.data?.recipe_count ?? 0;
 
   const steps: readonly Step[] = projectId ? STEPS_EXISTING : STEPS_NEW;
   const [step, setStep] = useState<Step>(steps[0]);
@@ -214,6 +221,36 @@ export default function SetupWizard({
             </>
           )}
 
+          {step === "gamedata" && (
+            <>
+              <h3 className={styles.stepTitle}>{t("setup.gamedata.title")}</h3>
+              <p className={styles.stepLead}>{t("setup.gamedata.lead")}</p>
+              <div className={styles.statusRow} data-testid="setup-gamedata-status">
+                <span className={styles.statusText}>
+                  {itemCount > 0
+                    ? t("setup.gamedata.loaded", {
+                        items: itemCount,
+                        recipes: recipeCount,
+                      })
+                    : t("setup.gamedata.empty")}
+                </span>
+                <ImportZipButton
+                  onImport={(file) =>
+                    importGameData.mutate(file, {
+                      onSuccess: () => void gameStats.refetch(),
+                    })
+                  }
+                  isImporting={importGameData.isPending}
+                />
+              </div>
+              {importGameData.isError && (
+                <p className={styles.stepLead} role="alert">
+                  {importGameData.error.message}
+                </p>
+              )}
+            </>
+          )}
+
           {step === "first-plan" && (
             <>
               <h3 className={styles.stepTitle}>
@@ -308,6 +345,17 @@ export default function SetupWizard({
               onClick={goNext}
               data-testid="setup-next"
               disabled={healthStatus === "pending"}
+            >
+              {t("setup.next")}
+            </button>
+          )}
+
+          {step === "gamedata" && (
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.primary}`}
+              onClick={goNext}
+              data-testid="setup-next"
             >
               {t("setup.next")}
             </button>

@@ -239,6 +239,12 @@
       "auth_required": "Connectez-vous pour créer votre premier plan — ou passez et faites-le plus tard.",
       "sign_in": "Se connecter"
     },
+    "gamedata": {
+      "title": "Données de jeu",
+      "lead": "Importez les recettes et objets Satisfactory pour que le calculateur puisse planifier la production. Optionnel — vous pourrez aussi l'importer plus tard depuis la page Données de jeu.",
+      "empty": "Aucune donnée de jeu chargée pour l'instant.",
+      "loaded": "{{items}} objets et {{recipes}} recettes chargés."
+    },
     "next": "Suivant",
     "project": {
       "lead": "Donnez un nom à ce projet d'usine et configurez l'adresse du backend.",
