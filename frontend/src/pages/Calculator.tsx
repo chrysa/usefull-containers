@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { useItemsQuery, useRecipesQuery, useGameDataStatsQuery } from "../domain/gamedata/queries";
 import { calculateProduction, flattenRequirements, summarizeMachines } from "../domain/gamedata/calculator";
 import type { CalculationNode } from "../domain/gamedata/calculator";
@@ -127,9 +128,14 @@ export default function CalculatorPage() {
   const itemsQuery = useItemsQuery("", hasData);
   const recipesQuery = useRecipesQuery("", hasData);
 
-  const [targetItemId, setTargetItemId] = useState("");
-  const [quantityRaw, setQuantityRaw] = useState("1");
-  const [submitted, setSubmitted] = useState(false);
+  // Deep-link prefill (W-05): /calculator?item=<id>&qty=<n> opens the calculator
+  // ready to compute that item, so other pages (e.g. Game Data) can link straight in.
+  const [searchParams] = useSearchParams();
+  const [targetItemId, setTargetItemId] = useState(() => searchParams.get("item") ?? "");
+  const [quantityRaw, setQuantityRaw] = useState(() => searchParams.get("qty") ?? "1");
+  // Auto-submit when arriving via a ?item= deep link: the tree memo computes as
+  // soon as game data loads, no effect needed. Manual changes reset it via onChange.
+  const [submitted, setSubmitted] = useState(() => !!searchParams.get("item"));
   const [viewMode, setViewMode] = useState<ViewMode>("tree");
   const [beltTier, setBeltTier] = useState(DEFAULT_BELT_TIER);
   const [pipeTier, setPipeTier] = useState(DEFAULT_PIPE_TIER);

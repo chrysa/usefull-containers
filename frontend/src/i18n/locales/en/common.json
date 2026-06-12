@@ -92,6 +92,7 @@
     "retryNow": "Retry now"
   },
   "gamedata": {
+    "calculate": "Calculate",
     "count_items": "{{count}} item(s)",
     "count_recipes": "{{count}} recipe(s)",
     "empty": "No game data imported yet. Use \"Import ZIP\" to load a Satisfactory Tools export.",
