@@ -87,6 +87,10 @@
     "message": "Données fictives explorées — aucune information réelle n'est utilisée."
   },
   "error": "Une erreur est survenue",
+  "errors": {
+    "backendDisconnected": "Backend injoignable — certaines fonctionnalités sont indisponibles.",
+    "retryNow": "Réessayer"
+  },
   "gamedata": {
     "count_items": "{{count}} objet(s)",
     "count_recipes": "{{count}} recette(s)",

@@ -87,6 +87,10 @@
     "message": "Exploring fixture data — no real credentials are used."
   },
   "error": "An error occurred",
+  "errors": {
+    "backendDisconnected": "Backend unreachable — some features are unavailable.",
+    "retryNow": "Retry now"
+  },
   "gamedata": {
     "count_items": "{{count}} item(s)",
     "count_recipes": "{{count}} recipe(s)",
