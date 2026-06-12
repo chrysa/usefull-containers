@@ -38,6 +38,12 @@
   margin: 0;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .skip {
   background: none;
   border: none;

@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useHealthQuery } from "../../api/health/queries";
 import { useCreatePlanMutation } from "../../domain/plans/queries";
 import { useAuth } from "../../context/useAuth";
+import LanguageSwitcher from "../languages/LanguageSwitcher";
 import styles from "./SetupWizard.module.scss";
 
 interface SetupWizardProps {
@@ -124,14 +125,17 @@ export default function SetupWizard({
           <h2 id="setup-wizard-title" className={styles.title}>
             {t("setup.title")}
           </h2>
-          <button
-            type="button"
-            className={styles.skip}
-            onClick={handleSkip}
-            aria-label={t("setup.skip_aria")}
-          >
-            {t("setup.skip")}
-          </button>
+          <div className={styles.headerActions} data-testid="setup-language">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              className={styles.skip}
+              onClick={handleSkip}
+              aria-label={t("setup.skip_aria")}
+            >
+              {t("setup.skip")}
+            </button>
+          </div>
         </header>
 
         <div className={styles.steps} aria-hidden="true">
