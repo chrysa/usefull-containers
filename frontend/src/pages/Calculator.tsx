@@ -11,6 +11,7 @@ import {
   type TransportRequirement,
 } from "../domain/gamedata/logistics";
 import { sizeVehicles } from "../domain/gamedata/vehicles";
+import { summarizePower } from "../domain/gamedata/power";
 import ProductionGraph from "../features/calculator/ProductionGraph";
 import SaveToPlanPanel from "../features/calculator/SaveToPlanPanel";
 import styles from "./Calculator.module.scss";
@@ -241,6 +242,7 @@ export default function CalculatorPage() {
 
   const flatReqs = useMemo(() => (tree ? flattenRequirements(tree) : []), [tree]);
   const machineSummary = useMemo(() => (tree ? summarizeMachines(tree) : []), [tree]);
+  const powerSummary = useMemo(() => summarizePower(machineSummary), [machineSummary]);
   const targetStackSize = useMemo(
     () => items.find((i) => i.id === targetItemId)?.stack_size ?? 0,
     [items, targetItemId],
@@ -379,6 +381,36 @@ export default function CalculatorPage() {
                   </div>
                 ))}
               </div>
+            </section>
+          )}
+
+          {viewMode === "tree" && powerSummary.entries.length > 0 && (
+            <section className={styles.section}>
+              <h2>{t("calculator.power_title")}</h2>
+              <p className={styles.estimateNote}>{t("calculator.power_clock_note")}</p>
+              <div className={styles.machineGrid}>
+                <div className={`${styles.machineChip} ${styles.powerTotalChip}`}>
+                  <span className={styles.machineChipCount}>
+                    {formatQty(powerSummary.totalMW)} {t("calculator.power_unit_mw")}
+                  </span>
+                  <span className={styles.machineChipName}>{t("calculator.power_total")}</span>
+                </div>
+                {powerSummary.entries.map((e) => (
+                  <div key={e.machine_id} className={styles.machineChip}>
+                    <span className={styles.machineChipCount}>
+                      {e.megawatts === null
+                        ? t("calculator.power_variable")
+                        : `${formatQty(e.megawatts)} ${t("calculator.power_unit_mw")}`}
+                    </span>
+                    <span className={styles.machineChipName}>
+                      {e.machines}× {prettifyMachine(e.machine_id)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {powerSummary.hasUnknown && (
+                <p className={styles.estimateNote}>{t("calculator.power_unknown_note")}</p>
+              )}
             </section>
           )}
 

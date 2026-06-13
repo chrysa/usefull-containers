@@ -273,6 +273,11 @@
   }
 }
 
+.powerTotalChip {
+  border-color: var(--color-accent, #7c3aed);
+  background: color-mix(in srgb, var(--color-accent, #7c3aed) 14%, var(--color-surface, #1e1e2e));
+}
+
 .estimateNote {
   font-size: 0.8rem;
   font-style: italic;
