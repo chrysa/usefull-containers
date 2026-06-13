@@ -1,5 +1,5 @@
 services:
-  backend:
+  api:
     build:
       context: ./backend
       target: production
@@ -31,9 +31,9 @@ services:
         # playwright container, so the backend is reachable by service name.
         # Without this, VITE_API_URL is empty and the client falls back to a
         # relative "/api", which vite preview answers with 404.
-        VITE_API_URL: http://backend:8000
+        VITE_API_URL: http://api:8000
     depends_on:
-      backend:
+      api:
         condition: service_healthy
   playwright:
     command: "sh -c \"npm ci &&\n       timeout 90 sh -c 'until curl -sf http://frontend:4173\

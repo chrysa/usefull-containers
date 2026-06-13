@@ -10,7 +10,7 @@ services:
     volumes:
     - ./agent:/app
     working_dir: /app
-  backend-test:
+  api-test:
     build:
       context: ./backend
       target: dev
