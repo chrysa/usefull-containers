@@ -6,9 +6,8 @@ import zipfile
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
-
 from app.config import settings
+from fastapi.testclient import TestClient
 
 # ---------------------------------------------------------------------------
 # Fixtures

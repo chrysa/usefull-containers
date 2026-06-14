@@ -12,6 +12,7 @@ interface HeaderProps {
   readonly onSwitch: (id: string) => void;
   readonly onDelete: (id: string) => void;
   readonly onNewProject: () => void;
+  readonly onRestartSetup: () => void;
 }
 
 export default function Header({
@@ -20,6 +21,7 @@ export default function Header({
   onSwitch,
   onDelete,
   onNewProject,
+  onRestartSetup,
 }: HeaderProps) {
   const { theme, setTheme, resetToSystem, isOverridden } = useTheme();
   const { user, isAuthenticated, isHydrating, logout } = useAuth();
@@ -58,6 +60,14 @@ export default function Header({
           </button>
         )}
         <LanguageSwitcher />
+        <button
+          onClick={onRestartSetup}
+          title="Restart setup wizard"
+          aria-label="Restart setup wizard"
+          data-testid="restart-setup"
+        >
+          🧭
+        </button>
         {isHydrating ? (
           // Keep the auth slot reserved (no flash of "Sign in" while /auth/me
           // is in flight on first load). aria-busy lets AT users know.

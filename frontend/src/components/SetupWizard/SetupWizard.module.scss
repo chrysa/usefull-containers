@@ -13,8 +13,8 @@
 .modal {
   background: var(--bg-secondary);
   color: var(--text);
-  border-radius: var(--radius-lg, 12px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
   width: 100%;
   max-width: 560px;
   display: flex;
@@ -38,6 +38,12 @@
   margin: 0;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .skip {
   background: none;
   border: none;
@@ -45,7 +51,7 @@
   font-size: var(--font-sm);
   cursor: pointer;
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 0;
 
   &:hover {
     color: var(--text);
@@ -63,7 +69,7 @@
   flex: 1;
   height: 4px;
   background: var(--border, rgba(255, 255, 255, 0.1));
-  border-radius: 2px;
+  border-radius: 0;
   transition: background-color 160ms ease;
 
   &.active {
@@ -111,7 +117,7 @@
     background: var(--bg);
     color: var(--text);
     border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-    border-radius: var(--radius-md, 6px);
+    border-radius: 0;
     padding: var(--space-sm);
     font-size: var(--font-sm);
 
@@ -127,7 +133,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md, 6px);
+  border-radius: 0;
   background: var(--bg);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
 
@@ -148,7 +154,7 @@
   flex-shrink: 0;
 
   &.online {
-    background: #22c55e;
+    background: var(--success);
   }
 
   &.offline {
@@ -201,7 +207,7 @@
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-  border-radius: var(--radius-md, 6px);
+  border-radius: 0;
   padding: var(--space-sm) var(--space-md);
   font-size: var(--font-sm);
   font-weight: 500;

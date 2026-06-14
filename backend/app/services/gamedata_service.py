@@ -158,7 +158,8 @@ def _load_raw(gamedata_dir: str) -> dict[str, Any]:
     path = Path(gamedata_dir) / GAMEDATA_JSON_FILENAME
     if not path.exists():
         raise GameDataNotFoundError("No game data imported yet")
-    return json.loads(path.read_text(encoding="utf-8"))
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return data
 
 
 def get_stats(gamedata_dir: str) -> GameDataStats:

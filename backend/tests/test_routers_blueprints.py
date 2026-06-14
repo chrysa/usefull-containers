@@ -8,6 +8,17 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+# The fake user injected by _build_authed_app(); blueprints are scoped under
+# {blueprints_dir}/{_TEST_USER_ID}/ since A-04b (per-user partitioning).
+_TEST_USER_ID = 1
+
+
+def _user_dir(blueprints_root: Path) -> Path:
+    """Return (and create) the per-user blueprint dir for the fake test user."""
+    d = blueprints_root / str(_TEST_USER_ID)
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
 
 def _write_blueprint(directory: Path, name: str, *, with_cfg: bool = True) -> None:
     (directory / f"{name}.sbp").write_bytes(b"SBP_FAKE_DATA")
@@ -16,26 +27,53 @@ def _write_blueprint(directory: Path, name: str, *, with_cfg: bool = True) -> No
         (directory / f"{name}.sbpcfg").write_text(json.dumps(cfg), encoding="utf-8")
 
 
+def _build_authed_app() -> TestClient:
+    """Create the app with the auth dependency (A-04) bypassed by a fake user.
+
+    These router tests exercise the file-based blueprint behaviour, not auth.
+    """
+    from app.db.models import User
+    from app.db.session import get_session
+    from app.dependencies.auth import get_current_user
+    from app.main import create_app
+
+    app = create_app()
+    app.dependency_overrides[get_current_user] = lambda: User(
+        id=_TEST_USER_ID, username="test-user", is_active=True
+    )
+    # Mutations also write an audit entry (A-07); these file-based tests don't
+    # set up a DB, so swap the session for a no-op.
+    app.dependency_overrides[get_session] = lambda: _NoopSession()
+    return TestClient(app)
+
+
+class _NoopSession:
+    """Stand-in async session: audit writes are no-ops in file-based tests."""
+
+    def add(self, *_args: object, **_kwargs: object) -> None: ...
+
+    async def commit(self) -> None: ...
+
+
 @pytest.fixture
 def patched_client(tmp_path: Path) -> TestClient:
     from app import config as cfg_module
 
     cfg_module.settings.blueprints_dir = str(tmp_path)
-    from app.main import create_app
-
-    return TestClient(create_app())
+    return _build_authed_app()
 
 
 @pytest.fixture
 def populated_client(tmp_path: Path) -> tuple[TestClient, Path]:
-    _write_blueprint(tmp_path, "alpha")
-    _write_blueprint(tmp_path, "beta")
     from app import config as cfg_module
 
     cfg_module.settings.blueprints_dir = str(tmp_path)
-    from app.main import create_app
-
-    return TestClient(create_app()), tmp_path
+    # Blueprints are partitioned per user (A-04b): write into the user's dir and
+    # hand it back so tests assert against the directory the router actually uses.
+    user_dir = _user_dir(tmp_path)
+    _write_blueprint(user_dir, "alpha")
+    _write_blueprint(user_dir, "beta")
+    return _build_authed_app(), user_dir
 
 
 class TestListBlueprintsEndpoint:
@@ -103,7 +141,7 @@ class TestUploadBlueprintEndpoint:
     ) -> None:
         from app import config as cfg_module
 
-        blueprints_dir = Path(cfg_module.settings.blueprints_dir)
+        blueprints_dir = _user_dir(Path(cfg_module.settings.blueprints_dir))
 
         cfg_content = json.dumps({"description": "test"}).encode()
         files = [
@@ -166,8 +204,8 @@ class TestDownloadAllEndpoint:
     ) -> None:
         from app import config as cfg_module
 
-        (tmp_path / "solo.sbp").write_bytes(b"REAL_SBP_BYTES")
         cfg_module.settings.blueprints_dir = str(tmp_path)
+        (_user_dir(tmp_path) / "solo.sbp").write_bytes(b"REAL_SBP_BYTES")
         resp = patched_client.get("/api/v1/blueprints/download-all")
         assert resp.status_code == 200
         zf = zipfile.ZipFile(io.BytesIO(resp.content))
@@ -202,7 +240,7 @@ class TestUploadBatchEndpoint:
         resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
         assert resp.status_code == 207
         assert "iron" in resp.json()["created"]
-        assert (tmp_path / "iron.sbpcfg").exists()
+        assert (_user_dir(tmp_path) / "iron.sbpcfg").exists()
 
     def test_batch_upload_existing_should_report_updated(
         self, populated_client: tuple[TestClient, Path]
@@ -391,10 +429,9 @@ class TestDownloadBlueprintCfgEndpoint:
         from app import config as cfg_module
 
         cfg_module.settings.blueprints_dir = str(tmp_path)
-        (tmp_path / "solo.sbp").write_bytes(b"SBP_FAKE_DATA")
-        from app.main import create_app
+        (_user_dir(tmp_path) / "solo.sbp").write_bytes(b"SBP_FAKE_DATA")
 
-        client = TestClient(create_app())
+        client = _build_authed_app()
         resp = client.get("/api/v1/blueprints/solo/download-cfg")
         assert resp.status_code == 404
 

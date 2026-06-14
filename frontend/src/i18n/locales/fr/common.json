@@ -100,8 +100,17 @@
     "view_graph": "Vue graphe",
     "view_tree": "Vue arbre"
   },
+  "demo": {
+    "label": "Démo",
+    "message": "Données fictives explorées — aucune information réelle n'est utilisée."
+  },
   "error": "Une erreur est survenue",
+  "errors": {
+    "backendDisconnected": "Backend injoignable — certaines fonctionnalités sont indisponibles.",
+    "retryNow": "Réessayer"
+  },
   "gamedata": {
+    "calculate": "Calculer",
     "count_items": "{{count}} objet(s)",
     "count_recipes": "{{count}} recette(s)",
     "empty": "Aucune donnée de jeu importée. Utilisez \"Importer un ZIP\" pour charger un export Satisfactory Tools.",
@@ -244,7 +253,15 @@
       "name_label": "Nom du plan",
       "name_placeholder": "Ex : Steel Foundry",
       "skip": "Plus tard",
-      "title": "Créer votre premier plan"
+      "title": "Créer votre premier plan",
+      "auth_required": "Connectez-vous pour créer votre premier plan — ou passez et faites-le plus tard.",
+      "sign_in": "Se connecter"
+    },
+    "gamedata": {
+      "title": "Données de jeu",
+      "lead": "Importez les recettes et objets Satisfactory pour que le calculateur puisse planifier la production. Optionnel — vous pourrez aussi l'importer plus tard depuis la page Données de jeu.",
+      "empty": "Aucune donnée de jeu chargée pour l'instant.",
+      "loaded": "{{items}} objets et {{recipes}} recettes chargés."
     },
     "next": "Suivant",
     "project": {

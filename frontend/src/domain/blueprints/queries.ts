@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../api/http/client";
+import { authHeaders } from "../auth/store";
+import { downloadAuthedFile } from "./download";
 import type { BatchUploadResult, Blueprint, BlueprintDescriptionUpdate, BlueprintList, BlueprintTagsUpdate, BlueprintUploadResult } from "./types";
 
 const QUERY_KEY = "blueprints";
@@ -26,6 +28,7 @@ export function useUploadBlueprintMutation() {
     mutationFn: async (formData: FormData) => {
       const res = await fetch("/api/v1/blueprints", {
         method: "POST",
+        headers: { ...authHeaders() },
         body: formData,
       });
       if (!res.ok) throw new Error(`Upload failed: HTTP ${res.status}`);
@@ -46,19 +49,8 @@ export function useDeleteBlueprintMutation() {
 
 export function useDownloadAllBlueprints() {
   return useMutation<void, Error, void>({
-    mutationFn: async () => {
-      const res = await fetch("/api/v1/blueprints/download-all");
-      if (!res.ok) throw new Error(`Download failed: HTTP ${res.status}`);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "blueprints.zip";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    },
+    mutationFn: () =>
+      downloadAuthedFile("/api/v1/blueprints/download-all", "blueprints.zip"),
   });
 }
 
@@ -72,6 +64,7 @@ export function useBatchUploadMutation() {
       });
       const res = await fetch("/api/v1/blueprints/upload-batch", {
         method: "POST",
+        headers: { ...authHeaders() },
         body: formData,
       });
       if (!res.ok) throw new Error(`Batch upload failed: HTTP ${res.status}`);
@@ -89,6 +82,7 @@ export function useImportZipMutation() {
       formData.append("zip_file", file, file.name);
       const res = await fetch("/api/v1/blueprints/import-zip", {
         method: "POST",
+        headers: { ...authHeaders() },
         body: formData,
       });
       if (!res.ok) throw new Error(`Import failed: HTTP ${res.status}`);

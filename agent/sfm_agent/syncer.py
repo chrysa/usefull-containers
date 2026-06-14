@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -29,7 +30,8 @@ class BlueprintSyncer:
     def __init__(self, config: AgentConfig, state: AgentState) -> None:
         self._cfg = config
         self._state = state
-        self._client = httpx.Client(base_url=config.api_base, timeout=30)
+        headers = {"X-SFM-Agent-Key": config.api_key} if config.api_key else {}
+        self._client = httpx.Client(base_url=config.api_base, timeout=30, headers=headers)
 
     def close(self) -> None:
         self._client.close()
@@ -139,5 +141,64 @@ class BlueprintSyncer:
                 result.downloaded.append(name)
             else:
                 result.errors.append(f"download:{name}")
+
+        return result
+
+    # ── Delta sync (SFM-7a) ─────────────────────────────────────────────────────
+
+    def _local_inventory(self, bp_dir: Path) -> list[dict]:
+        """Snapshot every local .sbp as {name, modified_at, size_bytes}."""
+        inventory: list[dict] = []
+        for sbp in sorted(bp_dir.glob("*.sbp")):
+            stat = sbp.stat()
+            mtime = datetime.fromtimestamp(stat.st_mtime, tz=UTC).isoformat()
+            inventory.append(
+                {
+                    "name": sbp.stem,
+                    "modified_at": mtime,
+                    "size_bytes": stat.st_size,
+                }
+            )
+        return inventory
+
+    def sync_diff(self) -> SyncResult:
+        """Push/mirror sync via the server-side delta endpoint (SFM-7a).
+
+        The local game folder is authoritative: the hub returns which blueprints
+        to upload and which it deleted (because they are gone locally). Falls back
+        to the legacy bidirectional :meth:`sync` when the hub has no ``/sync``
+        endpoint (HTTP 404).
+        """
+        result = SyncResult()
+        bp_dir = self._cfg.blueprints_dir
+        inventory = self._local_inventory(bp_dir)
+
+        try:
+            resp = self._client.post("/blueprints/sync", json={"blueprints": inventory})
+            resp.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                log.info("Hub has no /blueprints/sync — using legacy sync")
+                return self.sync()
+            log.error("sync_diff failed: %s", exc)
+            result.errors.append(f"sync:{exc}")
+            return result
+        except httpx.HTTPError as exc:
+            log.error("Cannot reach hub: %s", exc)
+            result.errors.append(f"sync:{exc}")
+            return result
+
+        data = resp.json()
+        for name in data.get("to_upload", []):
+            if self.upload_blueprint(name, bp_dir):
+                result.uploaded.append(name)
+            else:
+                result.errors.append(f"upload:{name}")
+
+        # to_delete are blueprints the hub removed because they are already gone
+        # locally — no local action needed, but drop any stale state entry.
+        for name in data.get("to_delete", []):
+            self._state.remove(name)
+        self._state.save()
 
         return result

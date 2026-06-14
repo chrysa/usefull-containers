@@ -1,27 +1,33 @@
-# ── Stage 1 : deps ────────────────────────────────────────────────────────────
-FROM python:3.12-slim AS deps
+# ── Stage 1 : deps (runtime only) ─────────────────────────────────────────────
+FROM python:3.14-slim AS deps
 
 WORKDIR /app
 RUN pip install --no-cache-dir "setuptools>=70" wheel
 
 COPY pyproject.toml .
+RUN pip install --no-cache-dir .
+
+# ── Stage 2 : dev (adds test/lint tooling) ────────────────────────────────────
+# Used by docker-compose.test.yml; never copied into the production image.
+FROM deps AS dev
+
 RUN pip install --no-cache-dir ".[dev]"
 
-# ── Stage 2 : builder ─────────────────────────────────────────────────────────
+# ── Stage 3 : builder ─────────────────────────────────────────────────────────
 FROM deps AS builder
 
 COPY app/ app/
 COPY alembic/ alembic/
 COPY alembic.ini ./
 
-# ── Stage 3 : production ──────────────────────────────────────────────────────
-FROM python:3.12-slim AS production
+# ── Stage 4 : production ──────────────────────────────────────────────────────
+FROM python:3.14-slim AS production
 
 WORKDIR /app
 
 RUN addgroup --system app && adduser --system --ingroup app app
 
-COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=deps /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=deps /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/alembic ./alembic

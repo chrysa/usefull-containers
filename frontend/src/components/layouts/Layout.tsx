@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import DemoBanner from "./DemoBanner";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import AssistantWidget from "../Assistant/AssistantWidget";
@@ -51,12 +52,14 @@ export default function Layout() {
 
   return (
     <div className={styles.layout}>
+      <DemoBanner />
       <Header
         projects={projects}
         activeProject={activeProject}
         onSwitch={handleSwitch}
         onDelete={deleteProject}
         onNewProject={handleNewProject}
+        onRestartSetup={wizard.open}
       />
       <div className={styles.body}>
         <Sidebar />

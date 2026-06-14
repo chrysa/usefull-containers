@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import styles from "./Login.module.scss";
 
@@ -14,6 +14,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login, register, loginWithSteam } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Where to return after a successful auth: the path the ProtectedRoute
+  // bounced us from, or the dashboard.
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
 
   const backendUrl = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -27,7 +31,7 @@ export default function Login() {
       } else {
         await register(username, password);
       }
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed");
     } finally {

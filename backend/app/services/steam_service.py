@@ -16,6 +16,7 @@ _STEAM_API_BASE = "https://api.steampowered.com"
 
 # ─── OpenID 2.0 helpers ──────────────────────────────────────────────────────
 
+
 def build_steam_openid_url(callback_url: str) -> str:
     """Build the URL to redirect the user to Steam's OpenID login page."""
     params = {
@@ -63,6 +64,7 @@ async def verify_steam_openid(params: dict[str, str]) -> str | None:
 
 # ─── Steam Web API ───────────────────────────────────────────────────────────
 
+
 async def get_player_summary(steam_id: str) -> dict[str, Any] | None:
     """Fetch basic Steam profile for one user (GetPlayerSummaries)."""
     api_key = settings.steam_api_key
@@ -87,8 +89,14 @@ async def get_satisfactory_stats(steam_id: str) -> dict[str, Any]:
     """
     api_key = settings.steam_api_key
     if not api_key:
-        return {"owned": False, "playtime_forever_minutes": 0, "playtime_2weeks_minutes": None,
-                "achievements_total": 0, "achievements_unlocked": 0, "achievement_percentage": 0.0}
+        return {
+            "owned": False,
+            "playtime_forever_minutes": 0,
+            "playtime_2weeks_minutes": None,
+            "achievements_total": 0,
+            "achievements_unlocked": 0,
+            "achievement_percentage": 0.0,
+        }
 
     result: dict[str, Any] = {
         "owned": False,
@@ -133,8 +141,8 @@ async def get_satisfactory_stats(steam_id: str) -> dict[str, Any]:
         )
         if ach_resp.is_success:
             ach_data: dict[str, Any] = ach_resp.json()
-            achievements: list[dict[str, Any]] = (
-                ach_data.get("playerstats", {}).get("achievements", [])
+            achievements: list[dict[str, Any]] = ach_data.get("playerstats", {}).get(
+                "achievements", []
             )
             total = len(achievements)
             unlocked = sum(1 for a in achievements if a.get("achieved") == 1)

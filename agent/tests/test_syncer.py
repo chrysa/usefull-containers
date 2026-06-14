@@ -10,7 +10,6 @@ from sfm_agent.config import AgentConfig
 from sfm_agent.state import AgentState
 from sfm_agent.syncer import BlueprintSyncer, SyncResult
 
-
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
 

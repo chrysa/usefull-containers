@@ -16,19 +16,19 @@
   justify-content: space-between;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   background: var(--bg-secondary);
   border-left: 4px solid transparent;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   pointer-events: auto;
   animation: slide-in 200ms ease;
 
   &.success {
-    border-left-color: #22c55e;
+    border-left-color: var(--success);
   }
 
   &.error {
-    border-left-color: #ef4444;
+    border-left-color: var(--danger);
   }
 
   &.info {

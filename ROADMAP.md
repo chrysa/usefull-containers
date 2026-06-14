@@ -4,19 +4,32 @@
 > [🏭 satisfactory-factory-manager](https://www.notion.so/35359293e35e81248b86ea438ce52995).
 > Source de vérité ticket-level : issues + PRs GitHub.
 >
-> Last updated: 2026-05-30 (auth feature added + sequencing revised).
+> Last updated: 2026-06-04 (A-04b per-user scoping implemented; only A-05 left before public exposure).
 
-## Statut actuel (2026-05-30)
+## Statut actuel (2026-06-04)
 
-- **V1 feature-complete** (SFM-1 → SFM-21). 55+ PRs mergés sur `main`.
+- **V1 feature-complete** (SFM-1 → SFM-21). 90+ PRs mergés sur `main` (`cca81c7`).
 - **PR #80 mergée** — nginx→vite preview + multi-project support (localStorage).
 - E2E suite : **23/23 passed** (après PR #68 — SFM-22 clôturée).
 - CI org-billing blocked → merges via `gh pr merge --admin`.
 - Gate V1 (3 sessions actionnables) : **en attente déploiement** — ArgoCD appset prêt, images GHCR à pusher (besoin PAT `write:packages`).
 - **Blocker images GHCR** : token actuel manque `write:packages` → créer un PAT et pusher manuellement ou débloquer la billing CI.
-- **NOUVEAU — Auth en cours** sur `feat/auth-local-steam` (4 commits, 1461 LoC, tests + lint verts) :
-  local auth + Steam OpenID + Epic placeholder. Pas encore PR-isé.
-  → bloque maintenant le déploiement public (sans auth, sfm.ducal.me ne peut pas être exposé hors Tailscale).
+- **Auth livrée** : A-01 (#81 local + Steam OpenID + Epic placeholder), A-02 (#85
+  Alembic baseline, fin de `create_all()` au lifespan), A-03 (#88 `/auth/me` +
+  auto-refresh / 401 logout) sont **mergés sur `main`**. La branche
+  `feat/auth-local-steam` est obsolète (squash-mergée).
+- **A-04 mergée (#117)** : auth **obligatoire** sur `plans` + `blueprints`
+  (router `Depends(get_current_user)` + tests 401/200, couverture 91 %).
+- **A-04b implémentée** : storage partitionné par utilisateur
+  (`{data_dir}/users/<id>/plans.json`, `{blueprints_dir}/<id>/`) — le chemin
+  *est* le scoping, pas de FK ajoutée aux modèles. Migration one-shot du store
+  global legacy vers le propriétaire (lowest-id user) au démarrage. Tests
+  d'isolation 2-users + migration (162 tests verts, couverture 91 %).
+- **Reste avant exposition publique** : A-05 (E2E auth) + D-03b (push images
+  GHCR). Sans ça, `sfm.ducal.me` reste Tailscale-only.
+- **Dependabot : file vidée** — bumps mineurs/patch mergés (#103/#106/#107/#108/#110
+  + autres) ; aucun PR Dependabot ouvert. Bumps **majeurs** (python 3.12→3.14,
+  node 22→26, eslint 9→10, lucide 0→1, i18next 25→26) restent à trier manuellement.
 
 ---
 
@@ -61,10 +74,11 @@ T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
 
 | ID    | Tâche                                                                                 | Effort | État    | Lien                    |
 |-------|---------------------------------------------------------------------------------------|--------|---------|-------------------------|
-| A-01  | PR-iser + merger `feat/auth-local-steam` (local + Steam OpenID + Epic placeholder)    | 30min  | open    | branche prête           |
-| A-02  | Alembic baseline migration (table `users`) — remplacer `create_all()` au lifespan     | 2h     | todo    | ADR à créer (cf. T-07)  |
-| A-03  | `/api/v1/auth/me` endpoint + auto-refresh côté frontend                               | 1h     | todo    | dépend A-01             |
-| A-04  | Protéger endpoints `plans` + `blueprints` avec `Depends(get_current_user)`            | 2h     | todo    | dépend A-03             |
+| A-01  | PR-iser + merger `feat/auth-local-steam` (local + Steam OpenID + Epic placeholder)    | 30min  | ✅ done | [PR #81](https://github.com/chrysa/satisfactory-factory-manager/pull/81) |
+| A-02  | Alembic baseline migration (table `users`) — remplacer `create_all()` au lifespan     | 2h     | ✅ done | [PR #85](https://github.com/chrysa/satisfactory-factory-manager/pull/85) |
+| A-03  | `/api/v1/auth/me` endpoint + auto-refresh côté frontend                               | 1h     | ✅ done | [PR #88](https://github.com/chrysa/satisfactory-factory-manager/pull/88) |
+| A-04  | Auth **obligatoire** sur `plans` + `blueprints` (`Depends(get_current_user)`) + fixtures tests / 4 fetch frontend / `.sbp` download authentifié / E2E login | 3h | ✅ done | router deps + tests 401/200 |
+| A-04b | Scoping réel par user : storage partitionné par `user_id` (sous-dossier) + migration du store global legacy + tests d'isolation | 4h | ✅ done | [#113](https://github.com/chrysa/satisfactory-factory-manager/issues/113) — le chemin `users/<id>/` *est* le scoping |
 | A-05  | E2E Playwright : register → login → access plans page (utilise A-04)                  | 2h     | todo    | dépend A-04             |
 | A-06  | Implem réelle Epic Games OAuth (actuellement placeholder)                             | 4h     | todo    | post-V1 si pas d'usage  |
 | A-07  | Audit log côté backoffice — toutes mutations user-scoped                              | 3h     | todo    | dépend A-04             |
@@ -120,7 +134,7 @@ avec auth obligatoire + plans/blueprints scopés par utilisateur.
 ```
 P0 ✅ ──┬→ D-01 ✅ → D-03 ✅ → D-03b 🔴 ┐
         │                              ├→ D-04 → D-05 (T+1 mois) → L9 / L10
-        └→ A-01 → A-02 → A-03 → A-04 ─┘
+        └→ A-01 ✅ → A-02 ✅ → A-03 ✅ → A-04 ✅ → A-04b ✅ ─┘
                                   │
                                   └→ A-05 (E2E)  ┐
                                                  ├→ Exposition publique sfm.ducal.me
@@ -139,14 +153,19 @@ n'est pas le cas, le déploiement reste Tailscale-only.
 
 **Règle 1+2** : 1 chantier principal, max 2 chantiers secondaires en parallèle.
 
-### Principal — A-01 PR-iser feat/auth-local-steam (30min)
-La branche est mûre, lints + tests verts, 4 commits propres. Push + PR + merge,
-sinon le diff périme et le rebase devient coûteux.
+### Principal — A-04 Auth obligatoire sur plans + blueprints (3h)
+A-01/A-02/A-03 sont mergés. Le dernier verrou code avant exposition publique est
+A-04 : ajouter `Depends(get_current_user)` aux routers `plans` + `blueprints`,
+puis réparer la casse identifiée (recon 2026-06-03) :
+- backend : fixture `authenticated_client` dans `conftest.py` (≈90 tests à recâbler) ;
+- frontend : 4 mutations en `fetch()` brut sans header Auth
+  (`domain/blueprints/queries.ts` upload / download-all / batch / import-zip) ;
+- E2E : ajouter un login (register → token → `localStorage`) avant navigation.
+Le **scoping réel par user** est sorti en A-04b (refactor services + storage).
 
-### Secondaire #1 — A-02 Alembic baseline migration (2h)
-`create_all()` au lifespan est fatal en prod (cf. discordium D-0005). À traiter
-avant de toucher au schéma `users` ou d'exposer la table à un vrai utilisateur.
-ADR-004 (T-07) en sortie.
+### Secondaire #1 — A-04b scoping par user_id (4h, après A-04)
+Sans `user_id`, tout utilisateur authentifié voit/modifie les plans de tous.
+Acceptable en V1 Tailscale, **bloquant pour l'exposition publique multi-user**.
 
 ### Secondaire #2 — D-03b débloquer GHCR (15min utilisateur)
 Action humaine : créer un PAT GitHub avec scope `write:packages` :

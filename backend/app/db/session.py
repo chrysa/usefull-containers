@@ -21,6 +21,15 @@ def get_engine() -> object:
     return _engine
 
 
+def get_session_factory() -> async_sessionmaker[AsyncSession]:
+    """Return the session factory for use outside the request lifecycle.
+
+    Used by startup tasks (e.g. the A-04b legacy-store migration) that need a
+    session but are not FastAPI dependencies.
+    """
+    return _session_factory
+
+
 async def init_db() -> None:
     """Run Alembic migrations to head. Call once at application startup.
 
@@ -43,9 +52,8 @@ async def init_db() -> None:
     # Production / dev: run Alembic migrations.
     from pathlib import Path
 
-    from alembic.config import Config
-
     from alembic import command
+    from alembic.config import Config
 
     backend_root = Path(__file__).resolve().parent.parent.parent
     cfg = Config(str(backend_root / "alembic.ini"))

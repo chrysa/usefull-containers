@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useHealthQuery } from "../../api/health/queries";
 import { useCreatePlanMutation } from "../../domain/plans/queries";
+import { useGameDataStatsQuery, useImportGameDataMutation } from "../../domain/gamedata/queries";
+import { useAuth } from "../../context/useAuth";
+import { ImportZipButton } from "../../features/gamedata";
+import LanguageSwitcher from "../languages/LanguageSwitcher";
 import styles from "./SetupWizard.module.scss";
 
 interface SetupWizardProps {
@@ -15,13 +19,15 @@ interface SetupWizardProps {
 }
 
 /** Steps for a first-time user (no project yet) */
-const STEPS_NEW = ["project", "backend", "first-plan", "done"] as const;
+const STEPS_NEW = ["project", "backend", "gamedata", "first-plan", "done"] as const;
 /** Steps when a project already exists but setup was not completed */
-const STEPS_EXISTING = ["backend", "first-plan", "done"] as const;
+const STEPS_EXISTING = ["backend", "gamedata", "first-plan", "done"] as const;
 
 type Step = (typeof STEPS_NEW)[number];
 
-const DEFAULT_BACKEND_URL = "http://localhost:9009";
+// Default to the app's build-time API URL so the wizard pre-fills the backend
+// the app is wired to (public API in prod, in-network backend in E2E).
+const DEFAULT_BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost:9009";
 
 export default function SetupWizard({
   projectId,
@@ -33,6 +39,12 @@ export default function SetupWizard({
   const navigate = useNavigate();
   const health = useHealthQuery();
   const createPlan = useCreatePlanMutation();
+  const gameStats = useGameDataStatsQuery();
+  const importGameData = useImportGameDataMutation();
+  const { isAuthenticated } = useAuth();
+
+  const itemCount = gameStats.data?.item_count ?? 0;
+  const recipeCount = gameStats.data?.recipe_count ?? 0;
 
   const steps: readonly Step[] = projectId ? STEPS_EXISTING : STEPS_NEW;
   const [step, setStep] = useState<Step>(steps[0]);
@@ -87,7 +99,9 @@ export default function SetupWizard({
     if (createdPlanId) {
       navigate(`/plans/${createdPlanId}`);
     } else {
-      navigate("/plans");
+      // No plan created (e.g. skipped or signed-out): land on the public
+      // dashboard rather than the now auth-guarded /plans.
+      navigate("/");
     }
   };
 
@@ -118,14 +132,17 @@ export default function SetupWizard({
           <h2 id="setup-wizard-title" className={styles.title}>
             {t("setup.title")}
           </h2>
-          <button
-            type="button"
-            className={styles.skip}
-            onClick={handleSkip}
-            aria-label={t("setup.skip_aria")}
-          >
-            {t("setup.skip")}
-          </button>
+          <div className={styles.headerActions} data-testid="setup-language">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              className={styles.skip}
+              onClick={handleSkip}
+              aria-label={t("setup.skip_aria")}
+            >
+              {t("setup.skip")}
+            </button>
+          </div>
         </header>
 
         <div className={styles.steps} aria-hidden="true">
@@ -204,29 +221,71 @@ export default function SetupWizard({
             </>
           )}
 
+          {step === "gamedata" && (
+            <>
+              <h3 className={styles.stepTitle}>{t("setup.gamedata.title")}</h3>
+              <p className={styles.stepLead}>{t("setup.gamedata.lead")}</p>
+              <div className={styles.statusRow} data-testid="setup-gamedata-status">
+                <span className={styles.statusText}>
+                  {itemCount > 0
+                    ? t("setup.gamedata.loaded", {
+                        items: itemCount,
+                        recipes: recipeCount,
+                      })
+                    : t("setup.gamedata.empty")}
+                </span>
+                <ImportZipButton
+                  onImport={(file) =>
+                    importGameData.mutate(file, {
+                      onSuccess: () => void gameStats.refetch(),
+                    })
+                  }
+                  isImporting={importGameData.isPending}
+                />
+              </div>
+              {importGameData.isError && (
+                <p className={styles.stepLead} role="alert">
+                  {importGameData.error.message}
+                </p>
+              )}
+            </>
+          )}
+
           {step === "first-plan" && (
             <>
               <h3 className={styles.stepTitle}>
                 {t("setup.first_plan.title")}
               </h3>
               <p className={styles.stepLead}>{t("setup.first_plan.lead")}</p>
-              <div className={styles.field}>
-                <label htmlFor="setup-plan-name">
-                  {t("setup.first_plan.name_label")}
-                </label>
-                <input
-                  id="setup-plan-name"
-                  type="text"
-                  value={planName}
-                  onChange={(e) => setPlanName(e.target.value)}
-                  placeholder={t("setup.first_plan.name_placeholder")}
-                  data-testid="setup-plan-name-input"
-                  autoFocus
-                />
-              </div>
-              {createPlan.isError && (
-                <p className={styles.stepLead} role="alert">
-                  {t("setup.first_plan.error")}
+              {isAuthenticated ? (
+                <>
+                  <div className={styles.field}>
+                    <label htmlFor="setup-plan-name">
+                      {t("setup.first_plan.name_label")}
+                    </label>
+                    <input
+                      id="setup-plan-name"
+                      type="text"
+                      value={planName}
+                      onChange={(e) => setPlanName(e.target.value)}
+                      placeholder={t("setup.first_plan.name_placeholder")}
+                      data-testid="setup-plan-name-input"
+                      autoFocus
+                    />
+                  </div>
+                  {createPlan.isError && (
+                    <p className={styles.stepLead} role="alert">
+                      {t("setup.first_plan.error")}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p
+                  className={styles.stepLead}
+                  data-testid="setup-plan-auth-required"
+                >
+                  {t("setup.first_plan.auth_required")}{" "}
+                  <Link to="/login">{t("setup.first_plan.sign_in")}</Link>
                 </p>
               )}
             </>
@@ -291,6 +350,17 @@ export default function SetupWizard({
             </button>
           )}
 
+          {step === "gamedata" && (
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.primary}`}
+              onClick={goNext}
+              data-testid="setup-next"
+            >
+              {t("setup.next")}
+            </button>
+          )}
+
           {step === "first-plan" && (
             <div className={styles.btnGroup}>
               <button
@@ -301,17 +371,19 @@ export default function SetupWizard({
               >
                 {t("setup.first_plan.skip")}
               </button>
-              <button
-                type="button"
-                className={`${styles.btn} ${styles.primary}`}
-                onClick={handleCreatePlan}
-                disabled={!planName.trim() || createPlan.isPending}
-                data-testid="setup-create-plan"
-              >
-                {createPlan.isPending
-                  ? t("setup.first_plan.creating")
-                  : t("setup.first_plan.create")}
-              </button>
+              {isAuthenticated && (
+                <button
+                  type="button"
+                  className={`${styles.btn} ${styles.primary}`}
+                  onClick={handleCreatePlan}
+                  disabled={!planName.trim() || createPlan.isPending}
+                  data-testid="setup-create-plan"
+                >
+                  {createPlan.isPending
+                    ? t("setup.first_plan.creating")
+                    : t("setup.first_plan.create")}
+                </button>
+              )}
             </div>
           )}
 

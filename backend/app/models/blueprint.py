@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -21,7 +22,7 @@ class BlueprintRead(BaseModel):
     has_cfg: bool
     size_bytes: int = 0
     modified_at: datetime | None = None
-    cfg_raw: dict | None = None  # raw .sbpcfg content
+    cfg_raw: dict[str, Any] | None = None  # raw .sbpcfg content
     tags: list[str] = Field(default_factory=list)
 
 
@@ -55,3 +56,28 @@ class SyncResult(BaseModel):
     added: int
     removed: int
     unchanged: int
+
+
+class BlueprintSyncEntry(BaseModel):
+    """One local blueprint as reported by the sfm-agent (SFM-7a)."""
+
+    name: str
+    modified_at: datetime
+    size_bytes: int = Field(0, ge=0)
+
+
+class BlueprintSyncRequest(BaseModel):
+    """The agent's full local blueprint inventory for a sync reconciliation."""
+
+    blueprints: list[BlueprintSyncEntry] = Field(default_factory=list)
+    # Opt-in to pruning the whole hub when the local inventory is empty. Off by
+    # default so a misconfigured/empty blueprints dir can never wipe the server.
+    allow_empty_prune: bool = False
+
+
+class BlueprintSyncResponse(BaseModel):
+    """Reconciliation result: names the agent must push, and names the server
+    deleted because they are gone locally (game-authoritative)."""
+
+    to_upload: list[str] = Field(default_factory=list)
+    to_delete: list[str] = Field(default_factory=list)

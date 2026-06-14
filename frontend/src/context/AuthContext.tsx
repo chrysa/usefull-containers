@@ -45,10 +45,10 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   // (b) refresh the cached user payload (steam profile, last_login_at, …).
   // A 401 here means the token was revoked/expired → clear it.
   useEffect(() => {
-    if (!stored.token) {
-      setIsHydrating(false);
-      return;
-    }
+    // No token → nothing to revalidate. `isHydrating` already initialises to
+    // false in this case, so we must not call setState synchronously here
+    // (it would trigger a cascading render and is a no-op anyway).
+    if (!stored.token) return;
     let cancelled = false;
     authApi
       .getMe()
