@@ -211,16 +211,14 @@ class TestListRecipes:
     def test_list_recipes_filters_by_name(self, tmp_path: Path) -> None:
         zip_bytes = _make_zip({"items": {}, "recipes": RECIPES_DICT})
         import_gamedata_zip(str(tmp_path), zip_bytes, "data.zip")
-        assert list_recipes(str(tmp_path), query="smelt") == [
-            RecipeSummary(
-                id="Recipe_IngotIron_C",
-                name="Smelt Iron",
-                ingredients=[RecipeIngredient(item_id="Desc_IronOre_C", amount=1.0)],
-                products=[RecipeIngredient(item_id="Desc_IronIngot_C", amount=1.0)],
-                produced_in=["Desc_Smelter_C"],
-                time=2.0,
-            )
-        ]
+        assert list_recipes(str(tmp_path), query="smelt") == [RecipeSummary(
+            id="Recipe_IngotIron_C",
+            name="Smelt Iron",
+            ingredients=[RecipeIngredient(item_id="Desc_IronOre_C", amount=1.0)],
+            products=[RecipeIngredient(item_id="Desc_IronIngot_C", amount=1.0)],
+            produced_in=["Desc_Smelter_C"],
+            time=2.0,
+        )]
 
     def test_list_recipes_raises_when_no_data(self, tmp_path: Path) -> None:
         with pytest.raises(GameDataNotFoundError):
