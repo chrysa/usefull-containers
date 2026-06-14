@@ -11,6 +11,8 @@ import {
   transportRequirement,
   type TransportRequirement,
 } from "../domain/gamedata/logistics";
+import { sizeVehicles } from "../domain/gamedata/vehicles";
+import { summarizePower } from "../domain/gamedata/power";
 import ProductionGraph from "../features/calculator/ProductionGraph";
 import SaveToPlanPanel from "../features/calculator/SaveToPlanPanel";
 import styles from "./Calculator.module.scss";
@@ -118,6 +120,94 @@ function TreeNode({
   );
 }
 
+// ── Vehicle sizing panel (estimate) ───────────────────────────────────────────
+
+function VehiclePanel({
+  rate,
+  stackSize,
+  isFluid,
+}: {
+  readonly rate: number;
+  readonly stackSize: number;
+  readonly isFluid: boolean;
+}) {
+  const { t } = useTranslation();
+  const [roundTripRaw, setRoundTripRaw] = useState("5");
+  const [carsRaw, setCarsRaw] = useState("1");
+
+  const roundTrip = Number.parseFloat(roundTripRaw);
+  const cars = Math.max(1, Math.floor(Number.parseInt(carsRaw, 10) || 1));
+  const validRoundTrip = Number.isFinite(roundTrip) && roundTrip > 0;
+
+  const sizing = useMemo(
+    () => (validRoundTrip ? sizeVehicles(rate, stackSize, roundTrip, isFluid, cars) : []),
+    [rate, stackSize, roundTrip, isFluid, cars, validRoundTrip],
+  );
+
+  const unit = isFluid ? "m³/min" : "/min";
+
+  return (
+    <section className={styles.section}>
+      <h2>{t("calculator.vehicles_title")}</h2>
+      <div className={styles.tierBar}>
+        <div className={styles.tierField}>
+          <label htmlFor="veh-rtt">{t("calculator.round_trip")}</label>
+          <input
+            id="veh-rtt"
+            type="number"
+            min="0.1"
+            step="any"
+            value={roundTripRaw}
+            onChange={(e) => { setRoundTripRaw(e.target.value); }}
+            className={styles.input}
+            style={{ width: "6rem" }}
+          />
+        </div>
+        <div className={styles.tierField}>
+          <label htmlFor="veh-cars">{t("calculator.train_cars")}</label>
+          <input
+            id="veh-cars"
+            type="number"
+            min="1"
+            step="1"
+            value={carsRaw}
+            onChange={(e) => { setCarsRaw(e.target.value); }}
+            className={styles.input}
+            style={{ width: "5rem" }}
+          />
+        </div>
+      </div>
+      <p className={styles.estimateNote}>{t("calculator.vehicles_estimate_note")}</p>
+      {validRoundTrip && (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>{t("calculator.col_vehicle")}</th>
+              <th>{t("calculator.col_throughput")}</th>
+              <th>{t("calculator.col_needed")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sizing.map((v) => (
+              <tr key={v.kind}>
+                <td>{t(`calculator.vehicle_${v.kind}`)}</td>
+                <td className={styles.qtyCell}>
+                  {v.perVehiclePerMin === null
+                    ? "—"
+                    : `${formatQty(v.perVehiclePerMin)} ${unit}`}
+                </td>
+                <td className={styles.qtyCell}>
+                  {v.vehiclesNeeded === null ? t("calculator.vehicles_na") : `×${v.vehiclesNeeded}`}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function CalculatorPage() {
@@ -158,6 +248,11 @@ export default function CalculatorPage() {
 
   const flatReqs = useMemo(() => (tree ? flattenRequirements(tree) : []), [tree]);
   const machineSummary = useMemo(() => (tree ? summarizeMachines(tree) : []), [tree]);
+  const powerSummary = useMemo(() => summarizePower(machineSummary), [machineSummary]);
+  const targetStackSize = useMemo(
+    () => items.find((i) => i.id === targetItemId)?.stack_size ?? 0,
+    [items, targetItemId],
+  );
 
   function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -293,6 +388,44 @@ export default function CalculatorPage() {
                 ))}
               </div>
             </section>
+          )}
+
+          {viewMode === "tree" && powerSummary.entries.length > 0 && (
+            <section className={styles.section}>
+              <h2>{t("calculator.power_title")}</h2>
+              <p className={styles.estimateNote}>{t("calculator.power_clock_note")}</p>
+              <div className={styles.machineGrid}>
+                <div className={`${styles.machineChip} ${styles.powerTotalChip}`}>
+                  <span className={styles.machineChipCount}>
+                    {formatQty(powerSummary.totalMW)} {t("calculator.power_unit_mw")}
+                  </span>
+                  <span className={styles.machineChipName}>{t("calculator.power_total")}</span>
+                </div>
+                {powerSummary.entries.map((e) => (
+                  <div key={e.machine_id} className={styles.machineChip}>
+                    <span className={styles.machineChipCount}>
+                      {e.megawatts === null
+                        ? t("calculator.power_variable")
+                        : `${formatQty(e.megawatts)} ${t("calculator.power_unit_mw")}`}
+                    </span>
+                    <span className={styles.machineChipName}>
+                      {e.machines}× {prettifyMachine(e.machine_id)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {powerSummary.hasUnknown && (
+                <p className={styles.estimateNote}>{t("calculator.power_unknown_note")}</p>
+              )}
+            </section>
+          )}
+
+          {viewMode === "tree" && (
+            <VehiclePanel
+              rate={tree.quantity}
+              stackSize={targetStackSize}
+              isFluid={tree.transport.is_fluid}
+            />
           )}
 
           {viewMode === "tree" && flatReqs.length > 0 && (
