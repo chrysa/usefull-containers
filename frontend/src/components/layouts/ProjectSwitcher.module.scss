@@ -9,7 +9,7 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
   color: var(--text);
-  border-radius: var(--radius-md, 6px);
+  border-radius: 0;
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-sm);
   cursor: pointer;
@@ -48,8 +48,8 @@
   min-width: 240px;
   background: var(--bg-secondary);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-  border-radius: var(--radius-lg, 10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
   z-index: 500;
   overflow: hidden;
   animation: pop-in 120ms ease;

@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
+
 def _register(client: TestClient, username: str, password: str) -> dict:
     resp = client.post(
         "/api/v1/auth/register",
@@ -21,6 +22,7 @@ def _login(client: TestClient, username: str, password: str) -> dict:
 
 
 # ─── Register ─────────────────────────────────────────────────────────────────
+
 
 def test_register_success(client: TestClient) -> None:
     resp = _register(client, "alice", "password123")
@@ -49,6 +51,7 @@ def test_register_invalid_username_chars(client: TestClient) -> None:
 
 # ─── Login ────────────────────────────────────────────────────────────────────
 
+
 def test_login_success(client: TestClient) -> None:
     _register(client, "dave", "mypassword")
     resp = _login(client, "dave", "mypassword")
@@ -68,6 +71,7 @@ def test_login_unknown_user(client: TestClient) -> None:
 
 
 # ─── /me ──────────────────────────────────────────────────────────────────────
+
 
 def test_me_with_valid_token(client: TestClient) -> None:
     _register(client, "frank", "password123")
@@ -90,6 +94,7 @@ def test_me_with_invalid_token(client: TestClient) -> None:
 
 # ─── Steam redirect ───────────────────────────────────────────────────────────
 
+
 def test_steam_login_redirects(client: TestClient) -> None:
     resp = client.get("/api/v1/auth/steam", follow_redirects=False)
     assert resp.status_code == status.HTTP_302_FOUND
@@ -97,6 +102,7 @@ def test_steam_login_redirects(client: TestClient) -> None:
 
 
 # ─── Epic stub ────────────────────────────────────────────────────────────────
+
 
 def test_epic_returns_501(client: TestClient) -> None:
     resp = client.get("/api/v1/auth/epic")

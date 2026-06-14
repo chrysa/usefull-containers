@@ -5,6 +5,7 @@ import signal
 import sys
 import threading
 import time
+from datetime import datetime
 from pathlib import Path
 
 import click
@@ -12,7 +13,7 @@ import httpx
 from rich.console import Console
 from rich.table import Table
 
-from .config import AgentConfig
+from .config import AgentConfig, default_blueprints_dir, detect_platform
 from .state import AgentState
 from .syncer import BlueprintSyncer
 from .watcher import BlueprintWatcher
@@ -28,6 +29,34 @@ def _setup_logging(verbose: bool) -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%H:%M:%S",
     )
+
+
+def _resolve_bp_dir(bp_dir: str | None) -> Path:
+    """
+    Resolve the blueprints directory: explicit ``--dir`` wins; otherwise fall
+    back to the per-platform default (Windows / Steam Deck / Linux). Exits with
+    a helpful message when nothing usable can be found.
+    """
+    if bp_dir:
+        path = Path(bp_dir).expanduser().resolve()
+    else:
+        platform = detect_platform()
+        default = default_blueprints_dir(platform)
+        if default is None:
+            console.print(
+                f"[red]No default blueprints directory for platform '{platform}'. "
+                "Pass --dir explicitly.[/red]"
+            )
+            sys.exit(1)
+        path = default.expanduser().resolve()
+        console.print(f"[dim]Auto-detected {platform} blueprints dir: {path}[/dim]")
+    if not path.exists():
+        console.print(
+            f"[red]Blueprint directory not found: {path}[/red]\n"
+            "[yellow]Start Satisfactory at least once, or pass --dir.[/yellow]"
+        )
+        sys.exit(1)
+    return path
 
 
 @click.group()
@@ -54,9 +83,9 @@ def cli() -> None:
     "--dir",
     "bp_dir",
     envvar="SFM_BLUEPRINTS_DIR",
-    required=True,
+    default=None,
     type=click.Path(),
-    help="Local blueprints directory",
+    help="Local blueprints directory (auto-detected per platform if omitted)",
 )
 @click.option(
     "--poll",
@@ -66,16 +95,19 @@ def cli() -> None:
     type=int,
     help="Poll interval (seconds)",
 )
+@click.option(
+    "--key",
+    envvar="SFM_API_KEY",
+    default="",
+    help="Agent API key sent as X-SFM-Agent-Key (or set SFM_API_KEY)",
+)
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logging")
-def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
+def start(hub: str, bp_dir: str | None, poll: int, key: str, verbose: bool) -> None:
     """Start the sync daemon (file watcher + periodic poll)."""
     _setup_logging(verbose)
-    bp_path = Path(bp_dir).expanduser().resolve()
-    if not bp_path.exists():
-        console.print(f"[red]Blueprint directory not found: {bp_path}[/red]")
-        sys.exit(1)
+    bp_path = _resolve_bp_dir(bp_dir)
 
-    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, poll_interval=poll)
+    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, poll_interval=poll, api_key=key)
     state = AgentState(cfg.state_file)
 
     console.print("[bold green]sfm-agent starting[/bold green]")
@@ -94,7 +126,7 @@ def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
 
     with BlueprintSyncer(cfg, state) as syncer:
         console.print("[cyan]Initial sync...[/cyan]")
-        result = syncer.sync()
+        result = syncer.sync_diff()
         console.print(
             f"  ↑ {len(result.uploaded)} uploaded  "
             f"↓ {len(result.downloaded)} downloaded  "
@@ -108,7 +140,7 @@ def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
         try:
             while not stop_event.is_set():
                 if time.monotonic() - last_poll >= poll:
-                    result = syncer.sync()
+                    result = syncer.sync_diff()
                     if result.uploaded or result.downloaded:
                         console.print(
                             f"[cyan]Poll:[/cyan] ↑{len(result.uploaded)} ↓{len(result.downloaded)}"
@@ -123,17 +155,23 @@ def start(hub: str, bp_dir: str, poll: int, verbose: bool) -> None:
 
 @cli.command()
 @click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
-@click.option("--dir", "bp_dir", envvar="SFM_BLUEPRINTS_DIR", required=True, type=click.Path())
+@click.option("--dir", "bp_dir", envvar="SFM_BLUEPRINTS_DIR", default=None, type=click.Path())
+@click.option(
+    "--key",
+    envvar="SFM_API_KEY",
+    default="",
+    help="Agent API key sent as X-SFM-Agent-Key (or set SFM_API_KEY)",
+)
 @click.option("--verbose", "-v", is_flag=True)
-def sync(hub: str, bp_dir: str, verbose: bool) -> None:
-    """Run a one-shot bidirectional sync and exit."""
+def sync(hub: str, bp_dir: str | None, key: str, verbose: bool) -> None:
+    """Run a one-shot delta sync (push local changes, mirror deletions) and exit."""
     _setup_logging(verbose)
-    bp_path = Path(bp_dir).expanduser().resolve()
-    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path)
+    bp_path = _resolve_bp_dir(bp_dir)
+    cfg = AgentConfig(hub_url=hub, blueprints_dir=bp_path, api_key=key)
     state = AgentState(cfg.state_file)
 
     with BlueprintSyncer(cfg, state) as syncer:
-        result = syncer.sync()
+        result = syncer.sync_diff()
 
     t = Table(title="Sync result")
     t.add_column("Category", style="bold")
@@ -152,20 +190,39 @@ def sync(hub: str, bp_dir: str, verbose: bool) -> None:
 @cli.command()
 @click.option("--hub", envvar="SFM_HUB_URL", default="http://localhost:8000", show_default=True)
 def status(hub: str) -> None:
-    """Check hub reachability and show blueprint count."""
+    """Report hub connection state and the last successful sync time."""
     try:
         resp = httpx.get(f"{hub}/api/v1/health", timeout=5)
         if resp.status_code == 200:
-            console.print(f"[green]Hub reachable[/green]: {hub}")
+            console.print(f"[green]Connected[/green]: {hub}")
         else:
-            console.print(f"[yellow]Hub HTTP {resp.status_code}[/yellow]")
+            console.print(f"[yellow]Hub HTTP {resp.status_code}[/yellow]: {hub}")
     except httpx.HTTPError as exc:
-        console.print(f"[red]Hub unreachable: {exc}[/red]")
+        console.print(f"[red]Disconnected[/red]: {hub} ({exc})")
         sys.exit(1)
 
-    try:
-        resp = httpx.get(f"{hub}/api/v1/blueprints", timeout=5)
-        data = resp.json()
-        console.print(f"  Blueprints on hub: {data.get('total', '?')}")
-    except (httpx.HTTPError, ValueError):
-        pass
+    # Last sync time: the state file is rewritten after every successful sync, so
+    # its mtime is a reliable "last sync" marker.
+    state_file = AgentConfig().state_file
+    if state_file.exists():
+        ts = datetime.fromtimestamp(state_file.stat().st_mtime).isoformat(timespec="seconds")
+        console.print(f"  Last sync: [cyan]{ts}[/cyan]")
+    else:
+        console.print("  Last sync: [dim]never[/dim]")
+
+
+@cli.command()
+def detect() -> None:
+    """Show the detected platform and its default blueprints directory."""
+    platform = detect_platform()
+    console.print(f"Platform: [cyan]{platform}[/cyan]")
+    path = default_blueprints_dir(platform)
+    if path is None:
+        console.print(
+            "[yellow]No default blueprints directory for this platform — "
+            "pass --dir explicitly.[/yellow]"
+        )
+        return
+    found = path.expanduser().exists()
+    state = "[green]found[/green]" if found else "[yellow]not found[/yellow]"
+    console.print(f"Blueprints dir: [cyan]{path}[/cyan] ({state})")

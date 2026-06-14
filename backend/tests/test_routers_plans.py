@@ -11,9 +11,29 @@ def plan_client(tmp_path: Path) -> TestClient:
     from app import config as cfg_module
 
     cfg_module.settings.data_dir = str(tmp_path)
+    from app.db.models import User
+    from app.db.session import get_session
+    from app.dependencies.auth import get_current_user
     from app.main import create_app
 
-    return TestClient(create_app())
+    app = create_app()
+    # Plans endpoints are auth-gated (A-04). These router tests exercise the
+    # file-based behaviour, not auth, so bypass the dependency with a fake user.
+    app.dependency_overrides[get_current_user] = lambda: User(
+        id=1, username="test-user", is_active=True
+    )
+    # Mutations also write an audit entry (A-07); these file-based tests don't
+    # set up a DB, so swap the session for a no-op.
+    app.dependency_overrides[get_session] = lambda: _NoopSession()
+    return TestClient(app)
+
+
+class _NoopSession:
+    """Stand-in async session: audit writes are no-ops in file-based tests."""
+
+    def add(self, *_args: object, **_kwargs: object) -> None: ...
+
+    async def commit(self) -> None: ...
 
 
 class TestListPlansEndpoint:

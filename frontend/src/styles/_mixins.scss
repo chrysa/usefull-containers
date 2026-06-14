@@ -25,6 +25,7 @@
   border: var(--border-light);
   border-radius: var(--radius-md);
   padding: var(--space-md);
+  box-shadow: var(--shadow-md);
 }
 
 @mixin text-muted {

@@ -92,6 +92,18 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> User | None:
     return await session.get(User, user_id)
 
 
+async def get_first_user(session: AsyncSession) -> User | None:
+    """Return the lowest-id active user — the deployment "owner".
+
+    Used to map the single shared sfm-agent key (SFM-7a) to a real user in the
+    current single-user deployment model. Multi-agent / per-key ownership would
+    require a dedicated ApiKey table (deferred).
+    """
+    return await session.scalar(
+        select(User).where(User.is_active).order_by(User.id).limit(1)
+    )
+
+
 async def upsert_steam_user(
     session: AsyncSession,
     steam_id: str,

@@ -10,6 +10,7 @@ from app.config import settings
 from app.db.models import User
 from app.db.session import get_session
 from app.dependencies.auth import get_current_user
+from app.dependencies.rate_limit import rate_limit_auth
 from app.models.steam import SatisfactoryGameData, SteamGameDataResponse, SteamProfile
 from app.models.user import TokenResponse, UserLogin, UserRead, UserRegister
 from app.services import auth_service, steam_service
@@ -34,6 +35,7 @@ def _callback_url(request: Request) -> str:
     response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Register with a local username/password",
+    dependencies=[Depends(rate_limit_auth)],
 )
 async def register(
     body: UserRegister,
@@ -54,6 +56,7 @@ async def register(
     "/login",
     response_model=TokenResponse,
     summary="Login with local credentials",
+    dependencies=[Depends(rate_limit_auth)],
 )
 async def login(
     body: UserLogin,

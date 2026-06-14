@@ -6,6 +6,7 @@ from pathlib import Path
 
 from watchdog.events import (
     FileCreatedEvent,
+    FileDeletedEvent,
     FileModifiedEvent,
     FileSystemEventHandler,
 )
@@ -52,11 +53,20 @@ class BlueprintEventHandler(FileSystemEventHandler):
         self._pending: dict[str, _DebounceTimer] = {}
         self._lock = threading.Lock()
 
+    #: Sentinel key for the debounced full-reconcile triggered by deletions.
+    _RECONCILE_KEY = "\x00reconcile"
+
     def _trigger_upload(self, name: str) -> None:
         log.info("File changed — uploading: %s", name)
         self._syncer.upload_blueprint(name, self._cfg.blueprints_dir)
         with self._lock:
             self._pending.pop(name, None)
+
+    def _trigger_reconcile(self) -> None:
+        log.info("File removed — reconciling with hub")
+        self._syncer.sync_diff()
+        with self._lock:
+            self._pending.pop(self._RECONCILE_KEY, None)
 
     def _schedule(self, path_str: str) -> None:
         p = Path(path_str)
@@ -78,6 +88,20 @@ class BlueprintEventHandler(FileSystemEventHandler):
     def on_modified(self, event: FileModifiedEvent) -> None:  # type: ignore[override]
         if not event.is_directory:
             self._schedule(str(event.src_path))
+
+    def on_deleted(self, event: FileDeletedEvent) -> None:  # type: ignore[override]
+        if event.is_directory:
+            return
+        if Path(str(event.src_path)).suffix not in WATCHED_EXTS:
+            return
+        # A removed file can't be uploaded per-name; reconcile the whole folder so
+        # the hub deletes blueprints that are now gone locally (game-authoritative).
+        with self._lock:
+            if self._RECONCILE_KEY not in self._pending:
+                self._pending[self._RECONCILE_KEY] = _DebounceTimer(
+                    self._cfg.debounce_seconds, self._trigger_reconcile
+                )
+            self._pending[self._RECONCILE_KEY].schedule()
 
 
 class BlueprintWatcher:

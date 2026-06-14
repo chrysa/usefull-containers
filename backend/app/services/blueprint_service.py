@@ -3,11 +3,23 @@ from __future__ import annotations
 import io
 import json
 import zipfile
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 from app.constants import BLUEPRINT_CFG_EXT, BLUEPRINT_FILE_EXT, BLUEPRINT_META_EXT
-from app.models.blueprint import BatchUploadResult, BlueprintColor, BlueprintRead
+from app.models.blueprint import (
+    BatchUploadResult,
+    BlueprintColor,
+    BlueprintRead,
+    BlueprintSyncEntry,
+)
+
+# Cross-host mtime comparisons are noisy (different clocks, float rounding), so a
+# blueprint counts as "modified" only when the agent's mtime is newer than the
+# server's by more than this slack. Size differences are compared exactly.
+_MTIME_SLACK = timedelta(seconds=1)
 
 
 class BlueprintNotFoundError(Exception):
@@ -18,10 +30,10 @@ class BlueprintDirectoryError(Exception):
     pass
 
 
-def _parse_cfg(cfg_path: Path) -> tuple[str, int, BlueprintColor | None, dict]:
+def _parse_cfg(cfg_path: Path) -> tuple[str, int, BlueprintColor | None, dict[str, Any]]:
     """Parse a .sbpcfg JSON file. Returns (description, icon_id, color, raw)."""
     try:
-        raw: dict = json.loads(cfg_path.read_text(encoding="utf-8"))
+        raw: dict[str, Any] = json.loads(cfg_path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return "", 0, None, {}
 
@@ -165,6 +177,70 @@ def delete_blueprint(blueprints_dir: str, name: str) -> None:
         meta_path.unlink()
 
 
+@dataclass
+class SyncDiff:
+    """Outcome of reconciling a remote store against the agent's local inventory."""
+
+    to_upload: list[str] = field(default_factory=list)
+    to_delete: list[str] = field(default_factory=list)
+
+
+def _as_utc(dt: datetime) -> datetime:
+    """Normalise to aware UTC. Naive datetimes are assumed to already be UTC
+    (the agent reports mtimes in UTC), so agent and server compare cleanly
+    regardless of either host's local timezone."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
+
+
+def compute_sync_diff(
+    blueprints_dir: str,
+    local_entries: list[BlueprintSyncEntry],
+    *,
+    allow_empty_prune: bool = False,
+) -> SyncDiff:
+    """Reconcile the server's stored blueprints against the agent's local list.
+
+    The local game folder is authoritative:
+
+    * ``to_upload`` — present locally but missing on the server, or differing in
+      size, or locally newer (beyond :data:`_MTIME_SLACK`). The agent then pushes
+      the bytes via the existing upload endpoints.
+    * ``to_delete`` — present on the server but absent locally. The caller is
+      expected to delete these server-side (game-authoritative removal).
+
+    Safety: an empty local inventory against a populated hub is almost always a
+    misconfigured or not-yet-scanned blueprints directory, not a deliberate
+    "delete everything". Such a mass prune is refused unless *allow_empty_prune*
+    is set, so a wrong ``--dir`` can never wipe the hub. (Propagating the removal
+    of your genuine last blueprint then needs the flag or the web UI.)
+    """
+    server = {bp.name: bp for bp in list_blueprints(blueprints_dir)}
+    directory = Path(blueprints_dir)
+    local = {entry.name: entry for entry in local_entries}
+
+    to_upload: list[str] = []
+    for name, entry in local.items():
+        remote = server.get(name)
+        if remote is None or remote.size_bytes != entry.size_bytes:
+            to_upload.append(name)
+            continue
+        # Compare mtimes in UTC, read straight from the file (list_blueprints'
+        # modified_at is naive *local* server time and would skew cross-timezone).
+        sbp_path = directory / f"{name}{BLUEPRINT_FILE_EXT}"
+        if sbp_path.exists():
+            remote_mtime = datetime.fromtimestamp(sbp_path.stat().st_mtime, tz=UTC)
+            if _as_utc(entry.modified_at) > remote_mtime + _MTIME_SLACK:
+                to_upload.append(name)
+
+    if not local and server and not allow_empty_prune:
+        to_delete: list[str] = []  # refuse mass wipe from an empty inventory
+    else:
+        to_delete = [name for name in server if name not in local]
+    return SyncDiff(to_upload=sorted(to_upload), to_delete=sorted(to_delete))
+
+
 def build_blueprints_zip(blueprints_dir: str) -> bytes:
     """
     Pack all .sbp and .sbpcfg files from blueprints_dir into a ZIP archive.
@@ -275,7 +351,7 @@ def set_tags(blueprints_dir: str, name: str, tags: list[str]) -> BlueprintRead:
     meta_path = directory / f"{name}{BLUEPRINT_META_EXT}"
     # Read existing sidecar to preserve future fields, then update tags
     try:
-        existing: dict = (
+        existing: dict[str, Any] = (
             json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
         )
     except (json.JSONDecodeError, OSError):
@@ -301,7 +377,7 @@ def update_description(blueprints_dir: str, name: str, description: str) -> Blue
         raise BlueprintNotFoundError(f"Blueprint '{name}' not found")
 
     try:
-        existing: dict = (
+        existing: dict[str, Any] = (
             json.loads(cfg_path.read_text(encoding="utf-8")) if cfg_path.exists() else {}
         )
     except (json.JSONDecodeError, OSError):

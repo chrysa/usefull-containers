@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import type { Blueprint } from "../../domain/blueprints/types";
+import { downloadAuthedFile } from "../../domain/blueprints/download";
 import { TagEditor } from "./TagEditor";
 import styles from "./BlueprintCard.module.scss";
 
@@ -16,7 +17,7 @@ function formatBytes(bytes: number): string {
 }
 
 export default function BlueprintCard({ blueprint, onDelete }: Props) {
-  const downloadUrl = `/api/v1/blueprints/${blueprint.name}/download`;
+  const downloadUrl = `/api/v1/blueprints/${encodeURIComponent(blueprint.name)}/download`;
   const modifiedDate = blueprint.modified_at
     ? new Date(blueprint.modified_at).toLocaleDateString()
     : "—";
@@ -53,14 +54,14 @@ export default function BlueprintCard({ blueprint, onDelete }: Props) {
         <span className={styles.meta}>{formatBytes(blueprint.size_bytes)}</span>
         <span className={styles.meta}>{modifiedDate}</span>
         <div className={styles.actions}>
-          <a
-            href={downloadUrl}
-            download={`${blueprint.name}.sbp`}
+          <button
+            type="button"
+            onClick={() => downloadAuthedFile(downloadUrl, `${blueprint.name}.sbp`)}
             className={styles.btnDownload}
             aria-label={`Download ${blueprint.name}`}
           >
             ↓ Export
-          </a>
+          </button>
           <button
             type="button"
             className={styles.btnDelete}

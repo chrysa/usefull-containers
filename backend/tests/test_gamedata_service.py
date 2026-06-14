@@ -6,7 +6,6 @@ import zipfile
 from pathlib import Path
 
 import pytest
-
 from app.models.gamedata import RecipeIngredient, RecipeSummary
 from app.services.gamedata_service import (
     GameDataNotFoundError,
@@ -20,6 +19,7 @@ from app.services.gamedata_service import (
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 def _make_zip(data: dict) -> bytes:
     buf = io.BytesIO()
@@ -47,6 +47,7 @@ RECIPES_DICT = {
 # ---------------------------------------------------------------------------
 # import_gamedata_zip
 # ---------------------------------------------------------------------------
+
 
 class TestImportGamedataZip:
     def test_valid_zip_with_items_and_recipes_should_save_json(self, tmp_path: Path) -> None:
@@ -158,6 +159,7 @@ class TestImportGamedataZip:
 # get_stats
 # ---------------------------------------------------------------------------
 
+
 class TestGetStats:
     def test_stats_when_no_data_imported_returns_zeros(self, tmp_path: Path) -> None:
         stats = get_stats(str(tmp_path))
@@ -177,6 +179,7 @@ class TestGetStats:
 # ---------------------------------------------------------------------------
 # list_items / list_recipes
 # ---------------------------------------------------------------------------
+
 
 class TestListItems:
     def test_list_items_returns_all_when_no_query(self, tmp_path: Path) -> None:

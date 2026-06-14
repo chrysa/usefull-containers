@@ -7,6 +7,7 @@ import {
   useDeleteBlueprintMutation,
   useUpdateBlueprintDescriptionMutation,
 } from "../domain/blueprints/queries";
+import { downloadAuthedFile } from "../domain/blueprints/download";
 import Skeleton from "../components/ui/Skeleton";
 import styles from "./BlueprintDetail.module.scss";
 
@@ -143,13 +144,13 @@ export default function BlueprintDetail() {
         </div>
 
         <div className={styles.actions}>
-          <a
-            href={downloadHref}
-            download
+          <button
+            type="button"
+            onClick={() => downloadAuthedFile(downloadHref, `${blueprint.name}.sbp`)}
             className={styles.btnDownload}
           >
             ↓ {t("blueprint_detail.download", { defaultValue: "Download" })}
-          </a>
+          </button>
           <button
             type="button"
             className={styles.btnDelete}

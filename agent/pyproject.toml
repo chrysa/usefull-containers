@@ -19,7 +19,7 @@ dependencies = [
 sfm-agent = "sfm_agent.cli:cli"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.3.0", "pytest-cov>=6.0.0", "pytest-mock>=3.14.0"]
+dev = ["pytest>=8.3.0", "pytest-cov>=6.0.0", "pytest-mock>=3.14.0", "ruff>=0.8.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -31,3 +31,8 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B"]
+
+[tool.ruff.lint.isort]
+# Declared explicitly so import grouping is identical whether ruff runs from the
+# repo root (CI) or from agent/ (local / pre-commit). Avoids first-party drift.
+known-first-party = ["sfm_agent"]
