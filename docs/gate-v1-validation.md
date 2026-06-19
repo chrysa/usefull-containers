@@ -34,6 +34,10 @@ used only to "play with the UI".
 
 Fill one row per Satisfactory play session between 2026-05-24 and 2026-06-24.
 
+> **How to log (≈30 s, right after the session — do not wait):** a session is **actionable**
+> only if the tool changed at least one build decision (see the 5 criteria above). Put `yes` in
+> "Decision changed?" only then; otherwise `no`. **Need 3 `yes` before 2026-06-24** to pass the gate.
+
 | # | Date       | Duration | Action attempted in-game | Tool used (calculator / graph / plans / assistant) | Decision changed? | Friction / bug |
 |---|------------|----------|--------------------------|----------------------------------------------------|-------------------|----------------|
 | 1 |            |          |                          |                                                    |                   |                |

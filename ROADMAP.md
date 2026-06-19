@@ -4,9 +4,10 @@
 > [🏭 satisfactory-factory-manager](https://www.notion.so/35359293e35e81248b86ea438ce52995).
 > Source de vérité ticket-level : issues + PRs GitHub.
 >
-> Last updated: 2026-06-04 (A-04b per-user scoping implemented; only A-05 left before public exposure).
+> Last updated: 2026-06-19 (all code locks for public exposure lifted; only the V1 gate
+> verdict — due 2026-06-24 — and infra/human blockers remain).
 
-## Statut actuel (2026-06-04)
+## Statut actuel (2026-06-19)
 
 - **V1 feature-complete** (SFM-1 → SFM-21). 90+ PRs mergés sur `main` (`cca81c7`).
 - **PR #80 mergée** — nginx→vite preview + multi-project support (localStorage).
@@ -25,8 +26,16 @@
   *est* le scoping, pas de FK ajoutée aux modèles. Migration one-shot du store
   global legacy vers le propriétaire (lowest-id user) au démarrage. Tests
   d'isolation 2-users + migration (162 tests verts, couverture 91 %).
-- **Reste avant exposition publique** : A-05 (E2E auth) + D-03b (push images
-  GHCR). Sans ça, `sfm.ducal.me` reste Tailscale-only.
+- **A-05 mergée (#121)** : E2E Playwright register → login → access plans + réparation
+  complète du pipeline E2E. **Tous les verrous code de l'exposition publique sont levés**
+  (A-04 + A-04b + A-05 + A-09 gate frontend).
+- **A-07 (#124) + A-08 (#123) mergées** : audit log self-scoped + rate-limit auth.
+- **Polish wizard W-01→W-05 mergé** (#160-164) + T-06 débit/min sur le graphe (#126).
+- **Reste avant exposition publique = infra/humain uniquement** : D-03b (push images
+  GHCR, PAT `write:packages`) + régulariser la facturation Actions org. Sans ça,
+  `sfm.ducal.me` reste Tailscale-only.
+- **Gate V1** : verdict dû le **2026-06-24** — 3 sessions actionnables loggées dans
+  [`docs/gate-v1-validation.md`](docs/gate-v1-validation.md). ≥3 → tag `v1.0.0` ; <3 → gel.
 - **Dependabot : file vidée** — bumps mineurs/patch mergés (#103/#106/#107/#108/#110
   + autres) ; aucun PR Dependabot ouvert. Bumps **majeurs** (python 3.12→3.14,
   node 22→26, eslint 9→10, lucide 0→1, i18next 25→26) restent à trier manuellement.
@@ -58,7 +67,7 @@
 | D-02  | SealedSecrets README pour SFM (V1 : aucun secret requis)                              | 1h     | ✅ done | [server PR #144](https://github.com/chrysa/server/pull/144) |
 | D-03  | ArgoCD appset `apps/dev/*` + route `sfm.ducal.me` via Traefik                         | 1h     | ✅ done | [server PR #144](https://github.com/chrysa/server/pull/144) |
 | D-03b | Push images GHCR (`write:packages` PAT requis — CI billing bloquée)                  | 15min  | 🔴 bloqué | token chrysa manque scope `write:packages` |
-| D-04  | Log book sessions actionnables (`docs/gate-v1-sessions.md`)                           | 30min  | open | [#67](https://github.com/chrysa/satisfactory-factory-manager/issues/67) |
+| D-04  | Log book sessions actionnables (`docs/gate-v1-validation.md`)                         | 30min  | ✅ done | journal prêt — à remplir en jouant avant le 24/06 |
 | D-05  | Check-in T+1 mois après V1 — décider Go/Defer/Reject pour L9-L10                      | —      | todo | dépend D-04             |
 
 **Gate de sortie P1** : 3 sessions documentées avec info actionnable. Sinon à
@@ -79,7 +88,7 @@ T+1 mois → **geler le projet** (et ne PAS ouvrir L9-L10).
 | A-03  | `/api/v1/auth/me` endpoint + auto-refresh côté frontend                               | 1h     | ✅ done | [PR #88](https://github.com/chrysa/satisfactory-factory-manager/pull/88) |
 | A-04  | Auth **obligatoire** sur `plans` + `blueprints` (`Depends(get_current_user)`) + fixtures tests / 4 fetch frontend / `.sbp` download authentifié / E2E login | 3h | ✅ done | router deps + tests 401/200 |
 | A-04b | Scoping réel par user : storage partitionné par `user_id` (sous-dossier) + migration du store global legacy + tests d'isolation | 4h | ✅ done | [#113](https://github.com/chrysa/satisfactory-factory-manager/issues/113) — le chemin `users/<id>/` *est* le scoping |
-| A-05  | E2E Playwright : register → login → access plans page (utilise A-04)                  | 2h     | todo    | dépend A-04             |
+| A-05  | E2E Playwright : register → login → access plans page (utilise A-04)                  | 2h     | ✅ done | [PR #121](https://github.com/chrysa/satisfactory-factory-manager/pull/121) + réparation pipeline E2E |
 | A-06  | Implem réelle Epic Games OAuth (actuellement placeholder)                             | 4h     | todo    | post-V1 si pas d'usage  |
 | A-07  | Audit log côté backoffice — toutes mutations user-scoped                              | 3h     | todo    | dépend A-04             |
 | A-08  | Rate limiting sur `/auth/login` + `/auth/register` (anti-brute-force)                 | 1h     | todo    | slowapi ou nginx limit  |
@@ -93,12 +102,12 @@ avec auth obligatoire + plans/blueprints scopés par utilisateur.
 
 | ID    | Tâche                                                                                 | Effort | État | Note                                     |
 |-------|---------------------------------------------------------------------------------------|--------|------|------------------------------------------|
-| W-01  | Toggle locale (FR/EN) sur l'étape welcome du wizard                                   | 1h     | todo | persiste dans localStorage               |
-| W-02  | Étape "import gamedata ZIP" optionnelle dans le wizard                                | 3h     | todo | sans gamedata, calculator inutilisable   |
-| W-03  | Bouton "relancer le wizard" dans un menu Settings/Help                                | 1h     | todo | reset localStorage `sfm.setup.completed` |
-| W-04  | Bouton "retry now" dans BackendConnectionBanner                                       | 30min  | todo | et dans l'étape backend du wizard        |
-| W-05  | 5e étape wizard : pré-remplir calculator avec target item                             | 2h     | todo | redirection vers `/calculator?item=…`    |
-| W-06  | Persister la dernière section visitée (sticky nav)                                    | 1h     | todo | quality-of-life                          |
+| W-01  | Toggle locale (FR/EN) sur l'étape welcome du wizard                                   | 1h     | ✅ done | [PR #161](https://github.com/chrysa/satisfactory-factory-manager/pull/161) |
+| W-02  | Étape "import gamedata ZIP" optionnelle dans le wizard                                | 3h     | ✅ done | [PR #163](https://github.com/chrysa/satisfactory-factory-manager/pull/163) |
+| W-03  | Bouton "relancer le wizard" dans un menu Settings/Help                                | 1h     | ✅ done | [PR #164](https://github.com/chrysa/satisfactory-factory-manager/pull/164) (bouton Header) |
+| W-04  | Bouton "retry now" dans BackendConnectionBanner                                       | 30min  | ✅ done | [PR #160](https://github.com/chrysa/satisfactory-factory-manager/pull/160) |
+| W-05  | 5e étape wizard : pré-remplir calculator avec target item                             | 2h     | ✅ done | [PR #162](https://github.com/chrysa/satisfactory-factory-manager/pull/162) (deep-link) |
+| W-06  | Persister la dernière section visitée (sticky nav)                                    | 1h     | todo | quality-of-life (seul W restant)         |
 
 ---
 
