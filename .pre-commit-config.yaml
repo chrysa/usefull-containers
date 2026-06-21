@@ -87,8 +87,7 @@ repos:
   - id: no-console-warn
   - id: import-no-relative-parent
   - id: yaml-sorter
-    exclude: 
-      ^(\.github/workflows/|\.github/ISSUE_TEMPLATE/|GitVersion\.yml|docker-compose.*\.yml)
+    exclude: ^(\.github/workflows/|\.github/ISSUE_TEMPLATE/|GitVersion\.yml|docker-compose.*\.yml)
   - id: json-sorter
   - id: adr-gate
   - id: regression-gate
@@ -97,7 +96,7 @@ repos:
   - id: env-file-check
   - id: env-example-sync
   repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-94
+  rev: v0.1.1-95
 - repo: local
   hooks:
   - id: run-tests
@@ -109,10 +108,8 @@ repos:
     - pre-push
   - id: sonar-scanner
     name: sonar cloud analysis
-    entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" 
-      sonarsource/sonar-scanner-cli:11 -Dsonar.host.url=https://sonarcloud.io 
-      -Dsonar.organization=chrysa 
-      -Dsonar.projectKey=chrysa_satisfactory-factory-manager'
+    entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11
+      -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_satisfactory-factory-manager'
     language: system
     pass_filenames: false
     stages:
