@@ -53,24 +53,24 @@ pre-commit: ## Install and run pre-commit hooks
 # ─── Quality ──────────────────────────────────────────────────────────────────
 
 lint: ## Run linters (ruff + eslint via Docker)
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps backend-test sh -c "ruff check ."
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps api-test sh -c "ruff check ."
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint
 
 format: ## Run formatters (ruff + prettier via Docker)
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps backend-test sh -c "ruff format ."
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps api-test sh -c "ruff format ."
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint sh -c "npm run format"
 
 
 # ─── Tests ────────────────────────────────────────────────────────────────────
 
 test: ## Run all tests via Docker
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm api-test
 
 test-cov: ## Run tests with coverage report
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm api-test
 
 docker-test: ## Run tests in Docker (CI-compatible)
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm backend-test
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm api-test
 
 agent-test: ## Run agent (sfm-agent) tests in Docker
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm agent-test

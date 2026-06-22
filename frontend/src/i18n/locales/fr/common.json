@@ -216,6 +216,15 @@
     "search_placeholder": "Rechercher des plans…",
     "title": "Plans de production"
   },
+  "project": {
+    "confirm_delete": "Supprimer le projet \"{{name}}\" ? Les plans et blueprints restent sur le backend.",
+    "create": "Nouveau projet",
+    "delete": "Supprimer",
+    "delete_aria": "Supprimer le projet {{name}}",
+    "no_projects": "Aucun projet",
+    "switch": "Changer de projet",
+    "unnamed": "Projet sans nom"
+  },
   "real_vs_planned": {
     "col_actual": "Construit",
     "col_planned": "Prévu",
@@ -227,6 +236,7 @@
     "needs_gamedata": "Importez d'abord les données du jeu pour calculer le prévu.",
     "parse_error": "Impossible d'analyser ce fichier de sauvegarde.",
     "parsing": "Analyse de la sauvegarde…",
+    "save_error": "Échec de l'enregistrement de l'instantané. Veuillez réessayer.",
     "save_name": "Sauvegarde : {{name}}",
     "saved": "Instantané enregistré.",
     "status_missing": "Manquant",
@@ -237,15 +247,6 @@
     "status_unplanned": "Non prévu",
     "tab": "Réel vs prévu",
     "title": "Réel vs prévu"
-  },
-  "project": {
-    "confirm_delete": "Supprimer le projet \"{{name}}\" ? Les plans et blueprints restent sur le backend.",
-    "create": "Nouveau projet",
-    "delete": "Supprimer",
-    "delete_aria": "Supprimer le projet {{name}}",
-    "no_projects": "Aucun projet",
-    "switch": "Changer de projet",
-    "unnamed": "Projet sans nom"
   },
   "retry": "Réessayer",
   "setup": {
@@ -268,22 +269,22 @@
     },
     "finish": "Terminer",
     "first_plan": {
+      "auth_required": "Connectez-vous pour créer votre premier plan — ou passez et faites-le plus tard.",
       "create": "Créer le plan",
       "creating": "Création…",
       "error": "Échec de la création. Vérifiez la connexion au backend.",
       "lead": "Un plan regroupe les cibles de production d'une usine. Vous pourrez ajouter recettes et blueprints après.",
       "name_label": "Nom du plan",
       "name_placeholder": "Ex : Steel Foundry",
+      "sign_in": "Se connecter",
       "skip": "Plus tard",
-      "title": "Créer votre premier plan",
-      "auth_required": "Connectez-vous pour créer votre premier plan — ou passez et faites-le plus tard.",
-      "sign_in": "Se connecter"
+      "title": "Créer votre premier plan"
     },
     "gamedata": {
-      "title": "Données de jeu",
-      "lead": "Importez les recettes et objets Satisfactory pour que le calculateur puisse planifier la production. Optionnel — vous pourrez aussi l'importer plus tard depuis la page Données de jeu.",
       "empty": "Aucune donnée de jeu chargée pour l'instant.",
-      "loaded": "{{items}} objets et {{recipes}} recettes chargés."
+      "lead": "Importez les recettes et objets Satisfactory pour que le calculateur puisse planifier la production. Optionnel — vous pourrez aussi l'importer plus tard depuis la page Données de jeu.",
+      "loaded": "{{items}} objets et {{recipes}} recettes chargés.",
+      "title": "Données de jeu"
     },
     "next": "Suivant",
     "project": {

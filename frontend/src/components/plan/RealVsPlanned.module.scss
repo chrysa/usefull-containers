@@ -13,6 +13,15 @@
   background: var(--bg-secondary, #1a1a1a);
   color: var(--text-muted, #888);
   transition: border-color 0.15s, background 0.15s;
+
+  &:focus-visible {
+    outline: 2px solid var(--primary, #ff8a00);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }
 
 .dropzoneActive {

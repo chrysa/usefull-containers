@@ -332,7 +332,9 @@ export default function PlanDetail() {
         <button
           type="button"
           role="tab"
+          id="tab-plan"
           aria-selected={view === "plan"}
+          aria-controls="tabpanel-plan"
           className={view === "plan" ? styles.viewBtnActive : styles.viewBtn}
           onClick={() => setView("plan")}
         >
@@ -341,7 +343,9 @@ export default function PlanDetail() {
         <button
           type="button"
           role="tab"
+          id="tab-real"
           aria-selected={view === "real"}
+          aria-controls="tabpanel-real"
           className={view === "real" ? styles.viewBtnActive : styles.viewBtn}
           onClick={() => setView("real")}
         >
@@ -400,7 +404,11 @@ export default function PlanDetail() {
       </section>
 
       {view === "plan" && (
-        <>
+        <div
+          role="tabpanel"
+          id="tabpanel-plan"
+          aria-labelledby="tab-plan"
+        >
           {/* ── Target items ─────────────────────────────────────────────── */}
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
@@ -577,10 +585,15 @@ export default function PlanDetail() {
               </ul>
             )}
           </section>
-        </>
+        </div>
       )}
 
-      <div hidden={view !== "real"}>
+      <div
+        role="tabpanel"
+        id="tabpanel-real"
+        aria-labelledby="tab-real"
+        hidden={view !== "real"}
+      >
         <RealVsPlanned targetItems={plan.target_items} />
       </div>
     </main>

@@ -27,8 +27,10 @@ async def create_snapshot(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> SnapshotRead:
+    # Stage both the snapshot row and the audit event in a single unit of work
+    # so a partial failure cannot leave a snapshot without an audit trail.
     snapshot = await snapshot_service.create(
-        session, user_id=current_user.id, payload=payload
+        session, user_id=current_user.id, payload=payload, commit=False
     )
     await audit_service.record_event(
         session,
@@ -36,7 +38,10 @@ async def create_snapshot(
         action="create",
         resource_type="snapshot",
         resource_id=snapshot.id,
+        commit=False,
     )
+    await session.commit()
+    await session.refresh(snapshot)
     return SnapshotRead.model_validate(snapshot)
 
 
@@ -79,7 +84,10 @@ async def delete_snapshot(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> None:
-    removed = await snapshot_service.delete(session, current_user.id, snapshot_id)
+    # Stage both the delete and audit event atomically before committing.
+    removed = await snapshot_service.delete(
+        session, current_user.id, snapshot_id, commit=False
+    )
     if not removed:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Snapshot not found")
     await audit_service.record_event(
@@ -88,4 +96,6 @@ async def delete_snapshot(
         action="delete",
         resource_type="snapshot",
         resource_id=snapshot_id,
+        commit=False,
     )
+    await session.commit()

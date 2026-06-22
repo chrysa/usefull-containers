@@ -216,6 +216,15 @@
     "search_placeholder": "Search plans…",
     "title": "Factory Plans"
   },
+  "project": {
+    "confirm_delete": "Delete project \"{{name}}\"? Plans and blueprints remain on the backend.",
+    "create": "New project",
+    "delete": "Delete",
+    "delete_aria": "Delete project {{name}}",
+    "no_projects": "No projects",
+    "switch": "Switch project",
+    "unnamed": "Unnamed project"
+  },
   "real_vs_planned": {
     "col_actual": "Built",
     "col_planned": "Planned",
@@ -227,6 +236,7 @@
     "needs_gamedata": "Import game data first to compute the planned side.",
     "parse_error": "Could not parse this save file.",
     "parsing": "Parsing save…",
+    "save_error": "Failed to save snapshot. Please try again.",
     "save_name": "Save: {{name}}",
     "saved": "Snapshot saved.",
     "status_missing": "Missing",
@@ -237,15 +247,6 @@
     "status_unplanned": "Unplanned",
     "tab": "Actual vs planned",
     "title": "Actual vs planned"
-  },
-  "project": {
-    "confirm_delete": "Delete project \"{{name}}\"? Plans and blueprints remain on the backend.",
-    "create": "New project",
-    "delete": "Delete",
-    "delete_aria": "Delete project {{name}}",
-    "no_projects": "No projects",
-    "switch": "Switch project",
-    "unnamed": "Unnamed project"
   },
   "retry": "Retry",
   "setup": {
@@ -268,22 +269,22 @@
     },
     "finish": "Finish",
     "first_plan": {
+      "auth_required": "Sign in to create your first plan — or skip and do it later.",
       "create": "Create plan",
       "creating": "Creating…",
       "error": "Creation failed. Check the backend connection.",
       "lead": "A plan groups the production targets of a factory. You can add recipes and blueprints later.",
       "name_label": "Plan name",
       "name_placeholder": "e.g. Steel Foundry",
+      "sign_in": "Sign in",
       "skip": "Later",
-      "title": "Create your first plan",
-      "auth_required": "Sign in to create your first plan — or skip and do it later.",
-      "sign_in": "Sign in"
+      "title": "Create your first plan"
     },
     "gamedata": {
-      "title": "Game data",
-      "lead": "Import Satisfactory recipe and item data so the calculator can plan production. Optional — you can also import it later from the Game Data page.",
       "empty": "No game data loaded yet.",
-      "loaded": "{{items}} items and {{recipes}} recipes loaded."
+      "lead": "Import Satisfactory recipe and item data so the calculator can plan production. Optional — you can also import it later from the Game Data page.",
+      "loaded": "{{items}} items and {{recipes}} recipes loaded.",
+      "title": "Game data"
     },
     "next": "Next",
     "project": {

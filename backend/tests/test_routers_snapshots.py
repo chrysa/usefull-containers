@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 def _register(client: TestClient, username: str) -> dict[str, str]:
     resp = client.post(
         "/api/v1/auth/register",
-        json={"username": username, "password": "pw-12345678"},
+        json={"username": username, "password": "pw-12345678"},  # pragma: allowlist secret
     )
     assert resp.status_code == 201
     return {"Authorization": f"Bearer {resp.json()['access_token']}"}
@@ -102,3 +102,91 @@ def test_snapshot_create_is_audited(client: TestClient) -> None:
     actions = {(e["action"], e["resource_type"]) for e in entries}
     assert ("create", "snapshot") in actions
     assert ("delete", "snapshot") in actions
+
+
+# ── Input-validation / DoS-guard tests ──────────────────────────────────────
+
+
+def test_snapshot_rejects_overclock_out_of_range(client: TestClient) -> None:
+    """overclock must be in [0, 250]; values outside are rejected with 422."""
+    headers = _register(client, "snapval1")
+    payload = _snapshot_payload()
+    payload["data"]["buildings"][0]["overclock"] = 300
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_snapshot_rejects_negative_overclock(client: TestClient) -> None:
+    headers = _register(client, "snapval2")
+    payload = _snapshot_payload()
+    payload["data"]["buildings"][0]["overclock"] = -1
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_snapshot_rejects_somersloops_out_of_range(client: TestClient) -> None:
+    """somersloops must be in [0, 4]."""
+    headers = _register(client, "snapval3")
+    payload = _snapshot_payload()
+    payload["data"]["buildings"][0]["somersloops"] = 5
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_snapshot_rejects_machine_id_too_long(client: TestClient) -> None:
+    """machine_id must not exceed 256 characters."""
+    headers = _register(client, "snapval4")
+    payload = _snapshot_payload()
+    payload["data"]["buildings"][0]["machine_id"] = "X" * 257
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_snapshot_rejects_save_name_too_long(client: TestClient) -> None:
+    """save_name must not exceed 256 characters."""
+    headers = _register(client, "snapval5")
+    payload = _snapshot_payload()
+    payload["data"]["save_name"] = "S" * 257
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_snapshot_rejects_too_many_buildings(client: TestClient) -> None:
+    """buildings list must not exceed 5000 entries."""
+    headers = _register(client, "snapval6")
+    building = {
+        "machine_id": "Build_ConstructorMk1_C",
+        "recipe_id": "Recipe_IronPlate_C",
+        "overclock": 100,
+        "state": "active",
+        "somersloops": 0,
+        "floor_id": None,
+    }
+    payload = _snapshot_payload()
+    payload["data"]["buildings"] = [building] * 5001
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_snapshot_accepts_boundary_values(client: TestClient) -> None:
+    """Boundary values (overclock=0/250, somersloops=4, 5000 buildings) are accepted."""
+    headers = _register(client, "snapval7")
+    building = {
+        "machine_id": "Build_ConstructorMk1_C",
+        "recipe_id": None,
+        "overclock": 250,
+        "state": "active",
+        "somersloops": 4,
+        "floor_id": None,
+    }
+    payload = {
+        "name": "Boundary test",
+        "data": {
+            "save_name": "BoundaryWorld",
+            "play_time": 0.0,
+            "buildings": [building] * 5000,
+            "power_grids": [],
+        },
+    }
+    resp = client.post("/api/v1/snapshots", json=payload, headers=headers)
+    assert resp.status_code == 201

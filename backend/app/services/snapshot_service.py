@@ -8,9 +8,19 @@ from app.models.snapshot import SnapshotCreate
 
 
 async def create(
-    session: AsyncSession, *, user_id: int, payload: SnapshotCreate
+    session: AsyncSession,
+    *,
+    user_id: int,
+    payload: SnapshotCreate,
+    commit: bool = True,
 ) -> FactorySnapshot:
-    """Persist a reduced snapshot for a user."""
+    """Stage (and optionally commit) a reduced snapshot for a user.
+
+    Pass ``commit=False`` when the caller needs to stage additional work in the
+    same unit of work before committing (e.g. an audit event).  The caller is
+    then responsible for calling ``await session.commit()`` and
+    ``await session.refresh(snapshot)`` itself.
+    """
     snapshot = FactorySnapshot(
         user_id=user_id,
         name=payload.name,
@@ -19,8 +29,9 @@ async def create(
         data=payload.data.model_dump(mode="json"),
     )
     session.add(snapshot)
-    await session.commit()
-    await session.refresh(snapshot)
+    if commit:
+        await session.commit()
+        await session.refresh(snapshot)
     return snapshot
 
 
@@ -51,12 +62,21 @@ async def get(
 
 
 async def delete(
-    session: AsyncSession, user_id: int, snapshot_id: str
+    session: AsyncSession,
+    user_id: int,
+    snapshot_id: str,
+    commit: bool = True,
 ) -> bool:
-    """Delete one snapshot owned by the user. Returns True if a row was removed."""
+    """Stage (and optionally commit) deletion of a snapshot owned by the user.
+
+    Returns True if a row was found and staged for removal.
+    Pass ``commit=False`` when the caller stages additional work (e.g. an audit
+    event) and will commit everything in a single unit of work.
+    """
     snapshot = await get(session, user_id, snapshot_id)
     if snapshot is None:
         return False
     await session.delete(snapshot)
-    await session.commit()
+    if commit:
+        await session.commit()
     return True

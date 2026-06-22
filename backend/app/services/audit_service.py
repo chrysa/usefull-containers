@@ -13,8 +13,13 @@ async def record_event(
     action: str,
     resource_type: str,
     resource_id: str,
+    commit: bool = True,
 ) -> None:
-    """Append an audit entry for a user mutation (A-07)."""
+    """Stage (and optionally commit) an audit entry for a user mutation (A-07).
+
+    Pass ``commit=False`` when the caller batches multiple operations in a
+    single unit of work and will call ``await session.commit()`` itself.
+    """
     session.add(
         AuditLog(
             user_id=user_id,
@@ -23,7 +28,8 @@ async def record_event(
             resource_id=str(resource_id),
         )
     )
-    await session.commit()
+    if commit:
+        await session.commit()
 
 
 async def list_for_user(

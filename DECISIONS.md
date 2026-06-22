@@ -98,7 +98,7 @@ Consequences:
 **Date**: 2026-05-30
 **Status**: accepted
 
-### Context
+### D-0006 context
 
 The deployed instance (Kimsufi, `sfm.ducal.me`) is protected at the infrastructure
 level by TinyAuth (Traefik ForwardAuth middleware). However, an application-level
@@ -113,7 +113,7 @@ auth layer adds value:
    Traefik SSO wall; auth only gates the `/auth` routes themselves and enriches
    the user experience.
 
-### Decision
+### D-0006 decision
 
 - **Local auth**: username + hashed password (bcrypt), JWT access token (HS256,
   24 h expiry). No email required for V1; no refresh token (kept simple).
@@ -137,7 +137,7 @@ auth layer adds value:
 | `STEAM_API_KEY` | optional | Steam Web API key (profile + achievements) |
 | `FRONTEND_URL` | optional | Redirect base after Steam callback (default `http://localhost:5173`) |
 
-### Consequences
+### D-0006 consequences
 
 - Adds deps: `sqlalchemy[asyncio]`, `aiosqlite`, `python-jose[cryptography]`,
   `passlib[bcrypt]`, `httpx`.
@@ -224,7 +224,7 @@ using `999px`/`50%`) keep their radius; everything else is radius 0.
 **Date**: 2026-06-10
 **Status**: accepted (lifts the "SFM-7 deferred" note in [D-0003](#d-0003--scope-pivot-offline-optimizer-not-live-monitoring))
 
-### Context
+### D-0009 context
 
 Two things sync Satisfactory blueprints in the chrysa portfolio, and they were
 easy to conflate:
@@ -244,7 +244,7 @@ The canonical Notion record describes blueprint sync "via Syncthing", which read
 as if the custom agent was redundant. It is not — the two operate at different
 layers.
 
-### Decision
+### D-0009 decision
 
 **Keep both; they do not overlap in function.**
 
@@ -267,7 +267,7 @@ web tool's value (search, tags, recipe graph, plans) requires the blueprints to
 exist *in the hub*, which only an HTTP client (the agent, or a manual upload) can
 do.
 
-### Consequences
+### D-0009 consequences
 
 - The agent is **not** a competitor to Syncthing and must not grow cross-machine
   P2P features — that scope stays in BP Sync.
@@ -278,3 +278,61 @@ do.
   Revisit only if multi-user mode is opened (gated by [D-0003](#d-0003--scope-pivot-offline-optimizer-not-live-monitoring)).
 - The Notion canonical record should be read with this split in mind: "via
   Syncthing" describes file replication, not web-hub ingestion.
+
+## D-0010 — Client-side .sav parsing via esm.sh CDN dynamic import
+
+**Date**: 2026-06-22
+**Status**: accepted
+
+### D-0010 context
+
+Satisfactory save files (`.sav`) are a proprietary binary format. Parsing them
+requires a dedicated library (`@etothepii/satisfactory-file-parser`). The L9
+feature (planned-vs-actual diff) needs to parse these files before uploading a
+compact snapshot to the backend.
+
+### D-0010 decision
+
+The parser library is **loaded at runtime in the browser** via a dynamic ESM
+import from `esm.sh` (a CDN that serves npm packages as ESM):
+
+```
+https://esm.sh/@etothepii/satisfactory-file-parser@4.1.1
+```
+
+The import is deferred to the moment the user drops a `.sav` file; the parser
+is never bundled into the application chunk, keeping the initial JS payload
+unaffected (~3–5 MB library).
+
+Parsing runs entirely client-side; the backend only receives the already-reduced
+`CompactSnapshot` JSON (a few KB), not the raw binary.
+
+### D-0010 offline / self-hosted limitation
+
+When the host has no outbound internet access (air-gapped self-hosting, offline
+LAN play) the CDN import will fail and `.sav` parsing will be unavailable.
+The rest of the application (blueprints, plans, game-data) continues to work.
+
+**Vendoring is deferred to a future iteration.** When vendoring is implemented,
+the parser module should be bundled as a web worker or lazy chunk via
+`vite-plugin-comlink` or a manual `new Worker()` to keep the main-thread bundle
+size unchanged.
+
+### D-0010 why not bundle it now
+
+- The library is large (~3–5 MB) and only needed for one feature.
+- `@etothepii/satisfactory-file-parser` has its own transitive deps (including
+  wasm); bundling it correctly (especially wasm assets) requires non-trivial
+  Vite configuration that is out of scope for V1.
+- For the target use case (home server on LAN with internet access) the CDN
+  import is reliable and introduces no additional latency on the hot path.
+
+### D-0010 consequences
+
+- `.sav` parsing requires internet access (or a local CDN mirror) at parse time.
+- The CDN URL is pinned to a specific package version; upgrades require an
+  intentional change to `PARSER_URL` in `parseSave.ts`.
+- File size is gated at 200 MiB before the `ArrayBuffer` is allocated (see PR
+  #186 follow-up) to prevent browser OOM on malformed payloads.
+- A user-visible error must be shown (and is) when the CDN import fails, so the
+  offline limitation is never a silent failure.

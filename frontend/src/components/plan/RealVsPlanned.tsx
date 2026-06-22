@@ -75,7 +75,10 @@ export default function RealVsPlanned({ targetItems }: Props) {
       setRows(diffPlanVsSnapshot(targetItems, snap, recipes, items));
       createSnapshot.mutate(
         { name: snap.save_name, data: snap },
-        { onSuccess: () => showToast(t("real_vs_planned.saved")) },
+        {
+          onSuccess: () => showToast(t("real_vs_planned.saved")),
+          onError: () => showToast(t("real_vs_planned.save_error"), "error"),
+        },
       );
     } catch {
       setError(true);
@@ -98,23 +101,27 @@ export default function RealVsPlanned({ targetItems }: Props) {
     <div className={styles.wrap}>
       <div
         className={`${styles.dropzone} ${dragActive ? styles.dropzoneActive : ""}`}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => !parsing && inputRef.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
-          setDragActive(true);
+          if (!parsing) setDragActive(true);
         }}
         onDragLeave={() => setDragActive(false)}
         onDrop={(e) => {
           e.preventDefault();
           setDragActive(false);
+          if (parsing) return;
           const file = e.dataTransfer.files[0];
           if (file) void handleFile(file);
         }}
         role="button"
         aria-label={t("real_vs_planned.drop_hint")}
+        aria-busy={parsing}
+        aria-disabled={parsing}
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+          if ((e.key === "Enter" || e.key === " ") && !parsing)
+            inputRef.current?.click();
         }}
       >
         {parsing ? t("real_vs_planned.parsing") : t("real_vs_planned.drop_hint")}
