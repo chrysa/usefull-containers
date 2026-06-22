@@ -1,7 +1,7 @@
 .card {
   background: var(--color-surface, #1e1e2e);
   border: 1px solid var(--color-border, #313244);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   padding: 0.875rem 1rem;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
 .id {
   font-size: 0.75rem;
   color: var(--color-text-secondary, #6c7086);
-  font-family: monospace;
+  font-family: var(--font-mono);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

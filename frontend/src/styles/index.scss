@@ -9,11 +9,13 @@
 
 body {
   margin: 0;
-  /* Neon Brutalist: mono-forward UI (fonts loaded via index.html). */
-  font-family: var(--font-mono);
+  /* Console persona: Inter for body copy; JetBrains Mono for data only. */
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 h1,
@@ -24,7 +26,7 @@ h3 {
 }
 
 :focus-visible {
-  outline: var(--border-width) solid var(--primary);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 

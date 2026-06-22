@@ -1,55 +1,109 @@
-/* chrysa "Neon Brutalist" palette (satisfactory-factory-manager accent = orange).
-   Token names preserved so every *.module.scss inherits. Light is the :root
-   default; dark (html.dark) is canonical per spec — both meet WCAG AA. */
+/* satisfactory-factory-manager — Console persona palette.
+   Accent: industrial orange (#ff8a00 dark / #c2410c light).
+   DESIGN-SYSTEM §3 + §4 (shared-standards).
+
+   Naming preserved for backwards-compatibility (every *.module.scss inherits).
+   :root   = LIGHT (the no-class default; useTheme toggles html.dark for dark).
+   html.dark = DARK (canonical reference; dark meets same WCAG AA bar).
+   DO NOT flip this. DO NOT add .light. useTheme.ts is untouched. */
 
 :root {
-  --bg: #fafafa;
+  /* Neutral frame — light */
+  --bg:           #fafafa;
   --bg-secondary: #ffffff;
-  --header-bg: #ffffff;
-  --text: #0e0e10;
-  --text-muted: #52525b;
-  --border: #0e0e10;
-  --grid: #d4d4d8;
-  --primary: #d97400;
-  --primary-hover: #b35f00;
-  --accent-ink: #ffffff;
-  --surface-hover: rgba(0, 0, 0, 0.06);
-  --shadow-color: #0e0e10;
-  --skeleton-base: #e4e4e7;
+  --surface:      #ffffff;
+  --surface-2:    #f0f0f0;
+  --header-bg:    #ffffff;
+
+  --text:         #0e0e10;
+  --text-muted:   #52525b;
+  --text-inverse: #fafafa;
+
+  /* Console hairline border — light */
+  --border:       #d4d4d8;
+  --grid:         #e4e4e7;
+
+  /* Industrial orange — light (DESIGN-SYSTEM §4: satisfactory-factory-manager / mirrador) */
+  --primary:       #c2410c;
+  --primary-hover: #9a3412;
+  --accent-ink:    #ffffff;
+
+  /* Semantic */
+  --danger:  #dc2626;
+  --success: #15803d;
+  --warning: #b45309;
+
+  --surface-hover: rgba(0, 0, 0, 0.05);
+
+  /* Focus ring follows primary */
+  --ring: var(--primary);
+
+  /* Skeleton shimmer — light */
+  --skeleton-base:      #e4e4e7;
   --skeleton-highlight: #f4f4f5;
 
-  /* Aliases — some modules reference these names with hardcoded fallbacks.
-     Map them onto the canonical tokens so they pick up the brutalist palette
-     (resolved per active theme since --primary/--border are theme-scoped). */
-  --color-primary: var(--primary);
-  --color-accent: var(--primary);
-  --color-border: var(--border);
+  /* Console shadows — soft, no hard offset */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.22);
+  --shadow-md: 0 1px 3px rgb(0 0 0 / 0.24), 0 1px 2px rgb(0 0 0 / 0.16);
+
+  /* Aliases — some modules reference these names; map onto canonical tokens */
+  --color-primary:        var(--primary);
+  --color-accent:         var(--primary);
+  --color-border:         var(--border);
   --color-text-secondary: var(--text-muted);
-  --color-code-bg: var(--bg);
-  --danger: #dc2626;
-  --success: #15803d;
-  --color-danger: var(--danger);
-  --color-success: var(--success);
+  --color-code-bg:        var(--bg);
+  --color-danger:         var(--danger);
+  --color-success:        var(--success);
+  --color-surface:        var(--surface);
+  --color-surface-2:      var(--surface-2);
 }
 
 html.dark {
-  --danger: #ff4d4d;
-  --success: #22c55e;
-}
-
-html.dark {
-  --bg: #0e0e10;
+  /* Neutral frame — dark (canonical) */
+  --bg:           #0e0e10;
   --bg-secondary: #18181b;
-  --header-bg: #18181b;
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
-  --border: #fafafa;
-  --grid: #3f3f46;
-  --primary: #ff8a00;
+  --surface:      #18181b;
+  --surface-2:    #242428;
+  --header-bg:    #18181b;
+
+  --text:         #fafafa;
+  --text-muted:   #a1a1aa;
+  --text-inverse: #0e0e10;
+
+  /* Console hairline border — dark */
+  --border:       #2e2e33;
+  --grid:         #3f3f46;
+
+  /* Industrial orange — dark (DESIGN-SYSTEM §4) */
+  --primary:       #ff8a00;
   --primary-hover: #ffa333;
-  --accent-ink: #0e0e10;
+  --accent-ink:    #0e0e10;
+
+  /* Semantic */
+  --danger:  #ff4d4d;
+  --success: #22c55e;
+  --warning: #fbbf24;
+
   --surface-hover: rgba(255, 255, 255, 0.06);
-  --shadow-color: #000000;
-  --skeleton-base: #18181b;
+
+  --ring: var(--primary);
+
+  /* Skeleton shimmer — dark */
+  --skeleton-base:      #18181b;
   --skeleton-highlight: #242428;
+
+  /* Console shadows — dark */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.40);
+  --shadow-md: 0 1px 3px rgb(0 0 0 / 0.48), 0 1px 2px rgb(0 0 0 / 0.32);
+
+  /* Aliases — updated per theme */
+  --color-primary:        var(--primary);
+  --color-accent:         var(--primary);
+  --color-border:         var(--border);
+  --color-text-secondary: var(--text-muted);
+  --color-code-bg:        var(--bg);
+  --color-danger:         var(--danger);
+  --color-success:        var(--success);
+  --color-surface:        var(--surface);
+  --color-surface-2:      var(--surface-2);
 }

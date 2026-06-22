@@ -1,7 +1,7 @@
 .container {
   height: 580px;
   border: 1px solid var(--color-border, #333);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-bg, #0d0d1a);
 
@@ -13,7 +13,7 @@
   :global(.react-flow__controls) {
     background: var(--color-surface, #1e1e2e);
     border: 1px solid var(--color-border, #333);
-    border-radius: 0;
+    border-radius: var(--radius-sm);
 
     button {
       background: transparent;
@@ -29,7 +29,7 @@
   :global(.react-flow__minimap) {
     background: var(--color-surface, #1e1e2e);
     border: 1px solid var(--color-border, #333);
-    border-radius: 0;
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -37,7 +37,7 @@
 
 .node {
   padding: 0.55rem 0.85rem;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   background: var(--color-surface, #1e1e2e);
   border: 1px solid var(--color-border, #444);
   width: 210px;
@@ -91,7 +91,7 @@
 .nodeRawBadge {
   display: inline-block;
   padding: 0.1rem 0.35rem;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   background: #a16207;
   color: #fff;
   font-size: 0.68rem;

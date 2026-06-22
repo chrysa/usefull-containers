@@ -3,8 +3,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  border: 2px dashed var(--color-border, #4a5568);
-  border-radius: 0;
+  border: var(--border-width) dashed var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     border-color 0.2s,

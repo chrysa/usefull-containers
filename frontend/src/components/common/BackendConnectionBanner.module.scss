@@ -21,8 +21,8 @@
   font-weight: 700;
   color: var(--accent-ink);
   background: transparent;
-  border: 2px solid var(--accent-ink);
-  border-radius: 0;
+  border: var(--border-width) solid var(--accent-ink);
+  border-radius: var(--radius-sm);
   cursor: pointer;
 
   &:hover:not(:disabled) {

@@ -13,7 +13,7 @@
 .modal {
   background: var(--bg-secondary);
   color: var(--text);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
   width: 100%;
   max-width: 560px;
@@ -51,7 +51,7 @@
   font-size: var(--font-sm);
   cursor: pointer;
   padding: var(--space-xs) var(--space-sm);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
 
   &:hover {
     color: var(--text);
@@ -69,7 +69,7 @@
   flex: 1;
   height: 4px;
   background: var(--border, rgba(255, 255, 255, 0.1));
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   transition: background-color 160ms ease;
 
   &.active {
@@ -117,7 +117,7 @@
     background: var(--bg);
     color: var(--text);
     border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-    border-radius: 0;
+    border-radius: var(--radius-sm);
     padding: var(--space-sm);
     font-size: var(--font-sm);
 
@@ -133,7 +133,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   background: var(--bg);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
 
@@ -207,7 +207,7 @@
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   padding: var(--space-sm) var(--space-md);
   font-size: var(--font-sm);
   font-weight: 500;

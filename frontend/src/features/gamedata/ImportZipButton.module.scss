@@ -6,7 +6,7 @@
   background: var(--color-primary, #f97316);
   color: #fff;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
