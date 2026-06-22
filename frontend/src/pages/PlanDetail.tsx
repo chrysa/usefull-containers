@@ -13,6 +13,7 @@ import { useBlueprintsQuery } from "../domain/blueprints/queries";
 import { useGameDataStatsQuery } from "../domain/gamedata/queries";
 import type { TargetItem } from "../domain/plans/types";
 import Skeleton from "../components/ui/Skeleton";
+import RealVsPlanned from "../components/plan/RealVsPlanned";
 import styles from "./PlanDetail.module.scss";
 
 export default function PlanDetail() {
@@ -30,6 +31,9 @@ export default function PlanDetail() {
   const updateMutation = useUpdatePlanMutation(id);
   const deleteMutation = useDeletePlanMutation();
   const duplicateMutation = useDuplicatePlanMutation();
+
+  // View toggle
+  const [view, setView] = useState<"plan" | "real">("plan");
 
   // Inline name/description editing
   const [editingName, setEditingName] = useState(false);
@@ -323,6 +327,28 @@ export default function PlanDetail() {
         )}
       </header>
 
+      {/* ── View toggle ──────────────────────────────────────────────── */}
+      <div className={styles.viewToggle} role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "plan"}
+          className={view === "plan" ? styles.viewBtnActive : styles.viewBtn}
+          onClick={() => setView("plan")}
+        >
+          {t("plan_detail.target_items")}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "real"}
+          className={view === "real" ? styles.viewBtnActive : styles.viewBtn}
+          onClick={() => setView("real")}
+        >
+          {t("real_vs_planned.tab")}
+        </button>
+      </div>
+
       {/* ── Description ──────────────────────────────────────────────── */}
       <section className={styles.descSection}>
         {editingDesc ? (
@@ -373,182 +399,190 @@ export default function PlanDetail() {
         )}
       </section>
 
-      {/* ── Target items ─────────────────────────────────────────────── */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>
-            {t("plan_detail.target_items")}
-          </h2>
-          {!addingItem && (
-            <button
-              type="button"
-              className={styles.btnAdd}
-              onClick={() => setAddingItem(true)}
-            >
-              + {t("plan_detail.add_item")}
-            </button>
-          )}
-        </div>
-
-        {addingItem && (
-          <form className={styles.addForm} onSubmit={handleAddItem}>
-            <select
-              className={styles.select}
-              value={newItemId}
-              onChange={(e) => setNewItemId(e.target.value)}
-              required
-            >
-              <option value="">{t("plan_detail.select_item")}</option>
-              {items.map((it) => (
-                <option key={it.id} value={it.id}>
-                  {it.name}
-                </option>
-              ))}
-            </select>
-            <input
-              className={styles.qtyInput}
-              type="number"
-              min="0.01"
-              step="0.01"
-              value={newItemQty}
-              onChange={(e) => setNewItemQty(e.target.value)}
-              required
-              aria-label={t("plan_detail.quantity")}
-            />
-            <span className={styles.qtyUnit}>/min</span>
-            <button
-              type="submit"
-              className={styles.btnSave}
-              disabled={updateMutation.isPending || !newItemId}
-            >
-              {t("plan_detail.add")}
-            </button>
-            <button
-              type="button"
-              className={styles.btnCancel}
-              onClick={() => {
-                setAddingItem(false);
-                setNewItemId("");
-                setNewItemQty("1");
-              }}
-            >
-              {t("plan_detail.cancel")}
-            </button>
-          </form>
-        )}
-
-        {plan.target_items.length === 0 && !addingItem && (
-          <p className={styles.emptyHint}>{t("plan_detail.no_items")}</p>
-        )}
-
-        {plan.target_items.length > 0 && (
-          <ul className={styles.itemList}>
-            {plan.target_items.map((ti) => (
-              <li key={ti.item_id} className={styles.itemRow}>
-                <span className={styles.itemName}>{itemName(ti.item_id)}</span>
-                <span className={styles.itemQty}>
-                  {ti.quantity}
-                  <span className={styles.unit}>/min</span>
-                </span>
+      {view === "plan" && (
+        <>
+          {/* ── Target items ─────────────────────────────────────────────── */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                {t("plan_detail.target_items")}
+              </h2>
+              {!addingItem && (
                 <button
                   type="button"
-                  className={styles.btnRemove}
-                  onClick={() => handleRemoveItem(ti.item_id)}
-                  disabled={updateMutation.isPending}
-                  aria-label={t("plan_detail.remove_item", {
-                    name: itemName(ti.item_id),
-                  })}
+                  className={styles.btnAdd}
+                  onClick={() => setAddingItem(true)}
                 >
-                  ✕
+                  + {t("plan_detail.add_item")}
                 </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+              )}
+            </div>
 
-      {/* ── Linked blueprints ─────────────────────────────────────────── */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>
-            {t("plan_detail.linked_blueprints")}
-          </h2>
-          {!linkingBp && availableBps.length > 0 && (
-            <button
-              type="button"
-              className={styles.btnAdd}
-              onClick={() => setLinkingBp(true)}
-            >
-              + {t("plan_detail.link_blueprint")}
-            </button>
-          )}
-        </div>
-
-        {linkingBp && (
-          <form className={styles.addForm} onSubmit={handleLinkBp}>
-            <select
-              className={styles.select}
-              value={newBpName}
-              onChange={(e) => setNewBpName(e.target.value)}
-              required
-            >
-              <option value="">{t("plan_detail.select_blueprint")}</option>
-              {availableBps.map((bp) => (
-                <option key={bp.name} value={bp.name}>
-                  {bp.name}
-                </option>
-              ))}
-            </select>
-            <button
-              type="submit"
-              className={styles.btnSave}
-              disabled={updateMutation.isPending || !newBpName}
-            >
-              {t("plan_detail.link")}
-            </button>
-            <button
-              type="button"
-              className={styles.btnCancel}
-              onClick={() => {
-                setLinkingBp(false);
-                setNewBpName("");
-              }}
-            >
-              {t("plan_detail.cancel")}
-            </button>
-          </form>
-        )}
-
-        {plan.linked_blueprints.length === 0 && !linkingBp && (
-          <p className={styles.emptyHint}>{t("plan_detail.no_blueprints")}</p>
-        )}
-
-        {plan.linked_blueprints.length > 0 && (
-          <ul className={styles.itemList}>
-            {plan.linked_blueprints.map((bpName) => (
-              <li key={bpName} className={styles.itemRow}>
-                <Link
-                  to={`/blueprints/${encodeURIComponent(bpName)}`}
-                  className={styles.bpLink}
+            {addingItem && (
+              <form className={styles.addForm} onSubmit={handleAddItem}>
+                <select
+                  className={styles.select}
+                  value={newItemId}
+                  onChange={(e) => setNewItemId(e.target.value)}
+                  required
                 >
-                  {bpName}
-                </Link>
+                  <option value="">{t("plan_detail.select_item")}</option>
+                  {items.map((it) => (
+                    <option key={it.id} value={it.id}>
+                      {it.name}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  className={styles.qtyInput}
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={newItemQty}
+                  onChange={(e) => setNewItemQty(e.target.value)}
+                  required
+                  aria-label={t("plan_detail.quantity")}
+                />
+                <span className={styles.qtyUnit}>/min</span>
+                <button
+                  type="submit"
+                  className={styles.btnSave}
+                  disabled={updateMutation.isPending || !newItemId}
+                >
+                  {t("plan_detail.add")}
+                </button>
                 <button
                   type="button"
-                  className={styles.btnRemove}
-                  onClick={() => handleUnlinkBp(bpName)}
-                  disabled={updateMutation.isPending}
-                  aria-label={t("plan_detail.unlink_blueprint", {
-                    name: bpName,
-                  })}
+                  className={styles.btnCancel}
+                  onClick={() => {
+                    setAddingItem(false);
+                    setNewItemId("");
+                    setNewItemQty("1");
+                  }}
                 >
-                  ✕
+                  {t("plan_detail.cancel")}
                 </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+              </form>
+            )}
+
+            {plan.target_items.length === 0 && !addingItem && (
+              <p className={styles.emptyHint}>{t("plan_detail.no_items")}</p>
+            )}
+
+            {plan.target_items.length > 0 && (
+              <ul className={styles.itemList}>
+                {plan.target_items.map((ti) => (
+                  <li key={ti.item_id} className={styles.itemRow}>
+                    <span className={styles.itemName}>{itemName(ti.item_id)}</span>
+                    <span className={styles.itemQty}>
+                      {ti.quantity}
+                      <span className={styles.unit}>/min</span>
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.btnRemove}
+                      onClick={() => handleRemoveItem(ti.item_id)}
+                      disabled={updateMutation.isPending}
+                      aria-label={t("plan_detail.remove_item", {
+                        name: itemName(ti.item_id),
+                      })}
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* ── Linked blueprints ─────────────────────────────────────────── */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                {t("plan_detail.linked_blueprints")}
+              </h2>
+              {!linkingBp && availableBps.length > 0 && (
+                <button
+                  type="button"
+                  className={styles.btnAdd}
+                  onClick={() => setLinkingBp(true)}
+                >
+                  + {t("plan_detail.link_blueprint")}
+                </button>
+              )}
+            </div>
+
+            {linkingBp && (
+              <form className={styles.addForm} onSubmit={handleLinkBp}>
+                <select
+                  className={styles.select}
+                  value={newBpName}
+                  onChange={(e) => setNewBpName(e.target.value)}
+                  required
+                >
+                  <option value="">{t("plan_detail.select_blueprint")}</option>
+                  {availableBps.map((bp) => (
+                    <option key={bp.name} value={bp.name}>
+                      {bp.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className={styles.btnSave}
+                  disabled={updateMutation.isPending || !newBpName}
+                >
+                  {t("plan_detail.link")}
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnCancel}
+                  onClick={() => {
+                    setLinkingBp(false);
+                    setNewBpName("");
+                  }}
+                >
+                  {t("plan_detail.cancel")}
+                </button>
+              </form>
+            )}
+
+            {plan.linked_blueprints.length === 0 && !linkingBp && (
+              <p className={styles.emptyHint}>{t("plan_detail.no_blueprints")}</p>
+            )}
+
+            {plan.linked_blueprints.length > 0 && (
+              <ul className={styles.itemList}>
+                {plan.linked_blueprints.map((bpName) => (
+                  <li key={bpName} className={styles.itemRow}>
+                    <Link
+                      to={`/blueprints/${encodeURIComponent(bpName)}`}
+                      className={styles.bpLink}
+                    >
+                      {bpName}
+                    </Link>
+                    <button
+                      type="button"
+                      className={styles.btnRemove}
+                      onClick={() => handleUnlinkBp(bpName)}
+                      disabled={updateMutation.isPending}
+                      aria-label={t("plan_detail.unlink_blueprint", {
+                        name: bpName,
+                      })}
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
+
+      <div hidden={view !== "real"}>
+        <RealVsPlanned targetItems={plan.target_items} />
+      </div>
     </main>
   );
 }

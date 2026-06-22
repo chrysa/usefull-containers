@@ -216,6 +216,28 @@
     "search_placeholder": "Rechercher des plans…",
     "title": "Plans de production"
   },
+  "real_vs_planned": {
+    "col_actual": "Construit",
+    "col_planned": "Prévu",
+    "col_recipe": "Recette",
+    "col_status": "Statut",
+    "drop_hint": "Déposez une sauvegarde .sav ici, ou cliquez pour choisir un fichier",
+    "empty": "Aucune sauvegarde chargée. Déposez un .sav pour le comparer à ce plan.",
+    "game_data_loading": "Les données du jeu se chargent encore — réessayez dans un instant.",
+    "needs_gamedata": "Importez d'abord les données du jeu pour calculer le prévu.",
+    "parse_error": "Impossible d'analyser ce fichier de sauvegarde.",
+    "parsing": "Analyse de la sauvegarde…",
+    "save_name": "Sauvegarde : {{name}}",
+    "saved": "Instantané enregistré.",
+    "status_missing": "Manquant",
+    "status_ok": "OK",
+    "status_over": "Sur-capacité",
+    "status_under": "Sous-capacité",
+    "status_unmatched": "Non reconnu",
+    "status_unplanned": "Non prévu",
+    "tab": "Réel vs prévu",
+    "title": "Réel vs prévu"
+  },
   "project": {
     "confirm_delete": "Supprimer le projet \"{{name}}\" ? Les plans et blueprints restent sur le backend.",
     "create": "Nouveau projet",

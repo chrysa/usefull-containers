@@ -1,0 +1,67 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dropzone {
+  border: 2px dashed var(--border, #3a3a3a);
+  border-radius: 0;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-secondary, #1a1a1a);
+  color: var(--text-muted, #888);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.dropzoneActive {
+  border-color: var(--primary, #ff8a00);
+  background: rgba(255, 138, 0, 0.08);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.error {
+  color: var(--danger, #ff5555);
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--border, #3a3a3a);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.table th {
+  background: var(--bg-secondary, #1a1a1a);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #888);
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.ok { background: #1f6f3f; color: #fff; }
+.under { background: #8a6d00; color: #fff; }
+.over { background: #7a3fbf; color: #fff; }
+.missing { background: #a01818; color: #fff; }
+.unplanned { background: #1d5f8a; color: #fff; }
+.unmatched { background: #555; color: #fff; }

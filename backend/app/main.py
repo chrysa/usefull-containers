@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.constants import API_PREFIX, APP_TITLE, APP_VERSION
-from app.routers import assistant, audit, auth, blueprints, gamedata, health, plans
+from app.routers import assistant, audit, auth, blueprints, gamedata, health, plans, snapshots
 
 
 @asynccontextmanager
@@ -45,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(assistant.router, prefix=API_PREFIX)
     app.include_router(auth.router, prefix=API_PREFIX)
     app.include_router(audit.router, prefix=API_PREFIX)
+    app.include_router(snapshots.router, prefix=API_PREFIX)
 
     return app
 

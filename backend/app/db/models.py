@@ -1,8 +1,19 @@
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime
+from typing import Any
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -50,3 +61,30 @@ class AuditLog(Base):
         default=lambda: datetime.now(UTC),
         nullable=False,
     )
+
+
+class FactorySnapshot(Base):
+    """A reduced parse of a player's Satisfactory .sav (L9).
+
+    Self-scoped like AuditLog: each user reads only their own snapshots. The
+    heavy reduction happens client-side; the backend only persists the result.
+    `save_name` and `play_time` are denormalized out of `data` for cheap listing.
+    """
+
+    __tablename__ = "factory_snapshots"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), index=True, nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    save_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    play_time: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    imported_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)

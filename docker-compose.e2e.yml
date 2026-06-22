@@ -41,6 +41,7 @@ services:
     depends_on:
     - frontend
     environment:
+      API_URL: http://api:8000
       BASE_URL: http://frontend:4173
       CI: 'true'
     image: mcr.microsoft.com/playwright:v1.52.0-noble

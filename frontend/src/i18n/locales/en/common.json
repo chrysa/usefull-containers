@@ -216,6 +216,28 @@
     "search_placeholder": "Search plans…",
     "title": "Factory Plans"
   },
+  "real_vs_planned": {
+    "col_actual": "Built",
+    "col_planned": "Planned",
+    "col_recipe": "Recipe",
+    "col_status": "Status",
+    "drop_hint": "Drop a Satisfactory .sav here, or click to choose a file",
+    "empty": "No save loaded yet. Drop a .sav to compare it with this plan.",
+    "game_data_loading": "Game data is still loading — try again in a moment.",
+    "needs_gamedata": "Import game data first to compute the planned side.",
+    "parse_error": "Could not parse this save file.",
+    "parsing": "Parsing save…",
+    "save_name": "Save: {{name}}",
+    "saved": "Snapshot saved.",
+    "status_missing": "Missing",
+    "status_ok": "OK",
+    "status_over": "Over",
+    "status_under": "Under",
+    "status_unmatched": "Unmatched",
+    "status_unplanned": "Unplanned",
+    "tab": "Actual vs planned",
+    "title": "Actual vs planned"
+  },
   "project": {
     "confirm_delete": "Delete project \"{{name}}\"? Plans and blueprints remain on the backend.",
     "create": "New project",

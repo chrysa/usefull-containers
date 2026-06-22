@@ -30,3 +30,12 @@ services:
     - ./frontend:/app
     - /app/node_modules
     working_dir: /app
+  frontend-test:
+    build:
+      context: ./frontend
+      target: deps
+    command: sh -c "npm run test"
+    volumes:
+    - ./frontend:/app
+    - /app/node_modules
+    working_dir: /app
