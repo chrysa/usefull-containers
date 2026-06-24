@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
             shift;
             break
             ;;
-        -h)
+        -h|--help)
             echo "Usage reorder python import :
                 [ -c | --config] define config flags
                 [ -f | --file] relative file(s) path to format
@@ -52,6 +52,8 @@ while [[ $# -gt 0 ]]; do
             exit 2
             ;;
         *)
+            echo "ignoring unexpected argument: $1" >&2
+            shift
             ;;
     esac
 done
