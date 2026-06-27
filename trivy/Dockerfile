@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM aquasec/trivy:0.71.1
+FROM aquasec/trivy:0.71.2
 
 WORKDIR /app
 
