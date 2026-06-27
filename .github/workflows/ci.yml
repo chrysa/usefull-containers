@@ -32,7 +32,7 @@ jobs:
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@v6.0.3
+            - uses: actions/checkout@v7.0.0
             - uses: chrysa/github-actions/python-setup@v1.2.1
               with:
                   python-version: "3.14"
@@ -65,7 +65,7 @@ jobs:
                     - actionlint
                     - yamllint
         steps:
-            - uses: actions/checkout@v6.0.3
+            - uses: actions/checkout@v7.0.0
             - name: Run hadolint on ${{ matrix.service }}/Dockerfile
               uses: hadolint/hadolint-action@v3.3.0
               with:
@@ -80,7 +80,7 @@ jobs:
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@v6.0.3
+            - uses: actions/checkout@v7.0.0
             - name: Validate root docker-compose.yaml
               run: docker compose config --quiet
               shell: bash
