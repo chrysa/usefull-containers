@@ -9,6 +9,7 @@ import {
 } from "../domain/blueprints/queries";
 import { downloadAuthedFile } from "../domain/blueprints/download";
 import Skeleton from "../components/ui/Skeleton";
+import { formatDateTime } from "../utils/formatDate";
 import styles from "./BlueprintDetail.module.scss";
 
 function formatBytes(bytes: number): string {
@@ -17,14 +18,9 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatDate(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString();
-}
-
 export default function BlueprintDetail() {
   const { name = "" } = useParams<{ name: string }>();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const { data: blueprint, isLoading, isError } = useBlueprintQuery(name);
@@ -168,7 +164,7 @@ export default function BlueprintDetail() {
           <dd>{formatBytes(blueprint.size_bytes)}</dd>
 
           <dt>{t("blueprint_detail.modified")}</dt>
-          <dd>{formatDate(blueprint.modified_at)}</dd>
+          <dd>{formatDateTime(blueprint.modified_at, i18n.language)}</dd>
 
           <dt>{t("blueprint_detail.files")}</dt>
           <dd>

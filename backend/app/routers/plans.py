@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.db.models import User
 from app.db.session import get_session
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import forbid_writes_in_demo, get_current_user
 from app.fixtures import demo_plan, demo_plans
 from app.models.plan import PlanCreate, PlanImport, PlanRead, PlanUpdate
 from app.services import audit_service, plan_service
@@ -15,7 +15,7 @@ from app.services.user_storage import user_data_dir
 router = APIRouter(
     prefix="/plans",
     tags=["plans"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(get_current_user), Depends(forbid_writes_in_demo)],
 )
 
 

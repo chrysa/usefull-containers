@@ -336,3 +336,55 @@ size unchanged.
   #186 follow-up) to prevent browser OOM on malformed payloads.
 - A user-visible error must be shown (and is) when the CDN import fails, so the
   offline limitation is never a silent failure.
+||||||| parent of 3d20c7be (feat(L10): NL assistant via ai-aggregator with rule-based fallback)
+## D-0011 — Assistant L10: LLM via ai-aggregator with rule-based fallback
+
+**Date**: 2026-06-25
+**Status**: accepted
+
+### Context
+
+The `/api/v1/assistant/chat` endpoint shipped in V1 as a deterministic keyword
+intent engine: it can report counts and link to pages, but cannot answer an open
+question like *"comment optimiser ma prod de rotor ?"*. L10 (ROADMAP P3) asks for
+a genuine natural-language assistant routed through the chrysa **ai-aggregator**
+gateway. The product brief (CLAUDE.md) lists an "AI Q&A assistant" as a core
+feature, so the keyword stub was a placeholder, not the intended end state.
+
+### Decision
+
+Add an LLM path that the assistant prefers when configured, falling back to the
+existing rule engine otherwise.
+
+- **Gateway contract**: `POST {AI_AGGREGATOR_URL}/api/v1/completions`, header
+  `X-API-Key`, body `{prompt, max_tokens, temperature, model?}` → `{text, ...}`.
+  The thin async client lives in `app/services/ai_client.py`.
+- **Grounding**: the prompt injects a Satisfactory-expert system message plus a
+  game-data context block — imported item/recipe counts and the recipes whose
+  name matches a significant word in the question (ingredients/products resolved
+  to readable item names). The model is told to use *only* that data.
+- **Graceful degradation is mandatory**: an empty `AI_AGGREGATOR_URL` disables the
+  LLM entirely; any network error, timeout, non-200, or empty completion returns
+  `None` and the assistant answers with the deterministic rule engine. Nothing in
+  the app depends on a live gateway — the feature is purely additive and the
+  offline build keeps working.
+- **Response contract unchanged**: replies stay `{reply, actions}`, so the
+  frontend widget needed no change. LLM replies still get contextual nav actions
+  via the same intent detector.
+
+### Why route through ai-aggregator (not call a provider SDK directly)
+
+The chrysa standard is one gateway for all LLM access (provider-agnostic routing,
+prompt history, quota). Calling Anthropic/Ollama directly here would duplicate
+key management and break the portfolio's single point of control. The gateway
+also lets the deployment pick Ollama as a local fallback without code changes.
+
+### Consequences
+
+- `assistant_service.py` is now covered by tests (removed from the coverage
+  `omit` list); both modules sit at 100%/86% line coverage.
+- Config gains `ai_aggregator_url`, `ai_aggregator_api_key`, `assistant_model`,
+  `assistant_max_tokens`, `assistant_temperature`, `assistant_timeout_seconds`.
+- The gateway API key is a secret: provision via SealedSecret when SFM is
+  deployed (see [D-0003](#d-0003--scope-pivot-offline-optimizer-not-live-monitoring)).
+  V1 stays offline-capable with the LLM off.

@@ -6,7 +6,22 @@
     "send": "Send",
     "title": "Factory Assistant",
     "toggle_label": "Open assistant",
-    "welcome": "Hi! I'm your Factory Manager assistant. How can I help you?"
+    "welcome": "Hi! I'm your Factory Manager assistant. How can I help you?",
+    "plan_mode": "Generate a factory plan",
+    "plan_mode_active": "Plan mode",
+    "plan_mode_hint": "Describe what to produce, e.g. \"120 iron plate per minute\".",
+    "plan": {
+      "steps": "Production steps",
+      "machine_line": "{{count}}× {{machine}} — {{recipe}} ({{clock}}%)",
+      "machine_unknown": "{{recipe}} — machine count unknown (no craft time)",
+      "consumes": "consumes",
+      "raw_inputs": "Raw inputs",
+      "assumptions": "Assumptions & limits",
+      "warnings": "Warnings",
+      "save": "Save as plan",
+      "saving": "Saving…",
+      "saved": "Saved ✓"
+    }
   },
   "blueprint_detail": {
     "back": "Back to Blueprints",
@@ -102,7 +117,8 @@
   },
   "demo": {
     "label": "Demo",
-    "message": "Exploring fixture data — no real credentials are used."
+    "message": "Exploring fixture data — no real credentials are used.",
+    "readonly_hint": "Read-only demo — connect a backend to save."
   },
   "error": "An error occurred",
   "errors": {

@@ -48,7 +48,6 @@ source = ["app"]
 omit = [
     "tests/*",
     "app/services/steam_service.py",
-    "app/services/assistant_service.py",
 ]
 concurrency = ["thread", "greenlet"]
 

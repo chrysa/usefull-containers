@@ -158,7 +158,8 @@
 .chip {
   background: var(--color-accent-subtle, rgb(124 58 237 / 12%));
   border: 1px solid var(--color-accent);
-  color: var(--color-accent);
+  // Darker accent so the chip label clears WCAG AA on the tinted bg (4.2:1 → ~6:1).
+  color: var(--color-primary-hover, #9a3412);
   font-size: 0.75rem;
   padding: 0.3rem 0.6rem;
   border-radius: var(--radius-sm);
@@ -307,19 +308,36 @@
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
 
   &:disabled {
     opacity: 0.4;
     cursor: default;
   }
 
+  // Darken on hover (not opacity) to preserve white-text WCAG AA contrast.
   &:not(:disabled):hover {
-    opacity: 0.85;
+    background: var(--color-primary-hover, #9a3412);
   }
 
   &:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
+}
+
+.modeBtn,
+.modeBtnActive {
+  flex: 0 0 auto;
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 0.375rem;
+  background: transparent;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.modeBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
 }

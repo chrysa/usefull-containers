@@ -48,7 +48,8 @@
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-sm);
   background: var(--color-accent-bg, rgba(59, 130, 246, 0.12));
-  color: var(--color-accent, #3b82f6);
+  // Darker accent so the badge text clears WCAG AA on the tinted pill (4.34:1 → ~6:1).
+  color: var(--color-primary-hover, #9a3412);
   border: 1px solid var(--color-accent-border, rgba(59, 130, 246, 0.3));
 }
 

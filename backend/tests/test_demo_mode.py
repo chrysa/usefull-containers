@@ -87,6 +87,54 @@ class TestGameDataFixtures:
         assert stats["source_file"]
 
 
+class TestGeneratePlanEndpoint:
+    """POST /assistant/generate-plan — calc-only, reachable in demo, never persists.
+
+    With no gateway configured in tests the LLM path is skipped, so these exercise
+    the deterministic offline keyword extraction end-to-end through the API.
+    """
+
+    def test_prompt_returns_a_deterministic_plan(self, demo_client: TestClient) -> None:
+        res = demo_client.post(
+            f"{API}/assistant/generate-plan",
+            json={"prompt": "120 iron plate per minute"},
+        )
+        assert res.status_code == 200
+        body = res.json()
+        assert body["clarification"] is None
+        plan = body["plan"]
+        assert plan is not None
+        assert [(t["item_id"], t["quantity"]) for t in plan["target_items"]] == [
+            ("Desc_IronPlate_C", 120)
+        ]
+        steps = {s["item_id"]: s for s in plan["steps"]}
+        assert steps["Desc_IronPlate_C"]["machine_count"] == 6
+        assert steps["Desc_IronIngot_C"]["machine_count"] == 6
+        raw = {r["item_id"]: r["per_minute"] for r in plan["raw_inputs"]}
+        assert raw["Desc_OreIron_C"] == 180
+        assert plan["build_order"].index("Desc_IronIngot_C") < plan["build_order"].index(
+            "Desc_IronPlate_C"
+        )
+
+    def test_vague_prompt_returns_clarification(self, demo_client: TestClient) -> None:
+        res = demo_client.post(
+            f"{API}/assistant/generate-plan", json={"prompt": "hi there"}
+        )
+        assert res.status_code == 200
+        body = res.json()
+        assert body["plan"] is None
+        assert body["clarification"]
+
+    def test_generate_plan_does_not_persist_anything(self, demo_client: TestClient) -> None:
+        before = len(demo_client.get(f"{API}/plans").json())
+        demo_client.post(
+            f"{API}/assistant/generate-plan",
+            json={"prompt": "60 iron rod per minute"},
+        )
+        after = len(demo_client.get(f"{API}/plans").json())
+        assert after == before
+
+
 class TestAuthGatedFixtures:
     def test_plans_reachable_without_credentials(self, demo_client: TestClient) -> None:
         # No Authorization header — would be 401 outside demo mode.
@@ -116,3 +164,54 @@ class TestAuthGatedFixtures:
         res = demo_client.get(f"{API}/blueprints/{name}")
         assert res.status_code == 200
         assert res.json()["name"] == name
+
+    def test_auth_me_reachable_without_credentials(self, demo_client: TestClient) -> None:
+        # Regression: the synthetic demo user used to lack ``created_at``, so
+        # serialising UserRead crashed /auth/me with 500 (surfaced as a CORS
+        # error in the browser on every page).
+        res = demo_client.get(f"{API}/auth/me")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["username"] == "demo"
+        assert body["created_at"]
+
+
+class TestDemoIsReadOnly:
+    """Demo mode serves shared fixtures through one synthetic user, so writes are
+    rejected (403) to avoid leaking one visitor's data to the next."""
+
+    def test_create_plan_is_forbidden(self, demo_client: TestClient) -> None:
+        res = demo_client.post(f"{API}/plans", json={"name": "x", "target_items": []})
+        assert res.status_code == 403
+        assert "read-only" in res.json()["detail"].lower()
+
+    def test_delete_plan_is_forbidden(self, demo_client: TestClient) -> None:
+        plan_id = demo_client.get(f"{API}/plans").json()[0]["id"]
+        assert demo_client.delete(f"{API}/plans/{plan_id}").status_code == 403
+
+    def test_delete_blueprint_is_forbidden(self, demo_client: TestClient) -> None:
+        name = demo_client.get(f"{API}/blueprints").json()["blueprints"][0]["name"]
+        assert demo_client.delete(f"{API}/blueprints/{name}").status_code == 403
+
+    def test_reads_still_work(self, demo_client: TestClient) -> None:
+        assert demo_client.get(f"{API}/plans").status_code == 200
+        assert demo_client.get(f"{API}/blueprints").status_code == 200
+
+
+class TestAssistantMatchesDemoData:
+    """The assistant must report the same counts the rest of the app shows in
+    demo mode — it used to read raw global storage and answer 0."""
+
+    def test_blueprint_count_matches_fixtures(self, demo_client: TestClient) -> None:
+        total = demo_client.get(f"{API}/blueprints").json()["total"]
+        assert total > 0
+        res = demo_client.post(f"{API}/assistant/chat", json={"message": "Combien de blueprints ?"})
+        assert res.status_code == 200
+        assert f"{total} blueprint" in res.json()["reply"]
+
+    def test_plan_count_matches_fixtures(self, demo_client: TestClient) -> None:
+        total = len(demo_client.get(f"{API}/plans").json())
+        assert total > 0
+        res = demo_client.post(f"{API}/assistant/chat", json={"message": "Voir mes plans"})
+        assert res.status_code == 200
+        assert f"{total} plan" in res.json()["reply"]

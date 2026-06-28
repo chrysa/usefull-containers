@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Plan, PlanCreate } from "../../domain/plans/types";
 import styles from "./PlanForm.module.scss";
@@ -15,6 +15,15 @@ export default function PlanForm({ initial, onSubmit, onCancel, isPending }: Pro
   const [name, setName] = useState(initial?.name ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
 
+  // Close the modal on Escape regardless of where focus currently sits.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
@@ -27,7 +36,11 @@ export default function PlanForm({ initial, onSubmit, onCancel, isPending }: Pro
   }
 
   return (
-    <div className={styles.overlay} role="dialog" aria-modal="true">
+    <div
+      className={styles.overlay}
+      role="dialog"
+      aria-modal="true"
+    >
       <form className={styles.dialog} onSubmit={handleSubmit}>
         <h2 className={styles.title}>
           {initial ? t("plans.form.edit_title") : t("plans.form.create_title")}

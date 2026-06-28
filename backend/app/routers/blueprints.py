@@ -10,7 +10,7 @@ from app.config import settings
 from app.constants import BLUEPRINTS_ZIP_FILENAME, MAX_BLUEPRINT_SIZE_BYTES
 from app.db.models import User
 from app.db.session import get_session
-from app.dependencies.auth import get_current_user, get_sync_user
+from app.dependencies.auth import forbid_writes_in_demo, get_current_user, get_sync_user
 from app.fixtures import demo_blueprint, demo_blueprints
 from app.models.blueprint import (
     BatchUploadResult,
@@ -45,7 +45,7 @@ from app.services.user_storage import user_blueprints_dir
 router = APIRouter(
     prefix="/blueprints",
     tags=["blueprints"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(get_current_user), Depends(forbid_writes_in_demo)],
 )
 
 # Separate router for the headless sync endpoint: it must accept the agent key

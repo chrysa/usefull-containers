@@ -118,8 +118,8 @@ avec auth obligatoire + plans/blueprints scopés par utilisateur.
 
 | ID    | Tâche                                                                                 | Effort | État    |
 |-------|---------------------------------------------------------------------------------------|--------|---------|
-| L9    | Parser `.sav` (format binaire propriétaire) — snapshots offline                       | M      | 🧊 gelé |
-| L10   | Assistant NL ("comment optimiser ma prod de rotor ?") via AI Aggregator               | S      | 🧊 gelé |
+| L9    | Parser `.sav` (format binaire propriétaire) — snapshots offline                       | M      | ✅ done ([PR #186](https://github.com/chrysa/satisfactory-factory-manager/pull/186)) |
+| L10   | Assistant NL ("comment optimiser ma prod de rotor ?") via AI Aggregator               | S      | ✅ done (LLM via ai-aggregator + fallback moteur à règles ; `AI_AGGREGATOR_URL` vide ⇒ offline) |
 
 ---
 

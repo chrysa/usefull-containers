@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Plan } from "../../domain/plans/types";
+import { formatDate } from "../../utils/formatDate";
 import styles from "./PlanCard.module.scss";
 
 interface Props {
@@ -11,8 +12,8 @@ interface Props {
 }
 
 export default function PlanCard({ plan, onEdit, onDelete, onDuplicate }: Props) {
-  const { t } = useTranslation();
-  const updatedDate = new Date(plan.updated_at).toLocaleDateString();
+  const { t, i18n } = useTranslation();
+  const updatedDate = formatDate(plan.updated_at, i18n.language);
 
   return (
     <article className={styles.card}>

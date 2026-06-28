@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAssistantChat } from "../../api/assistant/queries";
+import { useAssistantChat, useGeneratePlan } from "../../api/assistant/queries";
 import type { ChatMessage } from "../../api/assistant/types";
+import GeneratedPlanPreview from "./GeneratedPlanPreview";
 import styles from "./AssistantWidget.module.scss";
 
 const SUGGESTIONS_FR = [
@@ -29,6 +30,9 @@ export default function AssistantWidget() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { mutate, isPending } = useAssistantChat();
+  const generatePlan = useGeneratePlan();
+  const [planMode, setPlanMode] = useState(false);
+  const busy = isPending || generatePlan.isPending;
 
   const suggestions = i18n.language.startsWith("fr") ? SUGGESTIONS_FR : SUGGESTIONS_EN;
 
@@ -38,16 +42,51 @@ export default function AssistantWidget() {
     }
   }, [open]);
 
+  // Close on Escape from anywhere while open. A document-level listener is
+  // required because focus can leave the panel (e.g. the input is disabled
+  // while a reply is pending, which moves focus to <body>), so an onKeyDown
+  // bound to the panel element would silently stop firing.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   function sendMessage(text: string) {
     const trimmed = text.trim();
-    if (!trimmed || isPending) return;
+    if (!trimmed || busy) return;
     const userMsg: ChatMessage = { role: "user", text: trimmed };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+
+    if (planMode) {
+      generatePlan.mutate(trimmed, {
+        onSuccess: (data) => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              text: data.reply,
+              plan: data.plan ?? undefined,
+            },
+          ]);
+        },
+        onError: () => {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", text: t("assistant.error") },
+          ]);
+        },
+      });
+      return;
+    }
 
     mutate(trimmed, {
       onSuccess: (data) => {
@@ -151,10 +190,11 @@ export default function AssistantWidget() {
                     ))}
                   </div>
                 )}
+                {msg.plan && <GeneratedPlanPreview plan={msg.plan} />}
               </div>
             ))}
 
-            {isPending && (
+            {busy && (
               <div className={styles.assistantBubble}>
                 <span className={styles.typing}>
                   <span />
@@ -169,21 +209,36 @@ export default function AssistantWidget() {
 
           {/* Input */}
           <div className={styles.inputRow}>
+            <button
+              type="button"
+              className={planMode ? styles.modeBtnActive : styles.modeBtn}
+              data-testid="assistant-plan-mode"
+              aria-pressed={planMode}
+              title={t("assistant.plan_mode")}
+              aria-label={t("assistant.plan_mode")}
+              onClick={() => setPlanMode((v) => !v)}
+            >
+              🏭
+            </button>
             <input
               ref={inputRef}
               className={styles.input}
               type="text"
               value={input}
-              placeholder={t("assistant.placeholder")}
+              placeholder={
+                planMode ? t("assistant.plan_mode_hint") : t("assistant.placeholder")
+              }
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              aria-label={t("assistant.placeholder")}
-              disabled={isPending}
+              aria-label={
+                planMode ? t("assistant.plan_mode_hint") : t("assistant.placeholder")
+              }
+              disabled={busy}
             />
             <button
               className={styles.sendBtn}
               onClick={() => sendMessage(input)}
-              disabled={isPending || !input.trim()}
+              disabled={busy || !input.trim()}
               aria-label={t("assistant.send")}
             >
               ➤

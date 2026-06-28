@@ -4,15 +4,17 @@ import { useBlueprintsQuery } from "../domain/blueprints/queries";
 import { useHealthQuery } from "../api/health/queries";
 import { usePlansQuery } from "../domain/plans/queries";
 import Skeleton from "../components/ui/Skeleton";
+import { formatDate } from "../utils/formatDate";
 import styles from "./Home.module.scss";
 
-function formatDate(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
+const RECENT_DATE_OPTS: Intl.DateTimeFormatOptions = {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+};
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: bpData, isLoading: bpLoading } = useBlueprintsQuery();
   const { data: health, isLoading: healthLoading, isError: healthError } = useHealthQuery();
   const { data: plansData, isLoading: plansLoading } = usePlansQuery();
@@ -103,7 +105,9 @@ export default function Home() {
             {recent.map((bp) => (
               <li key={bp.name} className={styles.recentItem}>
                 <span className={styles.recentName}>{bp.name}</span>
-                <span className={styles.recentDate}>{formatDate(bp.modified_at)}</span>
+                <span className={styles.recentDate}>
+                  {formatDate(bp.modified_at, i18n.language, RECENT_DATE_OPTS)}
+                </span>
                 {bp.tags.length > 0 && (
                   <span className={styles.recentTags}>
                     {bp.tags.map((tag) => (
@@ -135,7 +139,9 @@ export default function Home() {
             {recentPlans.map((plan) => (
               <li key={plan.id} className={styles.recentItem}>
                 <Link to={`/plans/${plan.id}`} className={styles.recentLink}>{plan.name}</Link>
-                <span className={styles.recentDate}>{formatDate(plan.updated_at)}</span>
+                <span className={styles.recentDate}>
+                  {formatDate(plan.updated_at, i18n.language, RECENT_DATE_OPTS)}
+                </span>
                 {plan.target_items.length > 0 && (
                   <span className={styles.recentMeta}>
                     {t("plans.items_count", { count: plan.target_items.length })}

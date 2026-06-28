@@ -46,6 +46,22 @@ class Settings(BaseSettings):
     auth_rate_limit_max: int = 5
     auth_rate_limit_window_seconds: int = 60
 
+    # Assistant LLM (L10): the NL assistant routes questions through the chrysa
+    # ai-aggregator gateway (POST {url}/api/v1/completions, X-API-Key header).
+    # When ai_aggregator_url is empty the LLM path is disabled and the assistant
+    # falls back to the deterministic rule-based engine — so the feature degrades
+    # gracefully offline and the rest of the app never depends on a live gateway.
+    ai_aggregator_url: str = ""
+    ai_aggregator_api_key: str = ""
+    assistant_model: str = ""  # empty → let the gateway pick the best provider
+    assistant_max_tokens: int = 600
+    assistant_temperature: float = 0.3
+    assistant_timeout_seconds: float = 20.0
+
+    @property
+    def assistant_llm_enabled(self) -> bool:
+        return bool(self.ai_aggregator_url)
+
     @property
     def auth_db_path(self) -> str:
         return f"{self.data_dir}/{AUTH_DB_FILENAME}"

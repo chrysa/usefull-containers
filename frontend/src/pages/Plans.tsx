@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../context/useToast";
+import { useHealthQuery } from "../api/health/queries";
 import { PlanCard, PlanForm } from "../features/plans";
 import Skeleton from "../components/ui/Skeleton";
 import {
@@ -19,6 +20,10 @@ export default function PlansPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  // Demo mode is read-only (the backend rejects writes); disable the mutating
+  // controls so visitors get a clear hint instead of a failed action.
+  const { data: health } = useHealthQuery();
+  const isDemo = !!health?.demo_mode;
   const { data: plans, isLoading, isError } = usePlansQuery();
   const createMutation = useCreatePlanMutation();
   const deleteMutation = useDeletePlanMutation();
@@ -125,8 +130,8 @@ export default function PlansPage() {
             type="button"
             className={styles.btnImport}
             onClick={handleImportClick}
-            disabled={importMutation.isPending}
-            title={t("plans.import_json_hint")}
+            disabled={importMutation.isPending || isDemo}
+            title={isDemo ? t("demo.readonly_hint") : t("plans.import_json_hint")}
           >
             {importMutation.isPending
               ? t("plans.importing_json")
@@ -144,6 +149,8 @@ export default function PlansPage() {
             type="button"
             className={styles.btnCreate}
             onClick={openCreate}
+            disabled={isDemo}
+            title={isDemo ? t("demo.readonly_hint") : undefined}
           >
             + {t("plans.create")}
           </button>

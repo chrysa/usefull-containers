@@ -25,7 +25,7 @@ const PROJECT_ID = "e2e";
 async function authToken(): Promise<string> {
   const api = await playwrightRequest.newContext({ baseURL: API_URL });
   try {
-    const body = { data: { username: USERNAME, password: PASSWORD } };
+    const body = { username: USERNAME, password: PASSWORD };
     let resp = await api.post("/api/v1/auth/register", body);
     // 409 → the user already exists from a previous run: log in instead.
     if (resp.status() === 409) {

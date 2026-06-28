@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import secrets
+from datetime import UTC, datetime
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -19,7 +20,14 @@ AGENT_KEY_HEADER = "X-SFM-Agent-Key"
 #: Synthetic user returned by the auth dependencies while demo mode is on, so
 #: the auth-gated routers are reachable without any real credentials. It is
 #: never persisted; the read endpoints serve fixtures instead of real storage.
-DEMO_USER = User(id=0, username="demo", is_active=True)
+#: ``created_at`` must be set: it is a required, non-nullable field of UserRead,
+#: so GET /auth/me would otherwise crash (500) serialising this user in demo mode.
+DEMO_USER = User(
+    id=0,
+    username="demo",
+    is_active=True,
+    created_at=datetime(2024, 1, 1, tzinfo=UTC),
+)
 
 
 async def get_current_user_optional(
@@ -51,6 +59,21 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
+
+async def forbid_writes_in_demo(request: Request) -> None:
+    """Reject mutating requests while demo mode is on.
+
+    Demo mode serves shared fixtures to every anonymous visitor through a single
+    synthetic user, so persisting writes would leak one visitor's data to the
+    next (and never show, since reads return fixtures). Reads stay allowed; any
+    other method returns 403 so the UI can surface a read-only notice.
+    """
+    if settings.demo_mode and request.method not in ("GET", "HEAD", "OPTIONS"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This is a read-only demo.",
+        )
 
 
 async def get_sync_user(

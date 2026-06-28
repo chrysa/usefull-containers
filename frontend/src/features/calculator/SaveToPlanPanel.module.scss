@@ -106,10 +106,11 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.15s ease;
+  transition: background 0.15s ease;
 
+  // Darken on hover (not opacity) to preserve white-text WCAG AA contrast.
   &:hover:not(:disabled) {
-    opacity: 0.85;
+    background: var(--color-primary-hover, #9a3412);
   }
 
   &:disabled {

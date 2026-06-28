@@ -56,15 +56,17 @@
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
 
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
   }
 
+  // Darken on hover instead of fading opacity: opacity blended the orange with
+  // the page and dropped white-text contrast below WCAG AA (4.27:1).
   &:hover:not(:disabled) {
-    opacity: 0.88;
+    background: var(--color-primary-hover, #9a3412);
   }
 }
 
@@ -138,7 +140,8 @@
   font-size: 0.7rem;
   padding: 0 0.4rem;
   background: var(--color-accent-secondary, #f59e0b);
-  color: #000;
+  // White on the darkened amber (#b45309) clears WCAG AA (6.7:1); black did not.
+  color: #fff;
   border-radius: 999px;
   font-weight: 700;
   text-transform: uppercase;

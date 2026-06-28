@@ -151,7 +151,8 @@
   padding: 2px 6px;
   border-radius: 999px;
   background: var(--color-primary-alpha, rgba(100, 160, 255, 0.15));
-  color: var(--color-primary, #64a0ff);
+  // Darker primary so the tag text clears WCAG AA on the tinted pill (4.2:1 → ~6:1).
+  color: var(--color-primary-hover, #9a3412);
 }
 
 // ── Quick links ───────────────────────────────────────────────────────────────

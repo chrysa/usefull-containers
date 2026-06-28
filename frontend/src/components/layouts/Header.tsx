@@ -50,12 +50,13 @@ export default function Header({
               ? "Toggle theme (click to switch, long-press to reset)"
               : "Follows OS theme"
           }
+          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
         >
           {theme === "dark" ? "☀️" : "🌙"}
           {isOverridden && <span className={styles.overrideDot} />}
         </button>
         {isOverridden && (
-          <button onClick={resetToSystem} title="Reset to OS theme">
+          <button onClick={resetToSystem} title="Reset to OS theme" aria-label="Reset to OS theme">
             🖥️
           </button>
         )}

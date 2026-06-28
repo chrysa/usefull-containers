@@ -6,7 +6,22 @@
     "send": "Envoyer",
     "title": "Assistant Factory",
     "toggle_label": "Ouvrir l'assistant",
-    "welcome": "Bonjour ! Je suis votre assistant Factory Manager. Comment puis-je vous aider ?"
+    "welcome": "Bonjour ! Je suis votre assistant Factory Manager. Comment puis-je vous aider ?",
+    "plan_mode": "Générer un plan d'usine",
+    "plan_mode_active": "Mode plan",
+    "plan_mode_hint": "Décrivez quoi produire, ex. « 120 iron plate per minute ».",
+    "plan": {
+      "steps": "Étapes de production",
+      "machine_line": "{{count}}× {{machine}} — {{recipe}} ({{clock}} %)",
+      "machine_unknown": "{{recipe}} — nombre de machines inconnu (pas de temps de craft)",
+      "consumes": "consomme",
+      "raw_inputs": "Intrants bruts",
+      "assumptions": "Hypothèses & limites",
+      "warnings": "Avertissements",
+      "save": "Enregistrer comme plan",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré ✓"
+    }
   },
   "blueprint_detail": {
     "back": "Retour aux blueprints",
@@ -102,7 +117,8 @@
   },
   "demo": {
     "label": "Démo",
-    "message": "Données fictives explorées — aucune information réelle n'est utilisée."
+    "message": "Données fictives explorées — aucune information réelle n'est utilisée.",
+    "readonly_hint": "Démo en lecture seule — connectez un backend pour enregistrer."
   },
   "error": "Une erreur est survenue",
   "errors": {

@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Blueprint } from "../../domain/blueprints/types";
 import { downloadAuthedFile } from "../../domain/blueprints/download";
+import { formatDate } from "../../utils/formatDate";
 import { TagEditor } from "./TagEditor";
 import styles from "./BlueprintCard.module.scss";
 
@@ -17,10 +19,9 @@ function formatBytes(bytes: number): string {
 }
 
 export default function BlueprintCard({ blueprint, onDelete }: Props) {
+  const { i18n } = useTranslation();
   const downloadUrl = `/api/v1/blueprints/${encodeURIComponent(blueprint.name)}/download`;
-  const modifiedDate = blueprint.modified_at
-    ? new Date(blueprint.modified_at).toLocaleDateString()
-    : "—";
+  const modifiedDate = formatDate(blueprint.modified_at, i18n.language);
 
   return (
     <article className={styles.card}>
