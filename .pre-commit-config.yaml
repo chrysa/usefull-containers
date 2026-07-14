@@ -21,7 +21,7 @@ repos:
                 - main
             id: no-commit-to-branch
     - repo: https://github.com/chrysa/pre-commit-tools
-      rev: v0.1.1-95
+      rev: v0.1.1-97
       hooks:
           - id: makefile-check
           - id: format-dockerfiles
