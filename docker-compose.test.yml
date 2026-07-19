@@ -7,6 +7,13 @@ services:
       --cov-fail-under=85"
 
       '
+    environment:
+      HOME: /tmp
+      MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+      PYTEST_ADDOPTS: -p no:cacheprovider
+      PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+      RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+    user: ${UID:-1000}:${GID:-1000}
     volumes:
     - ./agent:/app
     working_dir: /app
@@ -18,6 +25,13 @@ services:
       --cov-fail-under=85"
 
       '
+    environment:
+      HOME: /tmp
+      MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+      PYTEST_ADDOPTS: -p no:cacheprovider
+      PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+      RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+    user: ${UID:-1000}:${GID:-1000}
     volumes:
     - ./backend:/app
     working_dir: /app
@@ -26,6 +40,9 @@ services:
       context: ./frontend
       target: deps
     command: sh -c "npm run lint"
+    environment:
+      HOME: /tmp
+    user: ${UID:-1000}:${GID:-1000}
     volumes:
     - ./frontend:/app
     - /app/node_modules
@@ -35,6 +52,9 @@ services:
       context: ./frontend
       target: deps
     command: sh -c "npm run test"
+    environment:
+      HOME: /tmp
+    user: ${UID:-1000}:${GID:-1000}
     volumes:
     - ./frontend:/app
     - /app/node_modules

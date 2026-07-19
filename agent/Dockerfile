@@ -18,3 +18,11 @@ RUN adduser --disabled-password --gecos "" appuser
 USER appuser
 
 ENTRYPOINT ["sfm-agent"]
+
+# ── dev stage (test/lint tooling for docker-compose.test.yml) ─────────────────
+# `deps` already carries the [dev] extras + source + tests; add the editable
+# install so `sfm_agent` resolves without a baked USER. Compose runs it as the
+# host UID, keeping bind-mounted artifacts host-owned.
+FROM deps AS dev
+
+RUN pip install --no-cache-dir -e . --no-deps

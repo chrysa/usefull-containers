@@ -44,7 +44,9 @@ services:
       API_URL: http://api:8000
       BASE_URL: http://frontend:4173
       CI: 'true'
+      HOME: /tmp
     image: mcr.microsoft.com/playwright:v1.52.0-noble
+    user: ${UID:-1000}:${GID:-1000}
     volumes:
     - ./test-results:/e2e/test-results
     - ./tests/e2e:/e2e
