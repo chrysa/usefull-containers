@@ -28,12 +28,15 @@ services:
     container_name: dango_drf-dev
     environment:
       DEBUG: true
+      HOME: /tmp
+      PYTHONPYCACHEPREFIX: /tmp/pycache
     hostname: dango_drf-dev
     image: ${DOCKER_REPO:-local}/dango-drf:${DANGO_DRF_CONTAINER_VERSION}
     ports:
     - 8080:8080
     stdin_open: true
     tty: true
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
     - source: ./src
       target: /drf-app
