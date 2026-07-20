@@ -17,9 +17,15 @@ services:
         container_name: pre-commit
         environment:
             - GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+            - HOME=/tmp
+            - PRE_COMMIT_HOME=/tmp/pre-commit-cache
+            - PYTHONPYCACHEPREFIX=/tmp/pycache
+            - RUFF_CACHE_DIR=/tmp/ruff-cache
+            - MYPY_CACHE_DIR=/tmp/mypy-cache
         hostname: pre-commit
         image: ${DOCKER_REPO:-local}/pre-commit:${PRE_COMMIT_CONTAINER_VERSION}
         tty: true
+        user: "${UID:-1000}:${GID:-1000}"
         volumes:
             - type: bind
               source: .
