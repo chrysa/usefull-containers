@@ -13,6 +13,12 @@ FROM deps AS dev
 
 RUN pip install --no-cache-dir ".[dev]"
 
+# Dev stage hot-reloads (shared-standards: "Dev stage must hot-reload"). Runs
+# uvicorn with --reload over the bind-mounted source (./backend:/app). Test
+# services override this command with pytest; production has its own no-reload
+# CMD in the production stage below.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
 # ── Stage 3 : builder ─────────────────────────────────────────────────────────
 FROM deps AS builder
 
