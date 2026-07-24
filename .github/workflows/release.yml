@@ -25,7 +25,7 @@ jobs:
               id: gitversion
               uses: chrysa/github-actions/gitversion@v1.3.0
             - name: Create release
-              uses: softprops/action-gh-release@v3.0.1
+              uses: softprops/action-gh-release@v3.0.2
               with:
                   tag_name: v${{ steps.gitversion.outputs.semVer }}
                   name: v${{ steps.gitversion.outputs.semVer }}
