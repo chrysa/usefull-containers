@@ -99,8 +99,9 @@ repos:
   - id: claude-agent-frontmatter
   - id: claude-mcp-config
   - id: python-no-unittest-import
+  - id: claude-assets-present
   repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-99
+  rev: v0.1.1-100
 - repo: local
   hooks:
   - id: run-tests
