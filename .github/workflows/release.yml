@@ -23,7 +23,7 @@ jobs:
                   fetch-depth: 0
             - name: Compute version
               id: gitversion
-              uses: chrysa/github-actions/gitversion@v1.3.0
+              uses: chrysa/github-actions/gitversion@v1.4.4
             - name: Create release
               uses: softprops/action-gh-release@v3.0.2
               with:
