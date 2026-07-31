@@ -1,4 +1,4 @@
-import type { CompactSnapshot } from "../savefile/types";
+import type { CompactSnapshot } from "@/domain/savefile/types";
 
 export interface SnapshotRead {
   id: string;

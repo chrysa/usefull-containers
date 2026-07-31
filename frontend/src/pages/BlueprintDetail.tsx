@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { TagEditor } from "../features/blueprints";
+import { TagEditor } from "@/features/blueprints";
 import {
   useBlueprintQuery,
   useDeleteBlueprintMutation,
   useUpdateBlueprintDescriptionMutation,
-} from "../domain/blueprints/queries";
-import { downloadAuthedFile } from "../domain/blueprints/download";
-import Skeleton from "../components/ui/Skeleton";
-import { formatDateTime } from "../utils/formatDate";
+} from "@/domain/blueprints/queries";
+import { downloadAuthedFile } from "@/domain/blueprints/download";
+import Skeleton from "@/components/ui/Skeleton";
+import { formatDateTime } from "@/utils/formatDate";
 import styles from "./BlueprintDetail.module.scss";
 
 function formatBytes(bytes: number): string {

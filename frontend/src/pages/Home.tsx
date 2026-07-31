@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useBlueprintsQuery } from "../domain/blueprints/queries";
-import { useHealthQuery } from "../api/health/queries";
-import { usePlansQuery } from "../domain/plans/queries";
-import Skeleton from "../components/ui/Skeleton";
-import { formatDate } from "../utils/formatDate";
+import { useBlueprintsQuery } from "@/domain/blueprints/queries";
+import { useHealthQuery } from "@/api/health/queries";
+import { usePlansQuery } from "@/domain/plans/queries";
+import Skeleton from "@/components/ui/Skeleton";
+import { formatDate } from "@/utils/formatDate";
 import styles from "./Home.module.scss";
 
 const RECENT_DATE_OPTS: Intl.DateTimeFormatOptions = {

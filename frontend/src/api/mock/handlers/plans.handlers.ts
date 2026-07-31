@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import type { Plan } from "../../../domain/plans/types";
+import type { Plan } from "@/domain/plans/types";
 
 let mockPlans: Plan[] = [
   {

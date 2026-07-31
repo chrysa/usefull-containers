@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { Blueprint } from "../../domain/blueprints/types";
-import { downloadAuthedFile } from "../../domain/blueprints/download";
-import { formatDate } from "../../utils/formatDate";
+import type { Blueprint } from "@/domain/blueprints/types";
+import { downloadAuthedFile } from "@/domain/blueprints/download";
+import { formatDate } from "@/utils/formatDate";
 import { TagEditor } from "./TagEditor";
 import styles from "./BlueprintCard.module.scss";
 

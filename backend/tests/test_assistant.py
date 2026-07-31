@@ -71,9 +71,7 @@ def test_rule_based_intents(client: TestClient, message: str, needle: str) -> No
 # ---------------------------------------------------------------------------
 
 
-def test_llm_reply_used_when_enabled(
-    client: TestClient, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_llm_reply_used_when_enabled(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "ai_aggregator_url", "http://gateway:8000")
 
     async def fake_complete(prompt: str) -> str:
@@ -110,9 +108,7 @@ def test_falls_back_to_rules_when_llm_returns_none(
 # ---------------------------------------------------------------------------
 
 
-def test_prompt_includes_relevant_recipe(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_prompt_includes_relevant_recipe(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _write_gamedata(tmp_path)
     monkeypatch.setattr(settings, "gamedata_dir", str(tmp_path))
 
@@ -129,9 +125,7 @@ def test_context_without_gamedata(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     assert "No game data imported yet." in prompt
 
 
-def test_match_recipes_ignores_short_words(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_match_recipes_ignores_short_words(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _write_gamedata(tmp_path)
     monkeypatch.setattr(settings, "gamedata_dir", str(tmp_path))
     # No word >= 4 chars that matches a recipe name → no recipe context.

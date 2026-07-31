@@ -6,8 +6,8 @@ import {
   createProject as storeCreate,
   updateProject as storeUpdate,
   deleteProject as storeDelete,
-} from "../domain/projects/store";
-import type { Project } from "../domain/projects/types";
+} from "@/domain/projects/store";
+import type { Project } from "@/domain/projects/types";
 
 export interface ProjectsState {
   projects: Project[];

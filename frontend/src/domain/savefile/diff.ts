@@ -1,8 +1,8 @@
 // Planned-vs-actual diff, aligned on recipe className. Pure logic.
 
-import { calculateProduction, type CalculationNode } from "../gamedata/calculator";
-import type { ItemSummary, RecipeSummary } from "../gamedata/types";
-import type { TargetItem } from "../plans/types";
+import { calculateProduction, type CalculationNode } from "@/domain/gamedata/calculator";
+import type { ItemSummary, RecipeSummary } from "@/domain/gamedata/types";
+import type { TargetItem } from "@/domain/plans/types";
 import type { CompactSnapshot } from "./types";
 
 export type DiffStatus = "OK" | "UNDER" | "OVER" | "MISSING" | "UNPLANNED" | "UNMATCHED";

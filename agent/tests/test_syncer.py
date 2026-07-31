@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
+from pytest_mock import MockerFixture, MockType
 
 from sfm_agent.config import AgentConfig
 from sfm_agent.state import AgentState
@@ -38,33 +38,33 @@ def syncer(config: AgentConfig, state: AgentState) -> BlueprintSyncer:
 # ── list_remote ───────────────────────────────────────────────────────────────
 
 
-def test_list_remote_returns_blueprints(syncer: BlueprintSyncer) -> None:
-    mock_resp = MagicMock()
+def test_list_remote_returns_blueprints(syncer: BlueprintSyncer, mocker: MockerFixture) -> None:
+    mock_resp = mocker.MagicMock()
     mock_resp.json.return_value = {"blueprints": [{"name": "foo"}], "total": 1}
     mock_resp.raise_for_status.return_value = None
-    with patch.object(syncer._client, "get", return_value=mock_resp):
-        result = syncer.list_remote()
+    mocker.patch.object(syncer._client, "get", return_value=mock_resp)
+    result = syncer.list_remote()
     assert len(result) == 1
     assert result[0]["name"] == "foo"
 
 
-def test_list_remote_raises_on_http_error(syncer: BlueprintSyncer) -> None:
-    with patch.object(syncer._client, "get", side_effect=httpx.ConnectError("refused")):
-        with pytest.raises(httpx.ConnectError):
-            syncer.list_remote()
+def test_list_remote_raises_on_http_error(syncer: BlueprintSyncer, mocker: MockerFixture) -> None:
+    mocker.patch.object(syncer._client, "get", side_effect=httpx.ConnectError("refused"))
+    with pytest.raises(httpx.ConnectError):
+        syncer.list_remote()
 
 
 # ── upload_blueprint ──────────────────────────────────────────────────────────
 
 
-def test_upload_blueprint_success(syncer: BlueprintSyncer, bp_dir: Path) -> None:
+def test_upload_blueprint_success(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
     (bp_dir / "test.sbp").write_bytes(b"sbp_data")
     (bp_dir / "test.sbpcfg").write_bytes(b"cfg_data")
 
-    mock_resp = MagicMock()
+    mock_resp = mocker.MagicMock()
     mock_resp.status_code = 207
-    with patch.object(syncer._client, "post", return_value=mock_resp):
-        result = syncer.upload_blueprint("test", bp_dir)
+    mocker.patch.object(syncer._client, "post", return_value=mock_resp)
+    result = syncer.upload_blueprint("test", bp_dir)
 
     assert result is True
 
@@ -74,30 +74,32 @@ def test_upload_blueprint_missing_sbp_returns_false(syncer: BlueprintSyncer, bp_
     assert result is False
 
 
-def test_upload_blueprint_http_500_returns_false(syncer: BlueprintSyncer, bp_dir: Path) -> None:
+def test_upload_blueprint_http_500_returns_false(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
     (bp_dir / "test.sbp").write_bytes(b"data")
-    mock_resp = MagicMock()
+    mock_resp = mocker.MagicMock()
     mock_resp.status_code = 500
-    with patch.object(syncer._client, "post", return_value=mock_resp):
-        result = syncer.upload_blueprint("test", bp_dir)
+    mocker.patch.object(syncer._client, "post", return_value=mock_resp)
+    result = syncer.upload_blueprint("test", bp_dir)
     assert result is False
 
 
 def test_upload_blueprint_connection_error_returns_false(
     syncer: BlueprintSyncer, bp_dir: Path
-) -> None:
+, mocker: MockerFixture) -> None:
     (bp_dir / "test.sbp").write_bytes(b"data")
-    with patch.object(syncer._client, "post", side_effect=httpx.ConnectError("refused")):
-        result = syncer.upload_blueprint("test", bp_dir)
+    mocker.patch.object(syncer._client, "post", side_effect=httpx.ConnectError("refused"))
+    result = syncer.upload_blueprint("test", bp_dir)
     assert result is False
 
 
 # ── download_blueprint ────────────────────────────────────────────────────────
 
 
-def _mock_download_responses(syncer: BlueprintSyncer, sbp_status: int, cfg_status: int) -> None:
-    def fake_get(url: str, **kwargs: object) -> MagicMock:
-        resp = MagicMock()
+def _mock_download_responses(
+    syncer: BlueprintSyncer, mocker: MockerFixture, sbp_status: int, cfg_status: int
+) -> None:
+    def fake_get(url: str, **kwargs: object) -> MockType:
+        resp = mocker.MagicMock()
         if url.endswith("/download"):
             resp.status_code = sbp_status
             resp.content = b"sbp_bytes"
@@ -109,24 +111,24 @@ def _mock_download_responses(syncer: BlueprintSyncer, sbp_status: int, cfg_statu
     syncer._client.get = fake_get  # type: ignore[method-assign]
 
 
-def test_download_blueprint_success(syncer: BlueprintSyncer, bp_dir: Path) -> None:
-    _mock_download_responses(syncer, sbp_status=200, cfg_status=200)
+def test_download_blueprint_success(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
+    _mock_download_responses(syncer, mocker, sbp_status=200, cfg_status=200)
     result = syncer.download_blueprint("foo", bp_dir)
     assert result is True
     assert (bp_dir / "foo.sbp").read_bytes() == b"sbp_bytes"
     assert (bp_dir / "foo.sbpcfg").read_bytes() == b"cfg_bytes"
 
 
-def test_download_blueprint_no_cfg_still_succeeds(syncer: BlueprintSyncer, bp_dir: Path) -> None:
-    _mock_download_responses(syncer, sbp_status=200, cfg_status=404)
+def test_download_blueprint_no_cfg_still_succeeds(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
+    _mock_download_responses(syncer, mocker, sbp_status=200, cfg_status=404)
     result = syncer.download_blueprint("foo", bp_dir)
     assert result is True
     assert (bp_dir / "foo.sbp").exists()
     assert not (bp_dir / "foo.sbpcfg").exists()
 
 
-def test_download_blueprint_sbp_404_returns_false(syncer: BlueprintSyncer, bp_dir: Path) -> None:
-    _mock_download_responses(syncer, sbp_status=404, cfg_status=404)
+def test_download_blueprint_sbp_404_returns_false(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
+    _mock_download_responses(syncer, mocker, sbp_status=404, cfg_status=404)
     result = syncer.download_blueprint("missing", bp_dir)
     assert result is False
 
@@ -134,49 +136,47 @@ def test_download_blueprint_sbp_404_returns_false(syncer: BlueprintSyncer, bp_di
 # ── sync ──────────────────────────────────────────────────────────────────────
 
 
-def test_sync_uploads_local_only(syncer: BlueprintSyncer, bp_dir: Path) -> None:
+def test_sync_uploads_local_only(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
     (bp_dir / "local-only.sbp").write_bytes(b"data")
 
-    list_resp = MagicMock()
+    list_resp = mocker.MagicMock()
     list_resp.json.return_value = {"blueprints": [], "total": 0}
     list_resp.raise_for_status.return_value = None
 
-    upload_resp = MagicMock()
+    upload_resp = mocker.MagicMock()
     upload_resp.status_code = 207
 
-    with (
-        patch.object(syncer._client, "get", return_value=list_resp),
-        patch.object(syncer._client, "post", return_value=upload_resp),
-    ):
-        result = syncer.sync()
+    mocker.patch.object(syncer._client, "get", return_value=list_resp)
+    mocker.patch.object(syncer._client, "post", return_value=upload_resp)
+    result = syncer.sync()
 
     assert "local-only" in result.uploaded
     assert not result.errors
 
 
-def test_sync_downloads_remote_only(syncer: BlueprintSyncer, bp_dir: Path) -> None:
-    list_resp = MagicMock()
+def test_sync_downloads_remote_only(syncer: BlueprintSyncer, bp_dir: Path, mocker: MockerFixture) -> None:
+    list_resp = mocker.MagicMock()
     list_resp.json.return_value = {"blueprints": [{"name": "remote-only"}], "total": 1}
     list_resp.raise_for_status.return_value = None
 
-    def fake_get(url: str, **kwargs: object) -> MagicMock:
-        resp = MagicMock()
+    def fake_get(url: str, **kwargs: object) -> MockType:
+        resp = mocker.MagicMock()
         if "/blueprints" == url or url == "/blueprints":
             return list_resp
         resp.status_code = 200 if url.endswith("/download") else 404
         resp.content = b"data"
         return resp
 
-    with patch.object(syncer._client, "get", side_effect=fake_get):
-        result = syncer.sync()
+    mocker.patch.object(syncer._client, "get", side_effect=fake_get)
+    result = syncer.sync()
 
     assert "remote-only" in result.downloaded
     assert not result.errors
 
 
-def test_sync_returns_error_on_connection_failure(syncer: BlueprintSyncer) -> None:
-    with patch.object(syncer._client, "get", side_effect=httpx.ConnectError("refused")):
-        result = syncer.sync()
+def test_sync_returns_error_on_connection_failure(syncer: BlueprintSyncer, mocker: MockerFixture) -> None:
+    mocker.patch.object(syncer._client, "get", side_effect=httpx.ConnectError("refused"))
+    result = syncer.sync()
     assert not result.ok
     assert result.errors
 

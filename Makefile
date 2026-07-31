@@ -39,12 +39,14 @@ logs: ## Tail service logs
 install: ## Install backend dev dependencies
 	pip install -e ".[dev]"
 
+install-dev: install ## Alias for install (dev dependencies are the default set)
+
 dev: up ## Start all services in development mode
 	$(DOCKER_COMPOSE) logs -f
 
 typecheck: ## Run type checkers (mypy + tsc via Docker)
-	$(DOCKER_COMPOSE) run --rm backend mypy .
-	$(DOCKER_COMPOSE) run --rm frontend npm run type-check
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps api-test sh -c "mypy ."
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint sh -c "npm run typecheck"
 
 pre-commit: ## Install and run pre-commit hooks
 	pre-commit install
@@ -52,13 +54,23 @@ pre-commit: ## Install and run pre-commit hooks
 
 # ─── Quality ──────────────────────────────────────────────────────────────────
 
-lint: ## Run linters (ruff + eslint via Docker)
+lint: ## Run linters (ruff; ESLint parked — see DECISIONS.md D-0012)
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps api-test sh -c "ruff check ."
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint
+	@echo "frontend: ESLint skipped — typescript-eslint does not run on TypeScript 7 (D-0012); tsc covers types via 'make typecheck'"
 
-format: ## Run formatters (ruff + prettier via Docker)
+format: ## Run formatters (ruff via Docker)
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps api-test sh -c "ruff format ."
-	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps frontend-lint sh -c "npm run format"
+
+format-check: ## Verify formatting without rewriting files
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm --no-deps api-test sh -c "ruff format --check ."
+
+quality-gate-baseline: ## Record the current coverage as the local baseline
+	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm api-test
+	@cp backend/coverage.xml .quality-gate-baseline.xml 2>/dev/null || cp coverage.xml .quality-gate-baseline.xml
+
+quality-gate-verify: lint format-check typecheck test ## Full local gate (lint + format + types + tests)
+
+ci: quality-gate-verify ## Alias for the full local gate, mirroring CI
 
 
 # ─── Tests ────────────────────────────────────────────────────────────────────

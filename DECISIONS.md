@@ -282,7 +282,7 @@ do.
 ## D-0010 — Client-side .sav parsing via esm.sh CDN dynamic import
 
 **Date**: 2026-06-22
-**Status**: accepted
+**Status**: superseded by [D-0013](#d-0013--vendor-the-sav-parser-parsing-works-with-no-outbound-network)
 
 ### D-0010 context
 
@@ -336,7 +336,7 @@ size unchanged.
   #186 follow-up) to prevent browser OOM on malformed payloads.
 - A user-visible error must be shown (and is) when the CDN import fails, so the
   offline limitation is never a silent failure.
-||||||| parent of 3d20c7be (feat(L10): NL assistant via ai-aggregator with rule-based fallback)
+
 ## D-0011 — Assistant L10: LLM via ai-aggregator with rule-based fallback
 
 **Date**: 2026-06-25
@@ -388,3 +388,123 @@ also lets the deployment pick Ollama as a local fallback without code changes.
 - The gateway API key is a secret: provision via SealedSecret when SFM is
   deployed (see [D-0003](#d-0003--scope-pivot-offline-optimizer-not-live-monitoring)).
   V1 stays offline-capable with the LLM off.
+
+## D-0012 — ESLint parked while TypeScript 7 has no typescript-eslint support
+
+**Date**: 2026-07-31
+**Status**: accepted
+
+### Context
+
+The chrysa stack pins **TypeScript 7** (settled ADR) and **ESLint** as the TS
+linter. Those two are currently incompatible: `typescript-eslint` refuses to run
+on TS 7 — the peer range caps at `<6.1.0`, `npm ci` fails ERESOLVE, and even the
+canary (`8.65.1-alpha.19`) aborts at load with
+`Error: typescript-eslint does not support TS 7.0.` There is no released version
+that parses TS 7, and ESLint cannot parse `.ts`/`.tsx` without a parser.
+
+So the repo can satisfy the TS-7 pin or the ESLint gate, not both.
+
+### Decision
+
+Keep TypeScript 7 and park the ESLint gate until upstream ships TS 7 support.
+`eslint.config.js` and the `lint` script stay in the repo, unchanged, so
+re-enabling is a dependency bump and nothing else. `make lint` reports the
+skip explicitly rather than passing silently.
+
+Type safety is not suspended in the meantime — it moves to `tsc`, which was
+tightened in the same batch to the full mandated strict set
+(`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`,
+`noImplicitReturns`, `useUnknownInCatchVariables`, `isolatedModules`). That
+covers the type-correctness rules; it does not cover the style and
+React-hooks rules ESLint carried, which are unguarded until it returns.
+
+### Fatal hypothesis
+
+typescript-eslint ships TS 7 support within a release cycle or two, so the gap
+is temporary and no alternative linter needs adopting.
+
+### Kill-test
+
+Checked at each dependency review, and at the latest **2026-10-31**: if no
+released `typescript-eslint` supports TS 7 by then, the gap has stopped being
+temporary — open an ADR to adopt a TS-native linter that does not depend on the
+compiler API (oxlint or Biome) rather than leaving the frontend unlinted.
+
+### Validation gate
+
+Re-enabling requires: `npm ci` without `--legacy-peer-deps`, `npm run lint`
+green over `src`, and the `lint` target failing on a seeded violation.
+
+### Consequences
+
+- `npm ci` runs with `--legacy-peer-deps` (see `frontend/Dockerfile`) — the
+  conflict is lint-only, build and runtime dependencies resolve cleanly.
+- The frontend half of `make lint` prints the skip and its reason; CI is not
+  gated on a check that cannot run.
+
+## D-0013 — Vendor the .sav parser: parsing works with no outbound network
+
+**Date**: 2026-07-31
+**Status**: accepted
+**Supersedes**: [D-0010](#d-0010--client-side-sav-parsing-via-esmsh-cdn-dynamic-import)
+
+### D-0013 context
+
+D-0010 loaded `@etothepii/satisfactory-file-parser` at runtime from `esm.sh`
+and deferred vendoring, on three premises: the library is 3–5 MB, it carries
+wasm assets that Vite cannot bundle without non-trivial configuration, and the
+target deployment always has internet access.
+
+Measured against version 4.1.2, the first two are false. The package's only
+dependency is `pako`; there is no wasm. Declared as a normal dependency behind
+a dynamic `import()`, it builds into a single lazy chunk of **280 kB
+(55 kB gzipped)** and leaves the entry chunk unchanged at 284 kB.
+
+The third premise conflicts with the project's own definition of done, which
+requires an `.sav` import that works from a real save on a self-hosted install,
+and with the portfolio rule that a third-party service has a documented
+self-hosted exit path. A CDN on the hot path of the headline feature is that
+service, and "vendor it later" was the exit path.
+
+### D-0013 decision
+
+`@etothepii/satisfactory-file-parser` is a declared dependency, imported by
+module specifier:
+
+```ts
+const [mod, buffer] = await Promise.all([
+  import("@etothepii/satisfactory-file-parser"),
+  file.arrayBuffer(),
+]);
+```
+
+Vite emits it as its own chunk, fetched the first time a user drops a `.sav`.
+The version is pinned by the lockfile instead of by a URL string in the source,
+so upgrades go through the normal dependency review.
+
+### D-0013 fatal hypothesis
+
+The parser stays small enough to ship as a lazy chunk — under roughly 1 MB
+gzipped — so vendoring never costs the user a perceptible wait on first parse.
+
+### D-0013 kill-test
+
+Measured at every parser upgrade, from the `vite build` chunk report: if the
+parser chunk exceeds **1 MB gzipped**, move it behind a web worker (the
+mechanism D-0010 anticipated) so the main thread is never blocked, and record
+the change here. Current value: 55 kB gzipped.
+
+### D-0013 validation gate
+
+`.sav` import succeeds from a real save on a host with outbound network
+disabled — the parcours the V1 gate documents.
+
+### D-0013 consequences
+
+- Parsing no longer depends on `esm.sh` being reachable, resolvable, or
+  serving the pinned version; an air-gapped install keeps the feature.
+- The entry chunk is unchanged: the parser is still loaded on demand.
+- The CDN-failure error path in the UI is now a parse-failure path only.
+- Type definitions ship with the package, so `Parser.ParseSave` is typed
+  instead of cast through a hand-written `ParserModule` interface.

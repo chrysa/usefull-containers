@@ -4,11 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import DemoBanner from "./DemoBanner";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import AssistantWidget from "../Assistant/AssistantWidget";
-import ToastContainer from "../ui/Toast/Toast";
-import SetupWizard from "../SetupWizard/SetupWizard";
-import { useSetupWizard } from "../SetupWizard/useSetupWizard";
-import { useProjects } from "../../hooks/useProjects";
+import AssistantWidget from "@/components/Assistant/AssistantWidget";
+import ToastContainer from "@/components/ui/Toast/Toast";
+import SetupWizard from "@/components/SetupWizard/SetupWizard";
+import { useSetupWizard } from "@/components/SetupWizard/useSetupWizard";
+import { useProjects } from "@/hooks/useProjects";
 import styles from "./Layout.module.scss";
 
 export default function Layout() {

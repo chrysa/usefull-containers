@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ItemSummary, RecipeSummary } from "../gamedata/types";
-import type { TargetItem } from "../plans/types";
+import type { ItemSummary, RecipeSummary } from "@/domain/gamedata/types";
+import type { TargetItem } from "@/domain/plans/types";
 import type { CompactSnapshot } from "./types";
 import { diffPlanVsSnapshot } from "./diff";
 

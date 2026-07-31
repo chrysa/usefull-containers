@@ -43,9 +43,7 @@ class CompactSnapshot(BaseModel):
     @model_validator(mode="after")
     def _check_list_lengths(self) -> CompactSnapshot:
         if len(self.buildings) > _MAX_BUILDINGS:
-            raise ValueError(
-                f"buildings list exceeds maximum allowed length ({_MAX_BUILDINGS})"
-            )
+            raise ValueError(f"buildings list exceeds maximum allowed length ({_MAX_BUILDINGS})")
         if len(self.power_grids) > _MAX_POWER_GRIDS:
             raise ValueError(
                 f"power_grids list exceeds maximum allowed length ({_MAX_POWER_GRIDS})"

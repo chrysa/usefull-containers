@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { http } from "../http/client";
+import { http } from "@/api/http/client";
 import type { AssistantReply, GeneratePlanResponse } from "./types";
 
 export function useAssistantChat() {

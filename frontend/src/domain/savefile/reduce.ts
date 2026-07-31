@@ -51,7 +51,7 @@ const PRODUCTION_CLASSES = new Set<string>([
 function classKey(p: string | undefined): string {
   if (!p) return "";
   const parts = p.split(".");
-  const last = parts[parts.length - 1];
+  const last = parts[parts.length - 1] ?? "";
   // Strip a leading slash left over from slash-only paths (typePath).
   const slashIdx = last.lastIndexOf("/");
   return slashIdx >= 0 ? last.slice(slashIdx + 1) : last;
@@ -112,7 +112,8 @@ export function reduce(save: RawSave, saveName: string): CompactSnapshot {
 
   const circuitToSwitch = new Map<number, string>();
   for (const [cid, list] of circuitSwitches) {
-    if (list.length === 1) circuitToSwitch.set(cid, list[0]);
+    const only = list.length === 1 ? list[0] : undefined;
+    if (only !== undefined) circuitToSwitch.set(cid, only);
   }
 
   // Production buildings.

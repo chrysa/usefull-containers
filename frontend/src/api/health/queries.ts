@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { http } from "../../api/http/client";
+import { http } from "@/api/http/client";
 
 export interface HealthResponse {
   status: string;

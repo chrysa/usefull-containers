@@ -32,9 +32,7 @@ async def record_event(
         await session.commit()
 
 
-async def list_for_user(
-    session: AsyncSession, user_id: int, limit: int = 200
-) -> list[AuditLog]:
+async def list_for_user(session: AsyncSession, user_id: int, limit: int = 200) -> list[AuditLog]:
     """Return a user's own audit entries, most recent first."""
     result = await session.scalars(
         select(AuditLog)

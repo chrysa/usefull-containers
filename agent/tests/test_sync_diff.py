@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
+from pytest_mock import MockerFixture, MockType
 
 from sfm_agent.config import AgentConfig
 from sfm_agent.state import AgentState, BlueprintEntry
@@ -44,82 +44,80 @@ def test_no_api_key_omits_header(bp_dir: Path, state: AgentState) -> None:
 # ── sync_diff ──────────────────────────────────────────────────────────────────
 
 
-def test_sync_diff_uploads_names_returned_by_hub(bp_dir: Path, state: AgentState) -> None:
+def test_sync_diff_uploads_names_returned_by_hub(bp_dir: Path, state: AgentState, mocker: MockerFixture) -> None:
     (bp_dir / "alpha.sbp").write_bytes(b"data")
     syncer = _make_syncer(bp_dir, state)
 
-    sync_resp = MagicMock()
+    sync_resp = mocker.MagicMock()
     sync_resp.raise_for_status.return_value = None
     sync_resp.json.return_value = {"to_upload": ["alpha"], "to_delete": []}
-    upload_resp = MagicMock()
+    upload_resp = mocker.MagicMock()
     upload_resp.status_code = 207
 
-    def fake_post(url: str, **_kwargs: object) -> MagicMock:
+    def fake_post(url: str, **_kwargs: object) -> MockType:
         return sync_resp if url == "/blueprints/sync" else upload_resp
 
-    with patch.object(syncer._client, "post", side_effect=fake_post):
-        result = syncer.sync_diff()
+    mocker.patch.object(syncer._client, "post", side_effect=fake_post)
+    result = syncer.sync_diff()
 
     assert result.uploaded == ["alpha"]
     assert result.errors == []
 
 
-def test_sync_diff_falls_back_to_legacy_on_404(bp_dir: Path, state: AgentState) -> None:
+def test_sync_diff_falls_back_to_legacy_on_404(bp_dir: Path, state: AgentState, mocker: MockerFixture) -> None:
     syncer = _make_syncer(bp_dir, state)
     err = httpx.HTTPStatusError(
-        "not found", request=MagicMock(), response=MagicMock(status_code=404)
+        "not found", request=mocker.MagicMock(), response=mocker.MagicMock(status_code=404)
     )
-    sync_resp = MagicMock()
+    sync_resp = mocker.MagicMock()
     sync_resp.raise_for_status.side_effect = err
 
-    with (
-        patch.object(syncer._client, "post", return_value=sync_resp),
-        patch.object(syncer, "sync", return_value=MagicMock()) as legacy,
-    ):
-        syncer.sync_diff()
+    mocker.patch.object(syncer._client, "post", return_value=sync_resp)
+    legacy = mocker.patch.object(syncer, "sync", return_value=mocker.MagicMock())
+    syncer.sync_diff()
 
     legacy.assert_called_once()
 
 
-def test_sync_diff_reports_error_on_connection_failure(bp_dir: Path, state: AgentState) -> None:
+def test_sync_diff_reports_error_on_connection_failure(bp_dir: Path, state: AgentState, mocker: MockerFixture) -> None:
     syncer = _make_syncer(bp_dir, state)
-    with patch.object(syncer._client, "post", side_effect=httpx.ConnectError("refused")):
-        result = syncer.sync_diff()
+    mocker.patch.object(syncer._client, "post", side_effect=httpx.ConnectError("refused"))
+    result = syncer.sync_diff()
     assert result.errors
     assert not result.ok
 
 
-def test_sync_diff_drops_state_entries_for_deleted(bp_dir: Path, state: AgentState) -> None:
+def test_sync_diff_drops_state_entries_for_deleted(bp_dir: Path, state: AgentState, mocker: MockerFixture) -> None:
     state.set(BlueprintEntry(name="gone", local_mtime=1.0))
     syncer = _make_syncer(bp_dir, state)
 
-    sync_resp = MagicMock()
+    sync_resp = mocker.MagicMock()
     sync_resp.raise_for_status.return_value = None
     sync_resp.json.return_value = {"to_upload": [], "to_delete": ["gone"]}
 
-    with patch.object(syncer._client, "post", return_value=sync_resp):
-        syncer.sync_diff()
+    mocker.patch.object(syncer._client, "post", return_value=sync_resp)
+    syncer.sync_diff()
 
     assert state.get("gone") is None
 
 
-def test_sync_diff_sends_local_inventory(bp_dir: Path, state: AgentState) -> None:
+def test_sync_diff_sends_local_inventory(bp_dir: Path, state: AgentState, mocker: MockerFixture) -> None:
     (bp_dir / "one.sbp").write_bytes(b"12345")
     syncer = _make_syncer(bp_dir, state)
 
-    sync_resp = MagicMock()
+    sync_resp = mocker.MagicMock()
     sync_resp.raise_for_status.return_value = None
     sync_resp.json.return_value = {"to_upload": [], "to_delete": []}
 
     captured: dict = {}
 
-    def fake_post(url: str, **kwargs: object) -> MagicMock:
+    def fake_post(url: str, **kwargs: object) -> MockType:
         captured["url"] = url
         captured["json"] = kwargs.get("json")
         return sync_resp
 
-    with patch.object(syncer._client, "post", side_effect=fake_post):
-        syncer.sync_diff()
+    mocker.patch.object(syncer._client, "post", side_effect=fake_post)
+    syncer.sync_diff()
 
     assert captured["url"] == "/blueprints/sync"
     entries = captured["json"]["blueprints"]

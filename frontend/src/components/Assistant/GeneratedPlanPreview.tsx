@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { useHealthQuery } from "../../api/health/queries";
-import { useCreatePlanMutation } from "../../domain/plans/queries";
-import { generatedPlanToPlanCreate } from "../../domain/plans/fromGeneratedPlan";
-import type { GeneratedFactoryPlan } from "../../api/assistant/types";
+import { useHealthQuery } from "@/api/health/queries";
+import { useCreatePlanMutation } from "@/domain/plans/queries";
+import { generatedPlanToPlanCreate } from "@/domain/plans/fromGeneratedPlan";
+import type { GeneratedFactoryPlan } from "@/api/assistant/types";
 import styles from "./GeneratedPlanPreview.module.scss";
 
 function rate(perMinute: number, name: string): string {

@@ -3,7 +3,10 @@ FROM node:26-alpine AS deps
 
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# typescript-eslint has no stable release accepting TypeScript 7 yet (its peer
+# range caps at <6.1.0), so a strict `npm ci` fails ERESOLVE. The conflict is
+# lint-tooling only — the build and runtime deps resolve cleanly.
+RUN npm ci --legacy-peer-deps
 
 # ── Stage 2 : builder ─────────────────────────────────────────────────────────
 FROM deps AS builder
@@ -27,7 +30,9 @@ COPY --from=builder /app/vite.config.ts ./
 EXPOSE 4173
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD wget -qO- http://localhost:4173/ || exit 1
+    # 127.0.0.1, not `localhost`: the container resolves localhost to ::1 first
+    # and vite preview only listens on IPv4, so the probe would always refuse.
+    CMD wget -qO- http://127.0.0.1:4173/ || exit 1
 
 CMD ["./node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "4173"]
 

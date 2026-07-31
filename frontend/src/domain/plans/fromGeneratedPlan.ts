@@ -1,4 +1,4 @@
-import type { GeneratedFactoryPlan } from "../../api/assistant/types";
+import type { GeneratedFactoryPlan } from "@/api/assistant/types";
 import type { PlanCreate } from "./types";
 
 /**

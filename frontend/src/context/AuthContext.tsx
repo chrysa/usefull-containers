@@ -6,10 +6,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import * as authApi from "../api/auth/auth";
-import { HttpError, registerAuthFailureHandler } from "../api/http/client";
-import { clearAuth, readAuthState, writeToken, writeUser } from "../domain/auth/store";
-import type { User } from "../domain/auth/types";
+import * as authApi from "@/api/auth/auth";
+import { HttpError, registerAuthFailureHandler } from "@/api/http/client";
+import { clearAuth, readAuthState, writeToken, writeUser } from "@/domain/auth/store";
+import type { User } from "@/domain/auth/types";
 
 export interface AuthContextValue {
   user: User | null;

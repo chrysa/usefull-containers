@@ -24,9 +24,10 @@ _BLUEPRINT_EXTS = {BLUEPRINT_FILE_EXT, BLUEPRINT_CFG_EXT, BLUEPRINT_META_EXT}
 
 async def _owner_id(session: AsyncSession) -> int | None:
     """Return the lowest-id active user — the V1 owner — or None if no user exists."""
-    return await session.scalar(
+    owner_id: int | None = await session.scalar(
         select(User.id).where(User.is_active.is_(True)).order_by(User.id).limit(1)
     )
+    return owner_id
 
 
 def _migrate_plans(owner_id: int) -> bool:

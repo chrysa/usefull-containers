@@ -1,6 +1,12 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
   test: {
     // Pure-logic unit tests only (reduce.ts / diff.ts). React components are
     // covered by Playwright E2E, so we use the lightweight "node" env and do

@@ -3,25 +3,25 @@
     "close": "Close",
     "error": "An error occurred. Please try again.",
     "placeholder": "Ask me anything…",
-    "send": "Send",
-    "title": "Factory Assistant",
-    "toggle_label": "Open assistant",
-    "welcome": "Hi! I'm your Factory Manager assistant. How can I help you?",
+    "plan": {
+      "assumptions": "Assumptions & limits",
+      "consumes": "consumes",
+      "machine_line": "{{count}}× {{machine}} — {{recipe}} ({{clock}}%)",
+      "machine_unknown": "{{recipe}} — machine count unknown (no craft time)",
+      "raw_inputs": "Raw inputs",
+      "save": "Save as plan",
+      "saved": "Saved ✓",
+      "saving": "Saving…",
+      "steps": "Production steps",
+      "warnings": "Warnings"
+    },
     "plan_mode": "Generate a factory plan",
     "plan_mode_active": "Plan mode",
     "plan_mode_hint": "Describe what to produce, e.g. \"120 iron plate per minute\".",
-    "plan": {
-      "steps": "Production steps",
-      "machine_line": "{{count}}× {{machine}} — {{recipe}} ({{clock}}%)",
-      "machine_unknown": "{{recipe}} — machine count unknown (no craft time)",
-      "consumes": "consumes",
-      "raw_inputs": "Raw inputs",
-      "assumptions": "Assumptions & limits",
-      "warnings": "Warnings",
-      "save": "Save as plan",
-      "saving": "Saving…",
-      "saved": "Saved ✓"
-    }
+    "send": "Send",
+    "title": "Factory Assistant",
+    "toggle_label": "Open assistant",
+    "welcome": "Hi! I'm your Factory Manager assistant. How can I help you?"
   },
   "blueprint_detail": {
     "back": "Back to Blueprints",

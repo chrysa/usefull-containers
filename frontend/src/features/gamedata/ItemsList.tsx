@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useItemsQuery } from "../../domain/gamedata/queries";
+import { useItemsQuery } from "@/domain/gamedata/queries";
 import { ItemCard } from "./ItemCard";
-import Skeleton from "../../components/ui/Skeleton";
+import Skeleton from "@/components/ui/Skeleton";
 import styles from "./SearchList.module.scss";
 
 interface Props {

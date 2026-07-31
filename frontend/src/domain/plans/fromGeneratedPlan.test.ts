@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generatedPlanToPlanCreate } from "./fromGeneratedPlan";
-import type { GeneratedFactoryPlan } from "../../api/assistant/types";
+import type { GeneratedFactoryPlan } from "@/api/assistant/types";
 
 const PLAN: GeneratedFactoryPlan = {
   name: "120 Iron Plate/min",

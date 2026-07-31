@@ -99,9 +99,10 @@ async def get_first_user(session: AsyncSession) -> User | None:
     current single-user deployment model. Multi-agent / per-key ownership would
     require a dedicated ApiKey table (deferred).
     """
-    return await session.scalar(
+    user: User | None = await session.scalar(
         select(User).where(User.is_active).order_by(User.id).limit(1)
     )
+    return user
 
 
 async def upsert_steam_user(

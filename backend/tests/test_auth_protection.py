@@ -20,7 +20,8 @@ def _register_token(client: TestClient, username: str = "gateuser") -> str:
         json={"username": username, "password": "password123"},
     )
     assert resp.status_code == status.HTTP_201_CREATED
-    return resp.json()["access_token"]
+    token: str = resp.json()["access_token"]
+    return token
 
 
 def test_plans_list_without_token_returns_401(client: TestClient) -> None:
@@ -39,9 +40,7 @@ def test_create_plan_without_token_returns_401(client: TestClient) -> None:
 
 
 def test_invalid_token_returns_401(client: TestClient) -> None:
-    resp = client.get(
-        "/api/v1/plans", headers={"Authorization": "Bearer not-a-real-token"}
-    )
+    resp = client.get("/api/v1/plans", headers={"Authorization": "Bearer not-a-real-token"})
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
@@ -54,8 +53,6 @@ def test_plans_list_with_valid_token_returns_200(client: TestClient) -> None:
 
 def test_blueprints_list_with_valid_token_returns_200(client: TestClient) -> None:
     token = _register_token(client, "bpuser")
-    resp = client.get(
-        "/api/v1/blueprints", headers={"Authorization": f"Bearer {token}"}
-    )
+    resp = client.get("/api/v1/blueprints", headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["blueprints"] == []

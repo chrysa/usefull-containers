@@ -70,6 +70,7 @@ def _gamedata_recipes(query: str = "") -> list[RecipeSummary]:
         return demo_recipes_filtered(query)
     return gamedata_service.list_recipes(settings.gamedata_dir, query)
 
+
 # ---------------------------------------------------------------------------
 # Intent detection — ordered: first match wins
 # ---------------------------------------------------------------------------

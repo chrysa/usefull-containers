@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { BatchUploadResult } from "../../domain/blueprints/types";
+import type { BatchUploadResult } from "@/domain/blueprints/types";
 import styles from "./DropZone.module.scss";
 
 interface DropZoneProps {

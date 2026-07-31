@@ -121,8 +121,7 @@ def lines_for_rate(rate: float, tier: TransportTier) -> int:
 def transport_requirement(rate: float, is_fluid: bool) -> TransportRequirement:
     tiers = tiers_for(is_fluid)
     per_tier = [
-        TierCount(tier=t.id, capacity=t.capacity, count=lines_for_rate(rate, t))
-        for t in tiers
+        TierCount(tier=t.id, capacity=t.capacity, count=lines_for_rate(rate, t)) for t in tiers
     ]
     single = next((t for t in tiers if rate <= t.capacity), None)
     return TransportRequirement(
@@ -190,9 +189,7 @@ def _build_node(
         return _leaf_node(item_id, quantity, items)
 
     recipe = next((r for r in recipes if any(p.item_id == item_id for p in r.products)), None)
-    product = (
-        next((p for p in recipe.products if p.item_id == item_id), None) if recipe else None
-    )
+    product = next((p for p in recipe.products if p.item_id == item_id), None) if recipe else None
     if recipe is None or product is None or product.amount <= 0:
         return _leaf_node(item_id, quantity, items)
 

@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from "msw";
-import type { GameDataStats, GameDataImportResult, ItemSummary, RecipeSummary } from "../../../domain/gamedata/types";
+import type { GameDataStats, GameDataImportResult, ItemSummary, RecipeSummary } from "@/domain/gamedata/types";
 
 const mockItems: ItemSummary[] = [
   { id: "Desc_IronIngot_C", name: "Iron Ingot", description: "A basic ingot smelted from iron ore.", stack_size: 100, is_fluid: false },

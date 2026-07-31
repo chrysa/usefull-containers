@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/useAuth";
-import { useTheme } from "../../hooks/useTheme";
-import LanguageSwitcher from "../languages/LanguageSwitcher";
+import { useAuth } from "@/context/useAuth";
+import { useTheme } from "@/hooks/useTheme";
+import LanguageSwitcher from "@/components/languages/LanguageSwitcher";
 import ProjectSwitcher from "./ProjectSwitcher";
-import type { Project } from "../../domain/projects/types";
+import type { Project } from "@/domain/projects/types";
 import styles from "./Header.module.scss";
 
 interface HeaderProps {

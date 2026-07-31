@@ -1,29 +1,31 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../../context/useToast";
+import { useToast } from "@/context/useToast";
 import {
   useGameDataStatsQuery,
   useItemsQuery,
   useRecipesQuery,
-} from "../../domain/gamedata/queries";
-import { parseSaveFile } from "../../domain/savefile/parseSave";
+} from "@/domain/gamedata/queries";
+import { parseSaveFile } from "@/domain/savefile/parseSave";
 import {
   diffPlanVsSnapshot,
   type DiffRow,
   type DiffStatus,
-} from "../../domain/savefile/diff";
-import type { CompactSnapshot } from "../../domain/savefile/types";
-import { useCreateSnapshotMutation } from "../../domain/snapshots/queries";
-import type { TargetItem } from "../../domain/plans/types";
+} from "@/domain/savefile/diff";
+import type { CompactSnapshot } from "@/domain/savefile/types";
+import { useCreateSnapshotMutation } from "@/domain/snapshots/queries";
+import type { TargetItem } from "@/domain/plans/types";
 import styles from "./RealVsPlanned.module.scss";
 
+// CSS-module lookups are index-signature reads, so each is `string | undefined`
+// under noUncheckedIndexedAccess; an absent class degrades to no class at all.
 const STATUS_CLASS: Record<DiffStatus, string> = {
-  OK: styles.ok,
-  UNDER: styles.under,
-  OVER: styles.over,
-  MISSING: styles.missing,
-  UNPLANNED: styles.unplanned,
-  UNMATCHED: styles.unmatched,
+  OK: styles.ok ?? "",
+  UNDER: styles.under ?? "",
+  OVER: styles.over ?? "",
+  MISSING: styles.missing ?? "",
+  UNPLANNED: styles.unplanned ?? "",
+  UNMATCHED: styles.unmatched ?? "",
 };
 
 const STATUS_KEY: Record<DiffStatus, string> = {

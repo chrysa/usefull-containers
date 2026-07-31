@@ -11,7 +11,7 @@ import {
   type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import type { CalculationNode } from "../../domain/gamedata/calculator";
+import type { CalculationNode } from "@/domain/gamedata/calculator";
 import {
   buildGraph,
   getDescendantIds,
@@ -74,7 +74,7 @@ export default function ProductionGraph({ tree }: Props) {
             className:
               highlightedIds.has(e.source) || highlightedIds.has(e.target)
                 ? ""
-                : styles.edgeDimmed,
+                : (styles.edgeDimmed ?? ""),
           })),
     [edges, highlightedIds],
   );
@@ -85,7 +85,7 @@ export default function ProductionGraph({ tree }: Props) {
         ? nodes
         : nodes.map((n) => ({
             ...n,
-            className: highlightedIds.has(n.id) ? "" : styles.nodeDimmed,
+            className: highlightedIds.has(n.id) ? "" : (styles.nodeDimmed ?? ""),
           })),
     [nodes, highlightedIds],
   );

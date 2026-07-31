@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSetTagsMutation } from "../../domain/blueprints/queries";
+import { useSetTagsMutation } from "@/domain/blueprints/queries";
 import styles from "./TagEditor.module.scss";
 
 interface Props {

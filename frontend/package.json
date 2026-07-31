@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@dagrejs/dagre": "^3.0.0",
+    "@etothepii/satisfactory-file-parser": "^4.1.2",
     "@tanstack/react-query": "^5.101.4",
     "@types/dagre": "^0.7.54",
     "@xyflow/react": "^12.11.2",
@@ -43,7 +44,7 @@
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "type": "module",
   "version": "0.0.0"

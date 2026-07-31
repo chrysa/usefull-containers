@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BlueprintCard, TagFilterBar, UploadButton } from "../features/blueprints";
-import Skeleton from "../components/ui/Skeleton";
-import { DropZone } from "../components/DropZone/DropZone";
+import { BlueprintCard, TagFilterBar, UploadButton } from "@/features/blueprints";
+import Skeleton from "@/components/ui/Skeleton";
+import { DropZone } from "@/components/DropZone/DropZone";
 import {
   useBatchUploadMutation,
   useBlueprintsQuery,
@@ -10,7 +10,7 @@ import {
   useDownloadAllBlueprints,
   useImportZipMutation,
   useUploadBlueprintMutation,
-} from "../domain/blueprints/queries";
+} from "@/domain/blueprints/queries";
 import styles from "./Blueprints.module.scss";
 
 export default function BlueprintsPage() {

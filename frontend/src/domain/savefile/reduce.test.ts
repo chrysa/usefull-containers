@@ -37,6 +37,8 @@ describe("reduce", () => {
     expect(snap.play_time).toBe(1200);
     expect(snap.buildings).toHaveLength(1);
     const b = snap.buildings[0];
+    expect(b).toBeDefined();
+    if (!b) return;
     expect(b.machine_id).toBe("Build_ConstructorMk1_C");
     expect(b.recipe_id).toBe("Recipe_IronPlate_C");
     expect(b.overclock).toBe(150);
@@ -45,10 +47,17 @@ describe("reduce", () => {
 
   it("marks a building with no recipe as off with null recipe_id", () => {
     const raw = rawSave();
-    raw.levels.Persistent.objects[0].properties = { mCurrentPotential: { value: 1.0 } };
+    const constructor = raw.levels.Persistent?.objects[0];
+    expect(constructor).toBeDefined();
+    if (!constructor) return;
+    constructor.properties = { mCurrentPotential: { value: 1.0 } };
+
     const snap = reduce(raw, "w");
-    expect(snap.buildings[0].recipe_id).toBeNull();
-    expect(snap.buildings[0].state).toBe("off");
-    expect(snap.buildings[0].overclock).toBe(100);
+    const b = snap.buildings[0];
+    expect(b).toBeDefined();
+    if (!b) return;
+    expect(b.recipe_id).toBeNull();
+    expect(b.state).toBe("off");
+    expect(b.overclock).toBe(100);
   });
 });

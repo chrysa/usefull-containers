@@ -1,4 +1,4 @@
-import { useLanguage } from "../../hooks/useLanguage";
+import { useLanguage } from "@/hooks/useLanguage";
 import styles from "./LanguageSwitcher.module.scss";
 
 export default function LanguageSwitcher() {

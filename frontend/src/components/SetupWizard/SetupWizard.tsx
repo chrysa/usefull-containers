@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { useHealthQuery } from "../../api/health/queries";
-import { useCreatePlanMutation } from "../../domain/plans/queries";
-import { useGameDataStatsQuery, useImportGameDataMutation } from "../../domain/gamedata/queries";
-import { useAuth } from "../../context/useAuth";
-import { ImportZipButton } from "../../features/gamedata";
-import LanguageSwitcher from "../languages/LanguageSwitcher";
+import { useHealthQuery } from "@/api/health/queries";
+import { useCreatePlanMutation } from "@/domain/plans/queries";
+import { useGameDataStatsQuery, useImportGameDataMutation } from "@/domain/gamedata/queries";
+import { useAuth } from "@/context/useAuth";
+import { ImportZipButton } from "@/features/gamedata";
+import LanguageSwitcher from "@/components/languages/LanguageSwitcher";
 import styles from "./SetupWizard.module.scss";
 
 interface SetupWizardProps {
@@ -46,7 +46,7 @@ export default function SetupWizard({
   const itemCount = gameStats.data?.item_count ?? 0;
   const recipeCount = gameStats.data?.recipe_count ?? 0;
 
-  const steps: readonly Step[] = projectId ? STEPS_EXISTING : STEPS_NEW;
+  const steps: readonly [Step, ...Step[]] = projectId ? STEPS_EXISTING : STEPS_NEW;
   const [step, setStep] = useState<Step>(steps[0]);
 
   // Tracks the project id once the "project" step is confirmed

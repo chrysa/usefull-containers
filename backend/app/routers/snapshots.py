@@ -85,9 +85,7 @@ async def delete_snapshot(
     session: AsyncSession = Depends(get_session),
 ) -> None:
     # Stage both the delete and audit event atomically before committing.
-    removed = await snapshot_service.delete(
-        session, current_user.id, snapshot_id, commit=False
-    )
+    removed = await snapshot_service.delete(session, current_user.id, snapshot_id, commit=False)
     if not removed:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Snapshot not found")
     await audit_service.record_event(

@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/useAuth";
-import GlobalLoader from "../loaders/GlobalLoader";
+import { useAuth } from "@/context/useAuth";
+import GlobalLoader from "@/components/loaders/GlobalLoader";
 
 /**
  * Guards routes that require authentication. A-04 made plans & blueprints

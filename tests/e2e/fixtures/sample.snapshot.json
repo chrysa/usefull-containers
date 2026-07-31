@@ -1,18 +1,18 @@
 {
-  "name": "E2E sample",
   "data": {
-    "save_name": "E2E_sample",
-    "play_time": 1000,
     "buildings": [
       {
+        "floor_id": null,
         "machine_id": "Build_ConstructorMk1_C",
-        "recipe_id": "Recipe_IronPlate_C",
         "overclock": 100,
-        "state": "active",
+        "recipe_id": "Recipe_IronPlate_C",
         "somersloops": 0,
-        "floor_id": null
+        "state": "active"
       }
     ],
-    "power_grids": []
-  }
+    "play_time": 1000,
+    "power_grids": [],
+    "save_name": "E2E_sample"
+  },
+  "name": "E2E sample"
 }

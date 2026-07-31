@@ -2,23 +2,25 @@ from __future__ import annotations
 
 from fastapi import status
 from fastapi.testclient import TestClient
+from httpx import Response
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 
-def _register(client: TestClient, username: str, password: str) -> dict:
-    resp = client.post(
+def _register(client: TestClient, username: str, password: str) -> Response:
+    resp: Response = client.post(
         "/api/v1/auth/register",
         json={"username": username, "password": password},
     )
     return resp
 
 
-def _login(client: TestClient, username: str, password: str) -> dict:
-    return client.post(
+def _login(client: TestClient, username: str, password: str) -> Response:
+    resp: Response = client.post(
         "/api/v1/auth/login",
         json={"username": username, "password": password},
     )
+    return resp
 
 
 # ─── Register ─────────────────────────────────────────────────────────────────

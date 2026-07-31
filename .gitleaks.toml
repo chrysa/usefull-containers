@@ -1,0 +1,9 @@
+# gitleaks configuration — extends the bundled default ruleset.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "detect-secrets baseline holds SHA1 digests, never plaintext secrets"
+paths = [
+    '''\.secrets\.baseline$''',
+]

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Plan, PlanCreate } from "../../domain/plans/types";
+import type { Plan, PlanCreate } from "@/domain/plans/types";
 import styles from "./PlanForm.module.scss";
 
 interface Props {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { useBackendStatus } from "../../hooks/useBackendStatus";
+import { useBackendStatus } from "@/hooks/useBackendStatus";
 import styles from "./BackendConnectionBanner.module.scss";
 
 export default function BackendConnectionBanner() {

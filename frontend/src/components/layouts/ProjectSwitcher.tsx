@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Project } from "../../domain/projects/types";
+import type { Project } from "@/domain/projects/types";
 import styles from "./ProjectSwitcher.module.scss";
 
 interface ProjectSwitcherProps {

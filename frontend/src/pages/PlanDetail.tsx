@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../context/useToast";
+import { useToast } from "@/context/useToast";
 import {
   usePlanQuery,
   useUpdatePlanMutation,
   useDeletePlanMutation,
   useDuplicatePlanMutation,
-} from "../domain/plans/queries";
-import { useItemsQuery } from "../domain/gamedata/queries";
-import { useBlueprintsQuery } from "../domain/blueprints/queries";
-import { useGameDataStatsQuery } from "../domain/gamedata/queries";
-import type { TargetItem } from "../domain/plans/types";
-import Skeleton from "../components/ui/Skeleton";
-import RealVsPlanned from "../components/plan/RealVsPlanned";
+} from "@/domain/plans/queries";
+import { useItemsQuery } from "@/domain/gamedata/queries";
+import { useBlueprintsQuery } from "@/domain/blueprints/queries";
+import { useGameDataStatsQuery } from "@/domain/gamedata/queries";
+import type { TargetItem } from "@/domain/plans/types";
+import Skeleton from "@/components/ui/Skeleton";
+import RealVsPlanned from "@/components/plan/RealVsPlanned";
 import styles from "./PlanDetail.module.scss";
 
 export default function PlanDetail() {

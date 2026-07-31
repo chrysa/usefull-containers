@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../context/useToast";
-import { useHealthQuery } from "../api/health/queries";
-import { PlanCard, PlanForm } from "../features/plans";
-import Skeleton from "../components/ui/Skeleton";
+import { useToast } from "@/context/useToast";
+import { useHealthQuery } from "@/api/health/queries";
+import { PlanCard, PlanForm } from "@/features/plans";
+import Skeleton from "@/components/ui/Skeleton";
 import {
   useCreatePlanMutation,
   useDeletePlanMutation,
@@ -12,8 +12,8 @@ import {
   useImportPlanMutation,
   usePlansQuery,
   useUpdatePlanMutation,
-} from "../domain/plans/queries";
-import type { Plan, PlanCreate } from "../domain/plans/types";
+} from "@/domain/plans/queries";
+import type { Plan, PlanCreate } from "@/domain/plans/types";
 import styles from "./Plans.module.scss";
 
 export default function PlansPage() {
@@ -215,7 +215,7 @@ export default function PlansPage() {
       {formOpen && (
         <PlanForm
           key={editingPlan?.id ?? "new"}
-          initial={editingPlan}
+          {...(editingPlan ? { initial: editingPlan } : {})}
           onSubmit={handleSubmit}
           onCancel={() => setFormOpen(false)}
           isPending={isPending}

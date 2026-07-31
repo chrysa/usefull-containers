@@ -1,4 +1,4 @@
-import { authHeaders } from "../auth/store";
+import { authHeaders } from "@/domain/auth/store";
 
 /**
  * Download a protected file endpoint and save it via a synthetic anchor click.

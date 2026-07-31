@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { http } from "../../api/http/client";
-import { usePlansQuery, useCreatePlanMutation } from "../../domain/plans/queries";
-import type { Plan, PlanCreate } from "../../domain/plans/types";
+import { http } from "@/api/http/client";
+import { usePlansQuery, useCreatePlanMutation } from "@/domain/plans/queries";
+import type { Plan, PlanCreate } from "@/domain/plans/types";
 import styles from "./SaveToPlanPanel.module.scss";
 
 interface Props {

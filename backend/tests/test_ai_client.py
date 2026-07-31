@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import httpx
 import pytest
 
@@ -30,7 +32,7 @@ class _FakeClient:
     def __init__(self, *, response: _FakeResponse | None = None, exc: Exception | None = None):
         self._response = response
         self._exc = exc
-        self.calls: list[dict[str, object]] = []
+        self.calls: list[dict[str, Any]] = []
 
     async def __aenter__(self) -> _FakeClient:
         return self
@@ -38,7 +40,9 @@ class _FakeClient:
     async def __aexit__(self, *_: object) -> bool:
         return False
 
-    async def post(self, url: str, *, json: dict, headers: dict) -> _FakeResponse:
+    async def post(
+        self, url: str, *, json: dict[str, Any], headers: dict[str, str]
+    ) -> _FakeResponse:
         self.calls.append({"url": url, "json": json, "headers": headers})
         if self._exc is not None:
             raise self._exc
@@ -47,7 +51,7 @@ class _FakeClient:
 
 
 def _patch_client(monkeypatch: pytest.MonkeyPatch, client: _FakeClient) -> None:
-    monkeypatch.setattr(ai_client.httpx, "AsyncClient", lambda *a, **k: client)
+    monkeypatch.setattr("app.services.ai_client.httpx.AsyncClient", lambda *a, **k: client)
 
 
 @pytest.fixture

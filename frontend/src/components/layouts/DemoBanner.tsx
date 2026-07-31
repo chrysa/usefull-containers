@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useHealthQuery } from "../../api/health/queries";
+import { useHealthQuery } from "@/api/health/queries";
 import styles from "./DemoBanner.module.scss";
 
 /**

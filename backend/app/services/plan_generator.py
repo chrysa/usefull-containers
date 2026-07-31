@@ -66,9 +66,7 @@ def _build_prompt(prompt: str, items: list[ItemSummary], *, strict: bool = False
     )
     if strict:
         instruction += " Respond with the JSON object and nothing else — no prose, no code fences."
-    return (
-        f"{instruction}\n\n## Catalog\n{catalog}\n\n## Request\n{prompt}\n\n## JSON\n"
-    )
+    return f"{instruction}\n\n## Catalog\n{catalog}\n\n## Request\n{prompt}\n\n## JSON\n"
 
 
 def _grounded_targets(raw: object, catalog_ids: set[str]) -> list[TargetItem]:
@@ -196,8 +194,7 @@ def _aggregate(trees: list[CalculationNode]) -> tuple[dict[str, _StepAcc], dict[
                 machine_id=node.machines.machine_id if node.machines else "",
                 per_machine_output=per_machine,
                 inputs_per_unit={
-                    child.item_id: child.quantity / node.quantity
-                    for child in node.children
+                    child.item_id: child.quantity / node.quantity for child in node.children
                 }
                 if node.quantity > 0
                 else {},

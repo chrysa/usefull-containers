@@ -48,9 +48,7 @@ async def list_for_user(
     return list(result)
 
 
-async def get(
-    session: AsyncSession, user_id: int, snapshot_id: str
-) -> FactorySnapshot | None:
+async def get(session: AsyncSession, user_id: int, snapshot_id: str) -> FactorySnapshot | None:
     """Return one snapshot owned by the user, or None."""
     result = await session.scalars(
         select(FactorySnapshot).where(

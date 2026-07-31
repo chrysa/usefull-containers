@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "@/context/useAuth";
 import styles from "./Login.module.scss";
 
 type Tab = "login" | "register";

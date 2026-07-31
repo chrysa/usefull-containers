@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAssistantChat, useGeneratePlan } from "../../api/assistant/queries";
-import type { ChatMessage } from "../../api/assistant/types";
+import { useAssistantChat, useGeneratePlan } from "@/api/assistant/queries";
+import type { ChatMessage } from "@/api/assistant/types";
 import GeneratedPlanPreview from "./GeneratedPlanPreview";
 import styles from "./AssistantWidget.module.scss";
 
@@ -74,7 +74,8 @@ export default function AssistantWidget() {
             {
               role: "assistant",
               text: data.reply,
-              plan: data.plan ?? undefined,
+              // exactOptionalPropertyTypes: omit `plan` rather than set it to undefined
+              ...(data.plan ? { plan: data.plan } : {}),
             },
           ]);
         },

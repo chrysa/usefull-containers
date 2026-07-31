@@ -273,25 +273,18 @@ class TestUploadBatchEndpoint:
         assert resp.status_code == 500
 
     def test_batch_upload_oversized_file_should_be_skipped(
-        self, patched_client: TestClient
+        self, patched_client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        # Build a payload exceeding MAX_BLUEPRINT_SIZE_BYTES (50 MB).
-        # Use monkeypatch to keep test fast.
+        # Shrink the limit instead of building a real 50 MB payload, so a
+        # 9-byte file counts as oversized and the test stays fast.
+        monkeypatch.setattr("app.routers.blueprints.MAX_BLUEPRINT_SIZE_BYTES", 5)
 
-        # Temporarily shrink the limit so a 10-byte file is "oversized"
-        import app.routers.blueprints as bp_module
+        files = [("files", ("big.sbp", io.BytesIO(b"123456789"), "application/octet-stream"))]
+        resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
 
-        original_max = bp_module.MAX_BLUEPRINT_SIZE_BYTES
-        # monkeypatch module-level constant in the router
-        bp_module.MAX_BLUEPRINT_SIZE_BYTES = 5
-        try:
-            files = [("files", ("big.sbp", io.BytesIO(b"123456789"), "application/octet-stream"))]
-            resp = patched_client.post("/api/v1/blueprints/upload-batch", files=files)
-            # file is silently skipped → total=0
-            assert resp.status_code == 207
-            assert resp.json()["total"] == 0
-        finally:
-            bp_module.MAX_BLUEPRINT_SIZE_BYTES = original_max
+        # file is silently skipped → total=0
+        assert resp.status_code == 207
+        assert resp.json()["total"] == 0
 
 
 class TestImportZipEndpoint:

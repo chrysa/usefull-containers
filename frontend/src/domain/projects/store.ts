@@ -56,9 +56,10 @@ export function getActiveProject(): Project | null {
     if (found) return found;
   }
   // Auto-activate the first available project if active ID is stale/missing
-  if (projects.length > 0) {
-    writeActiveProjectId(projects[0].id);
-    return projects[0];
+  const first = projects[0];
+  if (first) {
+    writeActiveProjectId(first.id);
+    return first;
   }
   return null;
 }

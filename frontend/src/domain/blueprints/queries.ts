@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { http } from "../../api/http/client";
-import { authHeaders } from "../auth/store";
+import { http } from "@/api/http/client";
+import { authHeaders } from "@/domain/auth/store";
 import { downloadAuthedFile } from "./download";
 import type { BatchUploadResult, Blueprint, BlueprintDescriptionUpdate, BlueprintList, BlueprintTagsUpdate, BlueprintUploadResult } from "./types";
 

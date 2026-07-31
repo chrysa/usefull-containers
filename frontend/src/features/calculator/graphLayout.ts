@@ -2,7 +2,7 @@
 // with automatic top-down DAG layout via dagre.
 import dagre from "@dagrejs/dagre";
 import type { Edge, Node } from "@xyflow/react";
-import type { CalculationNode } from "../../domain/gamedata/calculator";
+import type { CalculationNode } from "@/domain/gamedata/calculator";
 
 export const NODE_WIDTH = 210;
 export const NODE_HEIGHT = 76;

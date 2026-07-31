@@ -1,20 +1,20 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { useItemsQuery, useRecipesQuery, useGameDataStatsQuery } from "../domain/gamedata/queries";
-import { calculateProduction, flattenRequirements, summarizeMachines } from "../domain/gamedata/calculator";
-import type { CalculationNode } from "../domain/gamedata/calculator";
+import { useItemsQuery, useRecipesQuery, useGameDataStatsQuery } from "@/domain/gamedata/queries";
+import { calculateProduction, flattenRequirements, summarizeMachines } from "@/domain/gamedata/calculator";
+import type { CalculationNode } from "@/domain/gamedata/calculator";
 import {
   BELT_TIERS,
   PIPE_TIERS,
   countForTier,
   transportRequirement,
   type TransportRequirement,
-} from "../domain/gamedata/logistics";
-import { sizeVehicles } from "../domain/gamedata/vehicles";
-import { summarizePower } from "../domain/gamedata/power";
-import ProductionGraph from "../features/calculator/ProductionGraph";
-import SaveToPlanPanel from "../features/calculator/SaveToPlanPanel";
+} from "@/domain/gamedata/logistics";
+import { sizeVehicles } from "@/domain/gamedata/vehicles";
+import { summarizePower } from "@/domain/gamedata/power";
+import ProductionGraph from "@/features/calculator/ProductionGraph";
+import SaveToPlanPanel from "@/features/calculator/SaveToPlanPanel";
 import styles from "./Calculator.module.scss";
 
 type ViewMode = "tree" | "graph";

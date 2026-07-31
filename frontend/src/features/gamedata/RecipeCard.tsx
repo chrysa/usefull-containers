@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { RecipeSummary } from "../../domain/gamedata/types";
+import type { RecipeSummary } from "@/domain/gamedata/types";
 import styles from "./RecipeCard.module.scss";
 
 interface Props {

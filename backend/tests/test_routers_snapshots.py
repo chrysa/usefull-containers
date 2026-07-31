@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi.testclient import TestClient
 
 
@@ -14,7 +16,7 @@ def _register(client: TestClient, username: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {resp.json()['access_token']}"}
 
 
-def _snapshot_payload() -> dict:
+def _snapshot_payload() -> dict[str, Any]:
     return {
         "name": "Iron base",
         "data": {
@@ -69,9 +71,9 @@ def test_list_snapshots(client: TestClient) -> None:
 
 def test_delete_snapshot(client: TestClient) -> None:
     headers = _register(client, "snapuser3")
-    snap_id = client.post(
-        "/api/v1/snapshots", json=_snapshot_payload(), headers=headers
-    ).json()["id"]
+    snap_id = client.post("/api/v1/snapshots", json=_snapshot_payload(), headers=headers).json()[
+        "id"
+    ]
     assert client.delete(f"/api/v1/snapshots/{snap_id}", headers=headers).status_code == 204
     assert client.get(f"/api/v1/snapshots/{snap_id}", headers=headers).status_code == 404
 
@@ -79,9 +81,9 @@ def test_delete_snapshot(client: TestClient) -> None:
 def test_snapshots_are_user_scoped(client: TestClient) -> None:
     headers_a = _register(client, "snapuser_a")
     headers_b = _register(client, "snapuser_b")
-    snap_id = client.post(
-        "/api/v1/snapshots", json=_snapshot_payload(), headers=headers_a
-    ).json()["id"]
+    snap_id = client.post("/api/v1/snapshots", json=_snapshot_payload(), headers=headers_a).json()[
+        "id"
+    ]
     assert client.get(f"/api/v1/snapshots/{snap_id}", headers=headers_b).status_code == 404
     assert client.delete(f"/api/v1/snapshots/{snap_id}", headers=headers_b).status_code == 404
     assert client.get("/api/v1/snapshots", headers=headers_b).json() == []
@@ -94,9 +96,9 @@ def test_snapshots_require_auth(client: TestClient) -> None:
 
 def test_snapshot_create_is_audited(client: TestClient) -> None:
     headers = _register(client, "snapuser_audit")
-    snap_id = client.post(
-        "/api/v1/snapshots", json=_snapshot_payload(), headers=headers
-    ).json()["id"]
+    snap_id = client.post("/api/v1/snapshots", json=_snapshot_payload(), headers=headers).json()[
+        "id"
+    ]
     client.delete(f"/api/v1/snapshots/{snap_id}", headers=headers)
     entries = client.get("/api/v1/audit", headers=headers).json()
     actions = {(e["action"], e["resource_type"]) for e in entries}

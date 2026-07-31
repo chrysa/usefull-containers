@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { isSetupCompleted, markSetupCompleted } from "../../domain/projects/store";
+import { isSetupCompleted, markSetupCompleted } from "@/domain/projects/store";
 
 export interface SetupWizardState {
   isOpen: boolean;

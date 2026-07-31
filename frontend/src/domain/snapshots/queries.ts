@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { http } from "../../api/http/client";
+import { http } from "@/api/http/client";
 import type { SnapshotCreate, SnapshotRead } from "./types";
 
 const QUERY_KEY = "snapshots";

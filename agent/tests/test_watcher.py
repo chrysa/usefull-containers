@@ -3,9 +3,9 @@ from __future__ import annotations
 import threading
 import time
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture, MockType
 from watchdog.events import FileCreatedEvent, FileModifiedEvent
 
 from sfm_agent.config import AgentConfig
@@ -72,8 +72,8 @@ def test_watched_exts_contains_sbp_and_sbpcfg() -> None:
 # ── BlueprintEventHandler ─────────────────────────────────────────────────────
 
 
-def test_handler_ignores_directory_events(config: AgentConfig) -> None:
-    syncer = MagicMock()
+def test_handler_ignores_directory_events(config: AgentConfig, mocker: MockerFixture) -> None:
+    syncer = mocker.MagicMock()
     handler = BlueprintEventHandler(syncer, config)
     evt = FileCreatedEvent("/some/dir")
     evt.is_directory = True
@@ -82,8 +82,8 @@ def test_handler_ignores_directory_events(config: AgentConfig) -> None:
     syncer.upload_blueprint.assert_not_called()
 
 
-def test_handler_ignores_non_watched_extension(config: AgentConfig) -> None:
-    syncer = MagicMock()
+def test_handler_ignores_non_watched_extension(config: AgentConfig, mocker: MockerFixture) -> None:
+    syncer = mocker.MagicMock()
     handler = BlueprintEventHandler(syncer, config)
     evt = FileCreatedEvent(str(config.blueprints_dir / "readme.txt"))
     evt.is_directory = False
@@ -92,8 +92,8 @@ def test_handler_ignores_non_watched_extension(config: AgentConfig) -> None:
     syncer.upload_blueprint.assert_not_called()
 
 
-def test_handler_triggers_upload_on_sbp_created(config: AgentConfig) -> None:
-    syncer = MagicMock()
+def test_handler_triggers_upload_on_sbp_created(config: AgentConfig, mocker: MockerFixture) -> None:
+    syncer = mocker.MagicMock()
     handler = BlueprintEventHandler(syncer, config)
     evt = FileCreatedEvent(str(config.blueprints_dir / "my-bp.sbp"))
     evt.is_directory = False
@@ -102,8 +102,8 @@ def test_handler_triggers_upload_on_sbp_created(config: AgentConfig) -> None:
     syncer.upload_blueprint.assert_called_once_with("my-bp", config.blueprints_dir)
 
 
-def test_handler_triggers_upload_on_sbpcfg_modified(config: AgentConfig) -> None:
-    syncer = MagicMock()
+def test_handler_triggers_upload_on_sbpcfg_modified(config: AgentConfig, mocker: MockerFixture) -> None:
+    syncer = mocker.MagicMock()
     handler = BlueprintEventHandler(syncer, config)
     evt = FileModifiedEvent(str(config.blueprints_dir / "other.sbpcfg"))
     evt.is_directory = False
@@ -112,8 +112,8 @@ def test_handler_triggers_upload_on_sbpcfg_modified(config: AgentConfig) -> None
     syncer.upload_blueprint.assert_called_once_with("other", config.blueprints_dir)
 
 
-def test_handler_debounces_rapid_events(config: AgentConfig) -> None:
-    syncer = MagicMock()
+def test_handler_debounces_rapid_events(config: AgentConfig, mocker: MockerFixture) -> None:
+    syncer = mocker.MagicMock()
     handler = BlueprintEventHandler(syncer, config)
     path = str(config.blueprints_dir / "bp.sbp")
     for _ in range(5):
@@ -127,14 +127,14 @@ def test_handler_debounces_rapid_events(config: AgentConfig) -> None:
 # ── BlueprintWatcher ──────────────────────────────────────────────────────────
 
 
-def test_watcher_start_stop(config: AgentConfig) -> None:
-    syncer = MagicMock()
-    with patch("sfm_agent.watcher.Observer") as mock_obs_cls:
-        mock_obs = MagicMock()
-        mock_obs_cls.return_value = mock_obs
-        watcher = BlueprintWatcher(syncer, config)
-        watcher.start()
-        mock_obs.start.assert_called_once()
-        watcher.stop()
-        mock_obs.stop.assert_called_once()
-        mock_obs.join.assert_called_once()
+def test_watcher_start_stop(config: AgentConfig, mocker: MockerFixture) -> None:
+    syncer = mocker.MagicMock()
+    mock_obs_cls = mocker.patch("sfm_agent.watcher.Observer")
+    mock_obs = mocker.MagicMock()
+    mock_obs_cls.return_value = mock_obs
+    watcher = BlueprintWatcher(syncer, config)
+    watcher.start()
+    mock_obs.start.assert_called_once()
+    watcher.stop()
+    mock_obs.stop.assert_called_once()
+    mock_obs.join.assert_called_once()

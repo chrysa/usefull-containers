@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { Plan } from "../../domain/plans/types";
-import { formatDate } from "../../utils/formatDate";
+import type { Plan } from "@/domain/plans/types";
+import { formatDate } from "@/utils/formatDate";
 import styles from "./PlanCard.module.scss";
 
 interface Props {

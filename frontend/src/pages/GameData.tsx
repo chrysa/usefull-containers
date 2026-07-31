@@ -1,13 +1,13 @@
 import { useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
-import { ImportZipButton, ItemCard, RecipeCard } from "../features/gamedata";
-import Skeleton from "../components/ui/Skeleton";
+import { ImportZipButton, ItemCard, RecipeCard } from "@/features/gamedata";
+import Skeleton from "@/components/ui/Skeleton";
 import {
   useGameDataStatsQuery,
   useImportGameDataMutation,
   useItemsQuery,
   useRecipesQuery,
-} from "../domain/gamedata/queries";
+} from "@/domain/gamedata/queries";
 import styles from "./GameData.module.scss";
 
 type Tab = "items" | "recipes";

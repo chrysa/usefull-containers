@@ -3,25 +3,25 @@
     "close": "Fermer",
     "error": "Une erreur est survenue. Veuillez réessayer.",
     "placeholder": "Posez votre question…",
-    "send": "Envoyer",
-    "title": "Assistant Factory",
-    "toggle_label": "Ouvrir l'assistant",
-    "welcome": "Bonjour ! Je suis votre assistant Factory Manager. Comment puis-je vous aider ?",
+    "plan": {
+      "assumptions": "Hypothèses & limites",
+      "consumes": "consomme",
+      "machine_line": "{{count}}× {{machine}} — {{recipe}} ({{clock}} %)",
+      "machine_unknown": "{{recipe}} — nombre de machines inconnu (pas de temps de craft)",
+      "raw_inputs": "Intrants bruts",
+      "save": "Enregistrer comme plan",
+      "saved": "Enregistré ✓",
+      "saving": "Enregistrement…",
+      "steps": "Étapes de production",
+      "warnings": "Avertissements"
+    },
     "plan_mode": "Générer un plan d'usine",
     "plan_mode_active": "Mode plan",
     "plan_mode_hint": "Décrivez quoi produire, ex. « 120 iron plate per minute ».",
-    "plan": {
-      "steps": "Étapes de production",
-      "machine_line": "{{count}}× {{machine}} — {{recipe}} ({{clock}} %)",
-      "machine_unknown": "{{recipe}} — nombre de machines inconnu (pas de temps de craft)",
-      "consumes": "consomme",
-      "raw_inputs": "Intrants bruts",
-      "assumptions": "Hypothèses & limites",
-      "warnings": "Avertissements",
-      "save": "Enregistrer comme plan",
-      "saving": "Enregistrement…",
-      "saved": "Enregistré ✓"
-    }
+    "send": "Envoyer",
+    "title": "Assistant Factory",
+    "toggle_label": "Ouvrir l'assistant",
+    "welcome": "Bonjour ! Je suis votre assistant Factory Manager. Comment puis-je vous aider ?"
   },
   "blueprint_detail": {
     "back": "Retour aux blueprints",

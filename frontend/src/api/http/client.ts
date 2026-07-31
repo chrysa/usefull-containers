@@ -1,6 +1,6 @@
 // Lightweight fetch wrapper — no external dependency
-import { readActiveProjectId, readProjects } from "../../domain/projects/store";
-import { readToken } from "../../domain/auth/store";
+import { readActiveProjectId, readProjects } from "@/domain/projects/store";
+import { readToken } from "@/domain/auth/store";
 
 const FALLBACK_URL =
   (import.meta.env.VITE_API_URL ?? "http://localhost:9009") + "/api";

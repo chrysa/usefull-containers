@@ -117,9 +117,7 @@ class TestGeneratePlanEndpoint:
         )
 
     def test_vague_prompt_returns_clarification(self, demo_client: TestClient) -> None:
-        res = demo_client.post(
-            f"{API}/assistant/generate-plan", json={"prompt": "hi there"}
-        )
+        res = demo_client.post(f"{API}/assistant/generate-plan", json={"prompt": "hi there"})
         assert res.status_code == 200
         body = res.json()
         assert body["plan"] is None

@@ -4,6 +4,7 @@ import io
 import json
 import zipfile
 from pathlib import Path
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -23,7 +24,7 @@ def gamedata_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClie
     return TestClient(create_app())
 
 
-def _make_zip(data: dict) -> bytes:
+def _make_zip(data: dict[str, Any]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, mode="w") as zf:
         zf.writestr("data.json", json.dumps(data))

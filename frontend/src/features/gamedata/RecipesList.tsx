@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRecipesQuery } from "../../domain/gamedata/queries";
+import { useRecipesQuery } from "@/domain/gamedata/queries";
 import { RecipeCard } from "./RecipeCard";
-import Skeleton from "../../components/ui/Skeleton";
+import Skeleton from "@/components/ui/Skeleton";
 import styles from "./SearchList.module.scss";
 
 interface Props {

@@ -1,5 +1,5 @@
-import { http } from "../http/client";
-import type { SteamGameDataResponse, TokenResponse, User } from "../../domain/auth/types";
+import { http } from "@/api/http/client";
+import type { SteamGameDataResponse, TokenResponse, User } from "@/domain/auth/types";
 
 const BASE = "/v1/auth";
 

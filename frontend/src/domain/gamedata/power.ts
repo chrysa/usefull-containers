@@ -62,7 +62,7 @@ export function buildingKey(machineId: string): string {
 export function buildingPower(machineId: string): number | null {
   if (!machineId) return null;
   const key = buildingKey(machineId);
-  return key in POWER_TABLE ? POWER_TABLE[key] : null;
+  return POWER_TABLE[key] ?? null;
 }
 
 /**

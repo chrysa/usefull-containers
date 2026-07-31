@@ -97,3 +97,6 @@ graphify-out/
 Thumbs.db
 
 # ---8<--- chrysa:canonical:end --->8---
+
+# Generated audit report (guideline-checker) — never committed
+guideline-report.html

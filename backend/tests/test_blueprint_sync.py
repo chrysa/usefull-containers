@@ -41,9 +41,7 @@ class TestComputeSyncDiff:
 
     def test_local_only_blueprint_is_uploaded(self, tmp_path: Path) -> None:
         # Server empty; agent reports one local blueprint.
-        entry = BlueprintSyncEntry(
-            name="alpha", modified_at=datetime(2026, 1, 1), size_bytes=10
-        )
+        entry = BlueprintSyncEntry(name="alpha", modified_at=datetime(2026, 1, 1), size_bytes=10)
         diff = compute_sync_diff(str(tmp_path), [entry])
         assert diff.to_upload == ["alpha"]
         assert diff.to_delete == []
@@ -124,13 +122,12 @@ def _register(client: TestClient, username: str = "owner") -> str:
         "/api/v1/auth/register", json={"username": username, "password": "pw-long-enough-123"}
     )
     assert resp.status_code == 201, resp.text
-    return resp.json()["access_token"]
+    token: str = resp.json()["access_token"]
+    return token
 
 
 class TestSyncEndpointAuth:
-    def test_valid_agent_key_authorises(
-        self, client: TestClient, tmp_path: Path
-    ) -> None:
+    def test_valid_agent_key_authorises(self, client: TestClient, tmp_path: Path) -> None:
         from app.config import settings
 
         settings.agent_api_key = _AGENT_KEY

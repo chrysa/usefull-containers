@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import type { ItemSummary } from "../../domain/gamedata/types";
+import type { ItemSummary } from "@/domain/gamedata/types";
 import styles from "./ItemCard.module.scss";
 
 interface Props {

@@ -30,17 +30,19 @@ SMELTER = "Desc_SmelterMk1_C"
 
 
 @pytest.fixture
-def recipes():
+def recipes() -> list[RecipeSummary]:
     return demo_recipes()
 
 
 @pytest.fixture
-def items():
+def items() -> list[ItemSummary]:
     return demo_items()
 
 
 class TestCalculateProduction:
-    def test_iron_plate_tree_resolves_to_raw_ore(self, recipes, items):
+    def test_iron_plate_tree_resolves_to_raw_ore(
+        self, recipes: list[RecipeSummary], items: list[ItemSummary]
+    ) -> None:
         # 120 plates/min → 180 ingots/min → 180 ore/min (raw leaf).
         root = calculate_production(IRON_PLATE, 120, recipes, items)
 
@@ -65,7 +67,9 @@ class TestCalculateProduction:
         assert ore.recipe_id is None  # raw → leaf
         assert ore.machines is None
 
-    def test_raw_item_is_a_leaf(self, recipes, items):
+    def test_raw_item_is_a_leaf(
+        self, recipes: list[RecipeSummary], items: list[ItemSummary]
+    ) -> None:
         root = calculate_production(IRON_ORE, 60, recipes, items)
         assert root.recipe_id is None
         assert root.recipe_name is None
@@ -74,17 +78,22 @@ class TestCalculateProduction:
 
 
 class TestFlattenRequirements:
-    def test_flatten_collects_raw_inputs_sorted(self, recipes, items):
+    def test_flatten_collects_raw_inputs_sorted(
+        self, recipes: list[RecipeSummary], items: list[ItemSummary]
+    ) -> None:
         root = calculate_production(IRON_PLATE, 120, recipes, items)
         flat = flatten_requirements(root)
 
-        assert [(r.item_id, r.quantity) for r in flat] == [(IRON_ORE, pytest.approx(180))]
+        assert [r.item_id for r in flat] == [IRON_ORE]
+        assert [r.quantity for r in flat] == [pytest.approx(180)]
         assert flat[0].is_raw is True
         assert flat[0].is_fluid is False
 
 
 class TestSummarizeMachines:
-    def test_machine_counts_grouped_by_machine_type(self, recipes, items):
+    def test_machine_counts_grouped_by_machine_type(
+        self, recipes: list[RecipeSummary], items: list[ItemSummary]
+    ) -> None:
         root = calculate_production(IRON_PLATE, 120, recipes, items)
         summary = {m.machine_id: m for m in summarize_machines(root)}
 
@@ -95,7 +104,7 @@ class TestSummarizeMachines:
 
 
 class TestMachineRequirement:
-    def test_fractional_count_rounds_up_with_clock(self, recipes):
+    def test_fractional_count_rounds_up_with_clock(self, recipes: list[RecipeSummary]) -> None:
         plate_recipe = next(r for r in recipes if r.id == "Recipe_IronPlate_C")
         # 30 plates/min ÷ 20/machine = 1.5 → 2 machines @ 75% clock.
         req = machine_requirement(plate_recipe, IRON_PLATE, 30)
@@ -104,14 +113,14 @@ class TestMachineRequirement:
         assert req.count == 2
         assert req.clock_percent == pytest.approx(75)
 
-    def test_unknown_time_is_not_computable(self, recipes):
+    def test_unknown_time_is_not_computable(self, recipes: list[RecipeSummary]) -> None:
         plate_recipe = next(r for r in recipes if r.id == "Recipe_IronPlate_C")
         zero_time = plate_recipe.model_copy(update={"time": 0})
         assert machine_requirement(zero_time, IRON_PLATE, 30) is None
 
 
 class TestTransportRequirement:
-    def test_solid_belt_sizing(self):
+    def test_solid_belt_sizing(self) -> None:
         req = transport_requirement(120, is_fluid=False)
         assert req.is_fluid is False
         assert req.min_single_tier == "Mk.2"  # 120 ≤ 120
@@ -119,12 +128,12 @@ class TestTransportRequirement:
         assert per_tier["Mk.1"] == 2  # ceil(120 / 60)
         assert per_tier["Mk.2"] == 1
 
-    def test_fluid_uses_pipe_tiers(self):
+    def test_fluid_uses_pipe_tiers(self) -> None:
         req = transport_requirement(450, is_fluid=True)
         assert req.is_fluid is True
         assert req.min_single_tier == "Mk.2"  # 300 < 450 ≤ 600
 
-    def test_count_for_tier_lookup(self):
+    def test_count_for_tier_lookup(self) -> None:
         req = transport_requirement(120, is_fluid=False)
         assert count_for_tier(req, "Mk.1") == 2
         assert count_for_tier(req, "does-not-exist") == 0
@@ -177,28 +186,36 @@ _EDGE_RECIPES = [
 
 
 class TestEdgeCases:
-    def test_shared_raw_input_is_summed_in_flatten(self):
+    def test_shared_raw_input_is_summed_in_flatten(self) -> None:
         root = calculate_production(_WIDGET, 1, _EDGE_RECIPES, _EDGE_ITEMS)
         flat = {r.item_id: r for r in flatten_requirements(root)}
         # Part A needs 2 raw, Part B needs 3 raw → 5 raw total, single entry.
         assert flat[_RAW].quantity == pytest.approx(5)
         assert flat[_RAW].is_raw is True
 
-    def test_recipe_without_machine_groups_as_unknown(self):
+    def test_recipe_without_machine_groups_as_unknown(self) -> None:
         root = calculate_production(_WIDGET, 1, _EDGE_RECIPES, _EDGE_ITEMS)
         summary = {m.machine_id: m for m in summarize_machines(root)}
         assert "unknown" in summary  # Part B recipe has no produced_in
 
-    def test_recipe_cycle_terminates_as_leaf(self):
+    def test_recipe_cycle_terminates_as_leaf(self) -> None:
         items = [ItemSummary(id="a", name="A"), ItemSummary(id="b", name="B")]
         recipes = [
             RecipeSummary(
-                id="ra", name="A", ingredients=[RecipeIngredient(item_id="b", amount=1)],
-                products=[RecipeIngredient(item_id="a", amount=1)], produced_in=["m"], time=60,
+                id="ra",
+                name="A",
+                ingredients=[RecipeIngredient(item_id="b", amount=1)],
+                products=[RecipeIngredient(item_id="a", amount=1)],
+                produced_in=["m"],
+                time=60,
             ),
             RecipeSummary(
-                id="rb", name="B", ingredients=[RecipeIngredient(item_id="a", amount=1)],
-                products=[RecipeIngredient(item_id="b", amount=1)], produced_in=["m"], time=60,
+                id="rb",
+                name="B",
+                ingredients=[RecipeIngredient(item_id="a", amount=1)],
+                products=[RecipeIngredient(item_id="b", amount=1)],
+                produced_in=["m"],
+                time=60,
             ),
         ]
         # Must not recurse forever: the second time "a" is seen it becomes a leaf.

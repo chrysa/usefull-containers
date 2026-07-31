@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { writeToken, writeUser } from "../domain/auth/store";
-import { getMe } from "../api/auth/auth";
-import GlobalLoader from "../components/loaders/GlobalLoader";
+import { writeToken, writeUser } from "@/domain/auth/store";
+import { getMe } from "@/api/auth/auth";
+import GlobalLoader from "@/components/loaders/GlobalLoader";
 
 /**
  * Handles the redirect from the backend Steam OpenID callback.
