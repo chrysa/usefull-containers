@@ -36,7 +36,7 @@ jobs:
             - uses: chrysa/github-actions/python-setup@v1.4.4
               with:
                   python-version: "3.14"
-            - uses: pre-commit/action@v3.0.1
+            - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
     hadolint:
         name: Hadolint — ${{ matrix.service }}
@@ -67,7 +67,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
             - name: Run hadolint on ${{ matrix.service }}/Dockerfile
-              uses: hadolint/hadolint-action@v3.3.0
+              uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
               with:
                   dockerfile: ${{ matrix.service }}/Dockerfile
                   config: .hadolint.yaml
