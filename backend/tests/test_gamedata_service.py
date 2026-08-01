@@ -130,7 +130,7 @@ class TestImportGamedataZip:
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, mode="w") as zf:
             zf.writestr("readme.txt", "hello")
-        with pytest.raises(GameDataParseError, match="No .json file"):
+        with pytest.raises(GameDataParseError, match=r"No \.json file"):
             import_gamedata_zip(str(tmp_path), buf.getvalue(), "empty.zip")
 
     def test_bad_zip_bytes_should_raise_parse_error(self, tmp_path: Path) -> None:

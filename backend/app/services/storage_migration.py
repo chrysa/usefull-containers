@@ -97,5 +97,5 @@ async def migrate_legacy_global_store(session: AsyncSession) -> None:
             return  # No user yet to own the legacy data; retry on a later startup.
         _migrate_plans(owner_id)
         _migrate_blueprints(owner_id)
-    except Exception:  # noqa: BLE001 — startup migration must never crash boot
+    except Exception:
         logger.exception("A-04b legacy-store migration failed; continuing startup")

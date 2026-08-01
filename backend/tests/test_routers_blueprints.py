@@ -361,7 +361,7 @@ class TestBlueprintTagsEndpoint:
     def test_set_tags_replaces_existing_tags(
         self, populated_client: tuple[TestClient, Path]
     ) -> None:
-        client, directory = populated_client
+        client, _ = populated_client
         client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["old"]})
         resp = client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["new1", "new2"]})
         assert resp.status_code == 200
@@ -370,7 +370,7 @@ class TestBlueprintTagsEndpoint:
     def test_set_tags_clears_tags_when_empty_list(
         self, populated_client: tuple[TestClient, Path]
     ) -> None:
-        client, directory = populated_client
+        client, _ = populated_client
         client.patch("/api/v1/blueprints/alpha/tags", json={"tags": ["x"]})
         resp = client.patch("/api/v1/blueprints/alpha/tags", json={"tags": []})
         assert resp.status_code == 200

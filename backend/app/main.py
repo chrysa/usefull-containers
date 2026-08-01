@@ -13,8 +13,8 @@ from app.routers import assistant, audit, auth, blueprints, gamedata, health, pl
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    from app.db.session import get_session_factory, init_db  # noqa: PLC0415
-    from app.services.storage_migration import migrate_legacy_global_store  # noqa: PLC0415
+    from app.db.session import get_session_factory, init_db
+    from app.services.storage_migration import migrate_legacy_global_store
 
     await init_db()
     async with get_session_factory()() as session:

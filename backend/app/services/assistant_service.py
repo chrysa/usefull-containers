@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Callable
 
 from app.config import settings
 from app.db.models import User
@@ -150,7 +151,7 @@ def _match_recipes(message: str) -> list[RecipeSummary]:
                 matched[recipe.id] = recipe
                 if len(matched) >= MAX_CONTEXT_RECIPES:
                     return list(matched.values())
-    except Exception:  # noqa: BLE001 — context is best-effort; missing data is fine
+    except Exception:
         return []
     return list(matched.values())
 
@@ -161,7 +162,7 @@ def _item_names(recipes: list[RecipeSummary]) -> dict[str, str]:
         return {}
     try:
         items = _gamedata_items()
-    except Exception:  # noqa: BLE001
+    except Exception:
         return {}
     return {i.id: i.name for i in items if i.id in needed}
 
@@ -178,7 +179,7 @@ def _gather_context(message: str) -> str:
     lines: list[str] = []
     try:
         stats = _gamedata_stats()
-    except Exception:  # noqa: BLE001
+    except Exception:
         stats = None
     if stats and (stats.item_count or stats.recipe_count):
         lines.append(
@@ -217,7 +218,7 @@ def _catalog() -> tuple[list[ItemSummary], list[RecipeSummary]]:
     """All items + recipes for plan generation; empty when no data is available."""
     try:
         return _gamedata_items(), _gamedata_recipes()
-    except Exception:  # noqa: BLE001 — missing/unreadable gamedata → degrade to "no data"
+    except Exception:
         return [], []
 
 
@@ -236,108 +237,110 @@ async def generate_plan(prompt: str) -> GeneratePlanResponse:
 # ---------------------------------------------------------------------------
 
 
-def _rule_based_chat(message: str, user: User | None = None) -> AssistantReply:  # noqa: PLR0911
-    intent = _detect_intent(message)
+def _reply_greet(_user: User | None) -> AssistantReply:
+    return AssistantReply(
+        reply=(
+            "Bonjour ! Je suis l'assistant du Factory Manager. "
+            "Je peux vous aider avec vos blueprints, plans de production et calculs. "
+            "Que souhaitez-vous faire ?"
+        ),
+        actions=[_ACTION_BLUEPRINTS, _ACTION_PLANS, _ACTION_CALCULATOR],
+    )
 
-    if intent == "greet":
-        return AssistantReply(
-            reply=(
-                "Bonjour ! Je suis l'assistant du Factory Manager. "
-                "Je peux vous aider avec vos blueprints, plans de production et calculs. "
-                "Que souhaitez-vous faire ?"
-            ),
-            actions=[_ACTION_BLUEPRINTS, _ACTION_PLANS, _ACTION_CALCULATOR],
+
+def _reply_blueprints(user: User | None) -> AssistantReply:
+    try:
+        count = len(_user_blueprints(user))
+        plural = "s" if count != 1 else ""
+        reply = f"Vous avez {count} blueprint{plural} dans votre collection."
+    except Exception:
+        reply = "Impossible d'accéder à vos blueprints pour l'instant."
+    return AssistantReply(
+        reply=reply,
+        actions=[AssistantAction(label="📁 Gérer les blueprints", url="/blueprints")],
+    )
+
+
+def _reply_plans(user: User | None) -> AssistantReply:
+    try:
+        count = len(_user_plans(user))
+        plural = "s" if count != 1 else ""
+        reply = f"Vous avez {count} plan{plural} de production."
+    except Exception:
+        reply = "Impossible d'accéder à vos plans pour l'instant."
+    return AssistantReply(
+        reply=reply,
+        actions=[AssistantAction(label="📋 Voir les plans", url="/plans")],
+    )
+
+
+def _reply_calculator(_user: User | None) -> AssistantReply:
+    return AssistantReply(
+        reply=(
+            "Le calculateur vous permet de planifier votre chaîne de production. "
+            "Sélectionnez un item et une quantité cible pour obtenir la liste des "
+            "ressources nécessaires et une vue graphique du flux."
+        ),
+        actions=[AssistantAction(label="🧮 Ouvrir le calculateur", url="/calculator")],
+    )
+
+
+def _reply_items(_user: User | None) -> AssistantReply:
+    try:
+        count = len(_gamedata_items(""))
+        plural = "s" if count != 1 else ""
+        reply = f"Il y a {count} item{plural} disponible{plural} dans les données de jeu."
+    except Exception:
+        reply = (
+            "Aucune donnée de jeu importée. "
+            "Importez un ZIP depuis la page Données de jeu pour commencer."
         )
+    return AssistantReply(reply=reply, actions=[_ACTION_GAMEDATA])
 
-    if intent == "blueprints":
-        try:
-            bps = _user_blueprints(user)
-            count = len(bps)
-            plural = "s" if count != 1 else ""
-            reply = f"Vous avez {count} blueprint{plural} dans votre collection."
-        except Exception:  # noqa: BLE001
-            reply = "Impossible d'accéder à vos blueprints pour l'instant."
-        return AssistantReply(
-            reply=reply,
-            actions=[AssistantAction(label="📁 Gérer les blueprints", url="/blueprints")],
+
+def _reply_recipes(_user: User | None) -> AssistantReply:
+    try:
+        count = len(_gamedata_recipes(""))
+        plural = "s" if count != 1 else ""
+        reply = f"Il y a {count} recette{plural} disponible{plural} dans les données de jeu."
+    except Exception:
+        reply = "Aucune donnée de jeu importée. Importez un ZIP pour accéder aux recettes."
+    return AssistantReply(reply=reply, actions=[_ACTION_GAMEDATA])
+
+
+def _reply_gamedata(_user: User | None) -> AssistantReply:
+    try:
+        stats = _gamedata_stats()
+        reply = (
+            f"Les données de jeu contiennent {stats.item_count} items "
+            f"et {stats.recipe_count} recettes."
         )
-
-    if intent == "plans":
-        try:
-            plans = _user_plans(user)
-            count = len(plans)
-            plural = "s" if count != 1 else ""
-            reply = f"Vous avez {count} plan{plural} de production."
-        except Exception:  # noqa: BLE001
-            reply = "Impossible d'accéder à vos plans pour l'instant."
-        return AssistantReply(
-            reply=reply,
-            actions=[AssistantAction(label="📋 Voir les plans", url="/plans")],
+    except Exception:
+        reply = (
+            "Aucune donnée de jeu n'est encore importée. "
+            "Rendez-vous sur la page Données de jeu pour importer un fichier ZIP "
+            "Satisfactory Tools."
         )
+    return AssistantReply(
+        reply=reply,
+        actions=[AssistantAction(label="🎮 Aller aux données de jeu", url="/gamedata")],
+    )
 
-    if intent == "calculator":
-        return AssistantReply(
-            reply=(
-                "Le calculateur vous permet de planifier votre chaîne de production. "
-                "Sélectionnez un item et une quantité cible pour obtenir la liste des "
-                "ressources nécessaires et une vue graphique du flux."
-            ),
-            actions=[AssistantAction(label="🧮 Ouvrir le calculateur", url="/calculator")],
-        )
 
-    if intent == "items":
-        try:
-            items = _gamedata_items("")
-            count = len(items)
-            plural = "s" if count != 1 else ""
-            reply = f"Il y a {count} item{plural} disponible{plural} dans les données de jeu."
-        except Exception:  # noqa: BLE001
-            reply = (
-                "Aucune donnée de jeu importée. "
-                "Importez un ZIP depuis la page Données de jeu pour commencer."
-            )
-        return AssistantReply(reply=reply, actions=[_ACTION_GAMEDATA])
+def _reply_help(_user: User | None) -> AssistantReply:
+    return AssistantReply(
+        reply=(
+            "Je peux vous aider à :\n"
+            "• Consulter vos blueprints et plans de production\n"
+            "• Planifier une production avec le calculateur\n"
+            "• Vérifier les données de jeu importées\n"
+            "• Naviguer dans l'application"
+        ),
+        actions=[_ACTION_BLUEPRINTS, _ACTION_PLANS, _ACTION_CALCULATOR],
+    )
 
-    if intent == "recipes":
-        try:
-            recipes = _gamedata_recipes("")
-            count = len(recipes)
-            plural = "s" if count != 1 else ""
-            reply = f"Il y a {count} recette{plural} disponible{plural} dans les données de jeu."
-        except Exception:  # noqa: BLE001
-            reply = "Aucune donnée de jeu importée. Importez un ZIP pour accéder aux recettes."
-        return AssistantReply(reply=reply, actions=[_ACTION_GAMEDATA])
 
-    if intent == "gamedata":
-        try:
-            stats = _gamedata_stats()
-            reply = (
-                f"Les données de jeu contiennent {stats.item_count} items "
-                f"et {stats.recipe_count} recettes."
-            )
-        except Exception:  # noqa: BLE001
-            reply = (
-                "Aucune donnée de jeu n'est encore importée. "
-                "Rendez-vous sur la page Données de jeu pour importer un fichier ZIP "
-                "Satisfactory Tools."
-            )
-        return AssistantReply(
-            reply=reply,
-            actions=[AssistantAction(label="🎮 Aller aux données de jeu", url="/gamedata")],
-        )
-
-    if intent == "help":
-        return AssistantReply(
-            reply=(
-                "Je peux vous aider à :\n"
-                "• Consulter vos blueprints et plans de production\n"
-                "• Planifier une production avec le calculateur\n"
-                "• Vérifier les données de jeu importées\n"
-                "• Naviguer dans l'application"
-            ),
-            actions=[_ACTION_BLUEPRINTS, _ACTION_PLANS, _ACTION_CALCULATOR],
-        )
-
+def _reply_unknown(_user: User | None) -> AssistantReply:
     return AssistantReply(
         reply=(
             "Je n'ai pas bien compris votre demande. "
@@ -346,3 +349,21 @@ def _rule_based_chat(message: str, user: User | None = None) -> AssistantReply: 
         ),
         actions=[_ACTION_BLUEPRINTS, _ACTION_PLANS],
     )
+
+
+#: intent → responder. One entry per intent `_detect_intent` can return; an
+#: unknown intent falls back to `_reply_unknown`.
+_RESPONDERS: dict[str, Callable[[User | None], AssistantReply]] = {
+    "greet": _reply_greet,
+    "blueprints": _reply_blueprints,
+    "plans": _reply_plans,
+    "calculator": _reply_calculator,
+    "items": _reply_items,
+    "recipes": _reply_recipes,
+    "gamedata": _reply_gamedata,
+    "help": _reply_help,
+}
+
+
+def _rule_based_chat(message: str, user: User | None = None) -> AssistantReply:
+    return _RESPONDERS.get(_detect_intent(message), _reply_unknown)(user)
