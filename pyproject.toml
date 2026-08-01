@@ -1,0 +1,31 @@
+# Tooling configuration only — this repository is not an installable package.
+# No [project] table on purpose: nothing here is built or published. The file
+# exists so tool config has a standard home and the fleet rule distribution has
+# somewhere to write (chrysa/shared-standards#271).
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "C901",
+    "PERF203",
+    "PERF401",
+    "PLR0402",
+    "PLR0911",
+    "PLR0912",
+    "PLR0915",
+    "PLR1714",
+    "PLR1730",
+    "PLR5501",
+    "RUF005",
+    "RUF006",
+    "RUF007",
+    "RUF009",
+    "RUF012",
+    "RUF013",
+    "RUF022",
+    "RUF043",
+    "RUF059",
+    "RUF100",
+]

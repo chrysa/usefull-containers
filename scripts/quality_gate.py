@@ -146,21 +146,20 @@ class QualityGate:
         return 0
 
     def _parse_metric(self, gate_name: str, exit_code: int, output: str) -> Any:
-        if gate_name == "Tests":
-            return self._parse_passed_tests(output)
-        if gate_name == "Coverage":
-            return self._parse_coverage(output)
-        if gate_name == "Lint":
-            return self._parse_warning_count(output)
-        if gate_name == "Types":
-            return self._parse_error_count(output)
+        # Build is the only gate whose metric comes from the exit code rather
+        # than the output, so it stays out of the table.
         if gate_name == "Build":
             return 0 if exit_code == 0 else 1
-        if gate_name == "Secrets":
-            return self._parse_secret_count(output)
-        if gate_name == "VulnDeps":
-            return self._parse_vuln_count(output)
-        return None
+        parsers = {
+            "Tests": self._parse_passed_tests,
+            "Coverage": self._parse_coverage,
+            "Lint": self._parse_warning_count,
+            "Types": self._parse_error_count,
+            "Secrets": self._parse_secret_count,
+            "VulnDeps": self._parse_vuln_count,
+        }
+        parser = parsers.get(gate_name)
+        return parser(output) if parser else None
 
     def _compare(self, current: Any, target: Any, operator: str) -> bool:
         if operator == "=":
