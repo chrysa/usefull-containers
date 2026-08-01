@@ -16,7 +16,12 @@ class Settings(BaseSettings):
     blueprints_dir: str = BLUEPRINTS_DIR_DEFAULT
     gamedata_dir: str = GAMEDATA_DIR_DEFAULT
     data_dir: str = DATA_DIR_DEFAULT
-    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+    ]
     debug: bool = False
 
     # When True, init_db() uses Base.metadata.create_all() instead of running

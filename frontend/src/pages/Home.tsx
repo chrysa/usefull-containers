@@ -15,9 +15,9 @@ const RECENT_DATE_OPTS: Intl.DateTimeFormatOptions = {
 
 export default function Home() {
   const { t, i18n } = useTranslation();
-  const { data: bpData, isLoading: bpLoading } = useBlueprintsQuery();
+  const { data: bpData, isLoading: bpLoading, isError: bpError } = useBlueprintsQuery();
   const { data: health, isLoading: healthLoading, isError: healthError } = useHealthQuery();
-  const { data: plansData, isLoading: plansLoading } = usePlansQuery();
+  const { data: plansData, isLoading: plansLoading, isError: plansError } = usePlansQuery();
 
   const blueprintCount = bpData?.total ?? 0;
   const uniqueTags = bpData
@@ -59,21 +59,21 @@ export default function Home() {
       <section className={styles.stats} aria-label={t("home.title")}>
         <div className={styles.statCard}>
           <span className={styles.statValue}>
-            {bpLoading ? <Skeleton width="40px" height="28px" radius="4px" /> : blueprintCount}
+            {bpLoading ? <Skeleton width="40px" height="28px" radius="4px" /> : bpError ? t("home.stat_unavailable") : blueprintCount}
           </span>
           <span className={styles.statLabel}>{t("home.stat_blueprints")}</span>
         </div>
 
         <div className={styles.statCard}>
           <span className={styles.statValue}>
-            {bpLoading ? <Skeleton width="32px" height="28px" radius="4px" /> : uniqueTags}
+            {bpLoading ? <Skeleton width="32px" height="28px" radius="4px" /> : bpError ? t("home.stat_unavailable") : uniqueTags}
           </span>
           <span className={styles.statLabel}>{t("home.stat_tags")}</span>
         </div>
 
         <div className={styles.statCard}>
           <span className={styles.statValue}>
-            {plansLoading ? <Skeleton width="40px" height="28px" radius="4px" /> : planCount}
+            {plansLoading ? <Skeleton width="40px" height="28px" radius="4px" /> : plansError ? t("home.stat_unavailable") : planCount}
           </span>
           <span className={styles.statLabel}>{t("home.stat_plans")}</span>
         </div>
@@ -98,6 +98,8 @@ export default function Home() {
               </li>
             ))}
           </ul>
+        ) : bpError ? (
+          <p className={styles.error} role="alert">{t("home.recent_error")}</p>
         ) : recent.length === 0 ? (
           <p className={styles.empty}>{t("home.recent_empty")}</p>
         ) : (
@@ -132,6 +134,8 @@ export default function Home() {
               </li>
             ))}
           </ul>
+        ) : plansError ? (
+          <p className={styles.error} role="alert">{t("home.no_plans_error")}</p>
         ) : recentPlans.length === 0 ? (
           <p className={styles.empty}>{t("home.no_plans")}</p>
         ) : (

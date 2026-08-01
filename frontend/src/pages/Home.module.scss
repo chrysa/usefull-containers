@@ -90,6 +90,11 @@
   margin: 0;
 }
 
+.error {
+  color: var(--color-danger, #e5484d);
+  margin: 0;
+}
+
 // ── Recent list ───────────────────────────────────────────────────────────────
 .recentList {
   list-style: none;

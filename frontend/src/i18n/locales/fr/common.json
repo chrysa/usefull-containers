@@ -167,7 +167,10 @@
     "stat_plans": "Plans",
     "stat_tags": "Tags uniques",
     "subtitle": "Blueprint Sync Hub",
-    "title": "Tableau de bord"
+    "title": "Tableau de bord",
+    "recent_error": "Chargement des blueprints impossible. Vérifiez la connexion et réessayez.",
+    "no_plans_error": "Chargement des plans impossible. Vérifiez la connexion et réessayez.",
+    "stat_unavailable": "—"
   },
   "loading": "Chargement...",
   "nav": {

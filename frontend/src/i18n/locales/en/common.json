@@ -167,7 +167,10 @@
     "stat_plans": "Plans",
     "stat_tags": "Unique Tags",
     "subtitle": "Blueprint Sync Hub",
-    "title": "Dashboard"
+    "title": "Dashboard",
+    "recent_error": "Couldn’t load blueprints. Check your connection and retry.",
+    "no_plans_error": "Couldn’t load plans. Check your connection and retry.",
+    "stat_unavailable": "—"
   },
   "loading": "Loading...",
   "nav": {
