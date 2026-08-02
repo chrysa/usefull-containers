@@ -49,6 +49,9 @@ repos:
     exclude: ^tests?/
   - id: python-mutable-default
   - id: python-dispatch-ladder
+  - id: python-unreachable-code
+  - id: no-hardcoded-localhost
+    exclude: tests?/|\.test\.|\.spec\.
 - repo: https://github.com/AleksaC/hadolint-py
   rev: v2.14.0
   hooks:
