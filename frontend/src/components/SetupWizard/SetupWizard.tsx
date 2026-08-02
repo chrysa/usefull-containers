@@ -179,19 +179,23 @@ export default function SetupWizard({
                   autoFocus
                 />
               </div>
-              <div className={styles.field}>
-                <label htmlFor="setup-backend-url">
-                  {t("setup.project.url_label")}
-                </label>
-                <input
-                  id="setup-backend-url"
-                  type="url"
-                  value={backendUrl}
-                  onChange={(e) => setBackendUrl(e.target.value)}
-                  placeholder={DEFAULT_BACKEND_URL}
-                  data-testid="setup-backend-url-input"
-                />
-              </div>
+              <details className={styles.advanced}>
+                <summary>{t("setup.project.advanced")}</summary>
+                <div className={styles.field}>
+                  <label htmlFor="setup-backend-url">
+                    {t("setup.project.url_label")}
+                  </label>
+                  <input
+                    id="setup-backend-url"
+                    type="url"
+                    value={backendUrl}
+                    onChange={(e) => setBackendUrl(e.target.value)}
+                    placeholder={DEFAULT_BACKEND_URL}
+                    data-testid="setup-backend-url-input"
+                  />
+                  <p className={styles.hint}>{t("setup.project.url_hint")}</p>
+                </div>
+              </details>
             </>
           )}
 

@@ -307,12 +307,14 @@
     },
     "next": "Next",
     "project": {
-      "lead": "Give this factory project a name and configure where the backend is running.",
+      "lead": "Give this factory project a name to get started.",
       "name_label": "Project name",
       "name_placeholder": "e.g. Main Save",
       "title": "Set up your factory",
       "url_label": "Backend URL",
-      "url_placeholder": "http://localhost:9009"
+      "url_placeholder": "http://localhost:9009",
+      "advanced": "Advanced — backend URL",
+      "url_hint": "Leave the default unless you run the backend elsewhere."
     },
     "skip": "Skip",
     "skip_aria": "Skip the setup wizard",

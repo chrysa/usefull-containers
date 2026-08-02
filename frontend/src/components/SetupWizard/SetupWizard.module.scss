@@ -253,6 +253,27 @@
   }
 }
 
+.advanced {
+  margin-top: var(--space-sm);
+
+  summary {
+    cursor: pointer;
+    font-size: var(--font-sm);
+    color: var(--text-muted, rgba(255, 255, 255, 0.6));
+    user-select: none;
+  }
+
+  .field {
+    margin-top: var(--space-sm);
+  }
+}
+
+.hint {
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted, rgba(255, 255, 255, 0.6));
+  margin: 0;
+}
+
 @keyframes pulse {
   0%,
   100% {

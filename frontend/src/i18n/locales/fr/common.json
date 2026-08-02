@@ -307,12 +307,14 @@
     },
     "next": "Suivant",
     "project": {
-      "lead": "Donnez un nom à ce projet d'usine et configurez l'adresse du backend.",
+      "lead": "Donnez un nom à ce projet d'usine pour commencer.",
       "name_label": "Nom du projet",
       "name_placeholder": "Ex : Partie principale",
       "title": "Configurer votre usine",
       "url_label": "URL du backend",
-      "url_placeholder": "http://localhost:9009"
+      "url_placeholder": "http://localhost:9009",
+      "advanced": "Avancé — URL du backend",
+      "url_hint": "Laissez la valeur par défaut sauf si le backend tourne ailleurs."
     },
     "skip": "Passer",
     "skip_aria": "Passer le wizard d'installation",
