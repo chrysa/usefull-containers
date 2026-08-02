@@ -24,16 +24,16 @@ jobs:
                   token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
             - name: Setup GitVersion
-              uses: gittools/actions/gitversion/setup@v4.7.0
+              uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
               with:
                   versionSpec: 6.x
 
             - name: Determine version
               id: gitversion
-              uses: gittools/actions/gitversion/execute@v4.7.0
+              uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
 
             - name: Install git-cliff
-              uses: taiki-e/install-action@git-cliff
+              uses: taiki-e/install-action@e215f18e24d7f4b411833009234c054235f9447f # git-cliff
 
             - name: Generate changelog
               id: changelog
@@ -51,7 +51,7 @@ jobs:
                   git push origin "${{ steps.changelog.outputs.version }}" || echo "Tag push skipped"
 
             - name: Create GitHub Release
-              uses: softprops/action-gh-release@v3.0.2
+              uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
               with:
                   tag_name: ${{ steps.changelog.outputs.version }}
                   name: Release ${{ steps.changelog.outputs.version }}
