@@ -18,9 +18,14 @@ permissions:
   checks: write
   statuses: write
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     name: No-Regression Quality Gates
 
     steps:
