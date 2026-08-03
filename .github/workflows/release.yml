@@ -16,6 +16,7 @@ permissions:
 jobs:
     release:
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         name: Create release
         steps:
             - uses: actions/checkout@v7.0.1
