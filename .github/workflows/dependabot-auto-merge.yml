@@ -29,7 +29,3 @@ jobs:
         PR_URL: ${{ github.event.pull_request.html_url }}
       name: Enable auto-merge (squash — waits for CI)
       run: gh pr merge --auto --squash "$PR_URL"
-name: Dependabot Auto-merge
-permissions:
-  contents: write
-  pull-requests: write
