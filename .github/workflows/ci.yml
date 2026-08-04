@@ -27,4 +27,5 @@ jobs:
             project-key: chrysa_satisfactory-factory-manager
             project-name: satisfactory-factory-manager
             test-target: docker-test
-        secrets: inherit
+        secrets:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
