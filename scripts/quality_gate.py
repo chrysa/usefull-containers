@@ -10,12 +10,11 @@ Machine-readable output lines:
 
 import json
 import re
-import subprocess
+import subprocess  # nosec B404
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
-
+from typing import Any
 
 _OVERALL_PASS = "OVERALL_RESULT|PASS"
 _OVERALL_FAIL = "OVERALL_RESULT|FAIL"
@@ -32,10 +31,10 @@ class QualityGate:
         self.last_report_path = Path(self.LAST_REPORT_FILE)
 
         if not self.config_path.exists():
-            print(f"ERROR: configuration file not found: {self.CONFIG_FILE}")
+            print(f"ERROR: configuration file not found: {self.CONFIG_FILE}")  # print-detection: disable
             sys.exit(1)
 
-        with open(self.config_path, "r", encoding="utf-8") as handle:
+        with open(self.config_path, encoding="utf-8") as handle:
             self.config = json.load(handle)
 
         self.gates = [
@@ -44,13 +43,25 @@ class QualityGate:
             ("Lint", "lint", "warning_count", "=", "make lint"),
             ("Types", "types", "error_count", "≤", "make type-check"),
             ("Build", "build", "build_status", "=", "make build"),
-            ("Secrets", "security_secrets", "secret_count", "=", "detect-secrets scan --all-files 2>&1 || true"),
-            ("VulnDeps", "security_vulns", "vuln_count", "≤", "pip-audit 2>&1 || npm audit --audit-level=high 2>&1 || true"),
+            (
+                "Secrets",
+                "security_secrets",
+                "secret_count",
+                "=",
+                "detect-secrets scan --all-files 2>&1 || true",
+            ),
+            (
+                "VulnDeps",
+                "security_vulns",
+                "vuln_count",
+                "≤",
+                "pip-audit 2>&1 || npm audit --audit-level=high 2>&1 || true",
+            ),
         ]
 
-    def _run(self, cmd: str) -> Tuple[int, str]:
+    def _run(self, cmd: str) -> tuple[int, str]:
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # nosec B602 B603
                 cmd,
                 shell=True,
                 capture_output=True,
@@ -74,6 +85,10 @@ class QualityGate:
                 return int(match.group(1))
         return 0
 
+    # Coverage summary lines, in order of trust. Anchored on purpose: a loose
+    # "any line mentioning coverage" scan matches pytest's own verbose progress
+    # (`… ::test_service_named_dev_is_covered PASSED [ 13%]`) and reports the
+    # progress percentage as the coverage figure.
     COVERAGE_PATTERNS = (
         r"^TOTAL\s+.*?(\d+(?:\.\d+)?)%",  # pytest-cov / coverage term report
         r"Total coverage:\s*(\d+(?:\.\d+)?)%",  # --cov-fail-under summary line
@@ -174,9 +189,11 @@ class QualityGate:
             return current <= target
         return False
 
-    def _run_gate(self, gate_name: str, key: str, metric_name: str, default_cmd: str) -> Dict[str, Any]:
+    def _run_gate(
+        self, gate_name: str, key: str, metric_name: str, default_cmd: str
+    ) -> dict[str, Any]:
         cmd = self.config.get("commands", {}).get(key, default_cmd)
-        print(f"RUN_GATE|{gate_name}|{cmd}")
+        print(f"RUN_GATE|{gate_name}|{cmd}")  # print-detection: disable
         exit_code, output = self._run(cmd)
         metric = self._parse_metric(gate_name, exit_code, output)
         return {
@@ -189,13 +206,13 @@ class QualityGate:
             "output": output,
         }
 
-    def _write_report(self, report: Dict[str, Any]) -> None:
+    def _write_report(self, report: dict[str, Any]) -> None:
         with open(self.last_report_path, "w", encoding="utf-8") as handle:
             json.dump(report, handle, indent=2)
 
     def baseline(self) -> bool:
-        print("BASELINE|START")
-        baseline_data: Dict[str, Any] = {
+        print("BASELINE|START")  # print-detection: disable
+        baseline_data: dict[str, Any] = {
             "recorded_at": datetime.now().isoformat(),
             "gates": {},
             "valid": True,
@@ -209,7 +226,7 @@ class QualityGate:
                 all_ok = False
                 baseline_data["valid"] = False
             status = "PASS" if result["exit_code"] == 0 else "FAIL"
-            print(
+            print(  # print-detection: disable
                 f"GATE_RESULT|{gate_name}|{status}|metric={result['metric']}|"
                 f"exit={result['exit_code']}|mode=baseline"
             )
@@ -226,68 +243,36 @@ class QualityGate:
         self._write_report(report)
 
         if all_ok:
-            print(_OVERALL_PASS)
+            print(_OVERALL_PASS)  # print-detection: disable
             return True
 
-        print(_OVERALL_FAIL)
-        print("ERROR: baseline contains failing gates; fix quality checks before using this baseline")
+        print(_OVERALL_FAIL)  # print-detection: disable
+        print(  # print-detection: disable
+            "ERROR: baseline contains failing gates; fix quality checks before using this baseline"
+        )
         return False
 
-    def _process_verify_gate(
+    def _evaluate_gate_result(
         self,
-        gate_name: str,
-        current: Dict[str, Any],
-        baseline_gate: Dict[str, Any],
         baseline_valid: bool,
-        threshold_cfg: Dict[str, Any],
-        default_op: str,
-        metric_name: str,
-    ) -> Dict[str, Any]:
-        operator = str(threshold_cfg.get("operator", default_op))
-        baseline_metric = baseline_gate.get("metric", 0)
-        target = threshold_cfg.get("value", baseline_metric)
-        current_metric = current.get("metric", 0)
-
-        passed = True
-        reason = "ok"
-
+        current: dict[str, Any],
+        current_metric: Any,
+        target: Any,
+        operator: str,
+    ) -> tuple[bool, str]:
+        """Return (passed, reason) for a single gate evaluation."""
         if not baseline_valid:
-            passed = False
-            reason = "invalid_baseline"
-        elif current.get("exit_code", 1) != 0:
-            passed = False
-            reason = "command_failed"
-        else:
-            try:
-                passed = self._compare(current_metric, target, operator)
-                if not passed:
-                    reason = "metric_regression"
-            except Exception:
-                passed = False
-                reason = "comparison_error"
-
-        status = "PASS" if passed else "FAIL"
-        print(
-            f"GATE_RESULT|{gate_name}|{status}|baseline={baseline_metric}|"
-            f"target={target}|current={current_metric}|op={operator}|"
-            f"exit={current.get('exit_code', 1)}|reason={reason}"
-        )
-        return {
-            "gate": gate_name,
-            "status": status,
-            "reason": reason,
-            "operator": operator,
-            "baseline_metric": baseline_metric,
-            "target": target,
-            "current_metric": current_metric,
-            "exit_code": current.get("exit_code", 1),
-            "metric_name": metric_name,
-            "command": current.get("command", ""),
-            "passed": passed,
-        }
+            return False, "invalid_baseline"
+        if current.get("exit_code", 1) != 0:
+            return False, "command_failed"
+        try:
+            passed = self._compare(current_metric, target, operator)
+            return passed, "ok" if passed else "metric_regression"
+        except Exception:
+            return False, "comparison_error"
 
     def verify(self) -> bool:
-        print("VERIFY|START")
+        print("VERIFY|START")  # print-detection: disable
         if not self.baseline_path.exists():
             report = {
                 "mode": "verify",
@@ -296,28 +281,54 @@ class QualityGate:
                 "baseline_file": str(self.baseline_path),
             }
             self._write_report(report)
-            print(_OVERALL_FAIL)
-            print("ERROR: baseline file not found; run quality-gate-baseline first")
+            print(_OVERALL_FAIL)  # print-detection: disable
+            print("ERROR: baseline file not found; run quality-gate-baseline first")  # print-detection: disable
             return False
 
-        with open(self.baseline_path, "r", encoding="utf-8") as handle:
+        with open(self.baseline_path, encoding="utf-8") as handle:
             baseline = json.load(handle)
 
         baseline_valid = bool(baseline.get("valid", True))
         all_passed = True
-        gate_reports: List[Dict[str, Any]] = []
+        gate_reports: list[dict[str, Any]] = []
 
         for gate_name, key, metric_name, default_op, default_cmd in self.gates:
             current = self._run_gate(gate_name, key, metric_name, default_cmd)
             baseline_gate = baseline.get("gates", {}).get(gate_name, {})
+
             threshold_cfg = self.config.get("thresholds", {}).get(key, {})
-            gate_result = self._process_verify_gate(
-                gate_name, current, baseline_gate, baseline_valid,
-                threshold_cfg, default_op, metric_name,
+            operator = str(threshold_cfg.get("operator", default_op))
+            baseline_metric = baseline_gate.get("metric", 0)
+            target = threshold_cfg.get("value", baseline_metric)
+            current_metric = current.get("metric", 0)
+
+            passed, reason = self._evaluate_gate_result(
+                baseline_valid, current, current_metric, target, operator
             )
-            if not gate_result.pop("passed"):
+            if not passed:
                 all_passed = False
-            gate_reports.append(gate_result)
+
+            status = "PASS" if passed else "FAIL"
+            print(  # print-detection: disable
+                f"GATE_RESULT|{gate_name}|{status}|baseline={baseline_metric}|"
+                f"target={target}|current={current_metric}|op={operator}|"
+                f"exit={current.get('exit_code', 1)}|reason={reason}"
+            )
+
+            gate_reports.append(
+                {
+                    "gate": gate_name,
+                    "status": status,
+                    "reason": reason,
+                    "operator": operator,
+                    "baseline_metric": baseline_metric,
+                    "target": target,
+                    "current_metric": current_metric,
+                    "exit_code": current.get("exit_code", 1),
+                    "metric_name": metric_name,
+                    "command": current.get("command", ""),
+                }
+            )
 
         report = {
             "mode": "verify",
@@ -329,16 +340,16 @@ class QualityGate:
         self._write_report(report)
 
         if all_passed:
-            print(_OVERALL_PASS)
+            print(_OVERALL_PASS)  # print-detection: disable
             return True
 
-        print(_OVERALL_FAIL)
+        print(_OVERALL_FAIL)  # print-detection: disable
         return False
 
 
 def main() -> None:
     if len(sys.argv) < 2:
-        print("Usage: python3 quality_gate.py [baseline|verify]")
+        print("Usage: python3 quality_gate.py [baseline|verify]")  # print-detection: disable
         sys.exit(1)
 
     command = sys.argv[1].strip().lower()
@@ -349,7 +360,7 @@ def main() -> None:
     if command == "verify":
         sys.exit(0 if quality_gate.verify() else 1)
 
-    print(f"Unknown command: {command}")
+    print(f"Unknown command: {command}")  # print-detection: disable
     sys.exit(1)
 
 
