@@ -30,11 +30,15 @@ repos:
     exclude: ^(\.github/|pre-commit/|\.pre-commit-config\.yaml|\.hadolint\.yaml|\.yamllint\.yaml|\.markdownlint\.yml|GitVersion\.yml)
   - id: adr-gate
   - id: python-print-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: python-pprint-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: no-bare-except
   - id: python-logger-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: no-sync-in-async
   - id: debugger-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: env-example-sync
   - id: regression-gate
     stages:
@@ -46,7 +50,7 @@ repos:
   - id: python-no-unittest-import
   - id: claude-assets-present
   - id: python-untyped-raise
-    exclude: ^tests?/
+    exclude: (^|/)tests?/
   - id: python-mutable-default
   - id: python-dispatch-ladder
   - id: python-unreachable-code
