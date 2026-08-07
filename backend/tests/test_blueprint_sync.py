@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -25,7 +25,9 @@ def _entry(directory: Path, name: str) -> BlueprintSyncEntry:
     stat = sbp.stat()
     return BlueprintSyncEntry(
         name=name,
-        modified_at=datetime.fromtimestamp(stat.st_mtime),
+        # The sync agent reports mtimes in UTC (see compute_sync_diff); mirror that
+        # here so the entry compares cleanly regardless of the test host's timezone.
+        modified_at=datetime.fromtimestamp(stat.st_mtime, tz=UTC),
         size_bytes=stat.st_size,
     )
 
