@@ -63,6 +63,9 @@ help-%: ## Show help for a specific target
 install: ## No install step — containers are standalone
 	@echo "No install step needed — run 'docker compose up' directly"
 
+install-dev: ## No dev install step — the commit gate is host-native (pipx install pre-commit)
+	@echo "No dev install step — install the host gate once with 'pipx install pre-commit'"
+
 dev: ## Start all containers in development mode
 	docker compose up
 
@@ -78,14 +81,15 @@ lint: ## Lint Dockerfiles via pre-commit
 format: ## Format files via pre-commit
 	pre-commit run --all-files prettier 2>/dev/null || pre-commit run --all-files
 
+format-check: ## Check formatting/lint without writing (report drift)
+	pre-commit run --all-files
+
 typecheck: ## Validate Dockerfiles syntax (alias → test)
 	$(MAKE) test
-
-build: ## Build all containers
-	docker compose build
 
 clean: ## Remove containers and volumes
 	docker compose down -v --remove-orphans
 
-pre-commit: ## Run pre-commit hooks on all files
-	pre-commit run --all-files
+ci: ## Run the full local gate (lint + config validation)
+	$(MAKE) lint
+	$(MAKE) test
