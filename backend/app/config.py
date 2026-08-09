@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.constants import (
@@ -16,6 +17,10 @@ class Settings(BaseSettings):
     blueprints_dir: str = BLUEPRINTS_DIR_DEFAULT
     gamedata_dir: str = GAMEDATA_DIR_DEFAULT
     data_dir: str = DATA_DIR_DEFAULT
+    # Allowed CORS origins for the browser frontend. Env-driven via CORS_ORIGINS
+    # (comma-separated, e.g. "http://localhost:5173,http://localhost:4000") so a
+    # frontend running on any dev port is reachable without editing code; the
+    # default covers the common Vite/CRA dev ports on localhost + 127.0.0.1.
     cors_origins: list[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
@@ -23,6 +28,14 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
     ]
     debug: bool = False
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _split_cors_origins(cls, value: object) -> object:
+        """Accept a comma-separated CORS_ORIGINS string in addition to a JSON list."""
+        if isinstance(value, str):
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
 
     # When True, init_db() uses Base.metadata.create_all() instead of running
     # Alembic migrations. Set in tests/conftest.py — never in production.

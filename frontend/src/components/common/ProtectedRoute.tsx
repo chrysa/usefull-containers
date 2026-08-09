@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/useAuth";
+import { useHealthQuery } from "@/api/health/queries";
 import GlobalLoader from "@/components/loaders/GlobalLoader";
 
 /**
@@ -10,10 +11,20 @@ import GlobalLoader from "@/components/loaders/GlobalLoader";
  *
  * While the initial /auth/me revalidation is in flight (isHydrating), render
  * the loader rather than flashing a redirect for a session that is still valid.
+ *
+ * Demo mode is exempt: the backend serves fixtures and falls back to a demo
+ * user on the auth-gated routers, so the whole app — blueprints & plans
+ * included — is explorable without credentials. This mirrors DemoBanner's
+ * detection (VITE_DEMO_MODE build flag OR the backend's /health demo_mode).
  */
 export default function ProtectedRoute() {
   const { isAuthenticated, isHydrating } = useAuth();
+  const { data: health } = useHealthQuery();
   const location = useLocation();
+
+  const isDemo =
+    import.meta.env.VITE_DEMO_MODE === "true" || health?.demo_mode === true;
+  if (isDemo) return <Outlet />;
 
   if (isHydrating) return <GlobalLoader />;
   if (!isAuthenticated) {
