@@ -4,7 +4,7 @@
 [![CI — Build](https://github.com/chrysa/usefull-containers/actions/workflows/build-and-publish.yml/badge.svg)](https://github.com/chrysa/usefull-containers/actions/workflows/build-and-publish.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=chrysa_usefull-containers&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=chrysa_usefull-containers)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
-[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-chrysa-blue?logo=docker)](https://hub.docker.com/u/chrys4)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-chrys4-blue?logo=docker)](https://hub.docker.com/u/chrys4)
 
 > A collection of ready-to-use Docker containers for Python code quality, testing, and application runtime — drop them into any project, no local toolchain to install.
 
