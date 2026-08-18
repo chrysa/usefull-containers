@@ -66,7 +66,6 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "*",
         "hooks": [
           {
             "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/frustration-detection.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
@@ -74,13 +73,14 @@
             "timeout": 5000,
             "type": "command"
           }
-        ]
+        ],
+        "matcher": "*"
       },
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 .claude/ape/ape_hook.py --spec .claude/ape/ape-transform-v2.md"
+            "command": "python3 .claude/ape/ape_hook.py --spec .claude/ape/ape-transform-v2.md",
+            "type": "command"
           }
         ]
       }

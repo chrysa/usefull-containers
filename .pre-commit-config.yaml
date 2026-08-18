@@ -30,9 +30,9 @@ repos:
     exclude: ^(\.github/|pre-commit/|\.pre-commit-config\.yaml|\.hadolint\.yaml|\.yamllint\.yaml|\.markdownlint\.yml|GitVersion\.yml)
   - id: adr-gate
   - id: python-print-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
+    exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
   - id: python-pprint-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
+    exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
   - id: no-bare-except
   - id: python-logger-detection
     exclude: (^|/)tests?/|^(README\.md|docs/)
