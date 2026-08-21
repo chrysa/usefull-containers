@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
     ci:
-        uses: chrysa/github-actions/.github/workflows/ci-fullstack.yml@v1.8.0
+        uses: chrysa/github-actions/.github/workflows/ci-fullstack.yml@v1.8.1
         with:
             project-key: chrysa_satisfactory-factory-manager
             project-name: satisfactory-factory-manager
