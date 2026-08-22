@@ -84,3 +84,6 @@ graphify-out/
 Thumbs.db
 
 # ---8<--- chrysa:canonical:end --->8---
+
+# Guideline Compliance Check report (generated)
+guideline-report.html

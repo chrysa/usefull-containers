@@ -4,6 +4,9 @@ ignored:
     - DL3008
     - DL3013
     - DL3018
+    # named non-root users are created in-image (resolvable there); DL3066's
+    # host-resolvability warning is a false positive for a container-collection repo
+    - DL3066
     - DL4006
     - SC2021
     - SC2102
