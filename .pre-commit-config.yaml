@@ -89,7 +89,7 @@ repos:
       - id: no-console-warn
       - id: import-no-relative-parent
       - id: yaml-sorter
-        exclude: ^(\.github/workflows/|\.github/ISSUE_TEMPLATE/|GitVersion\.yml|docker-compose.*\.yml)
+        exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
       - id: json-sorter
       - id: adr-gate
       - id: regression-gate
@@ -110,11 +110,13 @@ repos:
       - id: no-hardcoded-localhost
         exclude: tests?/|\.test\.|\.spec\.
       - id: fastapi-missing-response-model
-        exclude: (^|/)tests/
+        exclude: '(^|/)tests/'
       - id: fastapi-missing-links
-        exclude: (^|/)tests/
+        exclude: '(^|/)tests/'
       - id: no-sync-in-async
       - id: ts-unreachable-code
+      - id: react-no-async-in-useeffect
+      - id: react-direct-dom
     repo: https://github.com/chrysa/pre-commit-tools
     rev: v0.2.0-253
   - repo: local
