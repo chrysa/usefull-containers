@@ -7,10 +7,11 @@ import type { BatchUploadResult, Blueprint, BlueprintDescriptionUpdate, Blueprin
 const QUERY_KEY = "blueprints";
 const API_BASE = "/v1/blueprints";
 
-export function useBlueprintsQuery() {
+export function useBlueprintsQuery(options?: { enabled?: boolean }) {
   return useQuery<BlueprintList>({
     queryKey: [QUERY_KEY],
     queryFn: () => http.get<BlueprintList>(API_BASE),
+    enabled: options?.enabled ?? true,
   });
 }
 

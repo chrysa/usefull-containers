@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import styles from "./TagFilterBar.module.scss";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   readonly allTags: string[];
@@ -14,16 +15,26 @@ export function TagFilterBar({ allTags, activeTags, onToggle, onClear }: Props) 
   if (allTags.length === 0) return null;
 
   return (
-    <fieldset className={styles.bar} aria-label={t("blueprints.filter_by_tag")}>
-      <legend className={styles.label}>{t("blueprints.filter_by_tag")}</legend>
-      <ul className={styles.tagList}>
+    <fieldset
+      className="flex flex-wrap items-center gap-2 rounded-[var(--radius)] border border-border bg-card p-3"
+      aria-label={t("blueprints.filter_by_tag")}
+    >
+      <legend className="px-1 text-xs font-medium text-muted-foreground">
+        {t("blueprints.filter_by_tag")}
+      </legend>
+      <ul className="flex flex-wrap items-center gap-2">
         {allTags.map((tag) => {
           const isActive = activeTags.has(tag);
           return (
             <li key={tag}>
               <button
                 type="button"
-                className={isActive ? styles.tagActive : styles.tag}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                  isActive
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary",
+                )}
                 aria-pressed={isActive}
                 onClick={() => onToggle(tag)}
               >
@@ -34,14 +45,16 @@ export function TagFilterBar({ allTags, activeTags, onToggle, onClear }: Props) 
         })}
       </ul>
       {activeTags.size > 0 && (
-        <button
+        <Button
           type="button"
-          className={styles.clearBtn}
+          variant="ghost"
+          size="sm"
+          className="ml-auto"
           onClick={onClear}
           aria-label={t("blueprints.clear_filters")}
         >
           {t("blueprints.clear_filters")}
-        </button>
+        </Button>
       )}
     </fieldset>
   );

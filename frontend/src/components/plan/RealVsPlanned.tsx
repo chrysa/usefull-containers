@@ -7,35 +7,12 @@ import {
   useRecipesQuery,
 } from "@/domain/gamedata/queries";
 import { parseSaveFile } from "@/domain/savefile/parseSave";
-import {
-  diffPlanVsSnapshot,
-  type DiffRow,
-  type DiffStatus,
-} from "@/domain/savefile/diff";
+import { diffPlanVsSnapshot, type DiffRow } from "@/domain/savefile/diff";
 import type { CompactSnapshot } from "@/domain/savefile/types";
 import { useCreateSnapshotMutation } from "@/domain/snapshots/queries";
 import type { TargetItem } from "@/domain/plans/types";
-import styles from "./RealVsPlanned.module.scss";
-
-// CSS-module lookups are index-signature reads, so each is `string | undefined`
-// under noUncheckedIndexedAccess; an absent class degrades to no class at all.
-const STATUS_CLASS: Record<DiffStatus, string> = {
-  OK: styles.ok ?? "",
-  UNDER: styles.under ?? "",
-  OVER: styles.over ?? "",
-  MISSING: styles.missing ?? "",
-  UNPLANNED: styles.unplanned ?? "",
-  UNMATCHED: styles.unmatched ?? "",
-};
-
-const STATUS_KEY: Record<DiffStatus, string> = {
-  OK: "real_vs_planned.status_ok",
-  UNDER: "real_vs_planned.status_under",
-  OVER: "real_vs_planned.status_over",
-  MISSING: "real_vs_planned.status_missing",
-  UNPLANNED: "real_vs_planned.status_unplanned",
-  UNMATCHED: "real_vs_planned.status_unmatched",
-};
+import DiffTable from "@/features/diff/DiffTable";
+import { cn } from "@/lib/utils";
 
 interface Props {
   targetItems: TargetItem[];
@@ -96,13 +73,16 @@ export default function RealVsPlanned({ targetItems }: Props) {
   }
 
   if (!hasGameData) {
-    return <p className={styles.error}>{t("real_vs_planned.needs_gamedata")}</p>;
+    return <p className="m-0 text-destructive">{t("real_vs_planned.needs_gamedata")}</p>;
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className="flex flex-col gap-4">
       <div
-        className={`${styles.dropzone} ${dragActive ? styles.dropzoneActive : ""}`}
+        className={cn(
+          "cursor-pointer border-2 border-dashed border-border bg-card p-8 text-center text-muted-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none",
+          dragActive && "border-primary bg-primary/10",
+        )}
         onClick={() => !parsing && inputRef.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
@@ -131,7 +111,7 @@ export default function RealVsPlanned({ targetItems }: Props) {
           ref={inputRef}
           type="file"
           accept=".sav"
-          className={styles.hiddenInput}
+          className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) void handleFile(file);
@@ -139,7 +119,7 @@ export default function RealVsPlanned({ targetItems }: Props) {
         />
       </div>
 
-      {error && <p className={styles.error}>{t("real_vs_planned.parse_error")}</p>}
+      {error && <p className="m-0 text-destructive">{t("real_vs_planned.parse_error")}</p>}
 
       {snapshot && (
         <p>{t("real_vs_planned.save_name", { name: snapshot.save_name })}</p>
@@ -149,32 +129,7 @@ export default function RealVsPlanned({ targetItems }: Props) {
         <p>{t("real_vs_planned.empty")}</p>
       )}
 
-      {rows && (
-        <table className={styles.table} aria-label={t("real_vs_planned.title")}>
-          <thead>
-            <tr>
-              <th>{t("real_vs_planned.col_recipe")}</th>
-              <th>{t("real_vs_planned.col_planned")}</th>
-              <th>{t("real_vs_planned.col_actual")}</th>
-              <th>{t("real_vs_planned.col_status")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.recipe_id}>
-                <td>{r.recipe_name ?? r.recipe_id}</td>
-                <td>{r.planned.toFixed(2)}</td>
-                <td>{r.actual.toFixed(2)}</td>
-                <td>
-                  <span className={`${styles.chip} ${STATUS_CLASS[r.status]}`}>
-                    {t(STATUS_KEY[r.status])}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      {rows && <DiffTable rows={rows} />}
     </div>
   );
 }

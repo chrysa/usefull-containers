@@ -1,18 +1,30 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import DemoBanner from "./DemoBanner";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import AssistantWidget from "@/components/Assistant/AssistantWidget";
 import ToastContainer from "@/components/ui/Toast/Toast";
 import SetupWizard from "@/components/SetupWizard/SetupWizard";
 import { useSetupWizard } from "@/components/SetupWizard/useSetupWizard";
 import { useProjects } from "@/hooks/useProjects";
-import styles from "./Layout.module.scss";
+
+type Section = "overview" | "plan" | "track" | "reference";
+
+const PLAN_PREFIXES = ["/calculator", "/plans", "/blueprints"];
+const TRACK_PREFIXES = ["/snapshots", "/diff", "/assistant"];
+const REFERENCE_PREFIXES = ["/gamedata"];
+
+function sectionForPath(pathname: string): Section {
+  if (PLAN_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return "plan";
+  if (TRACK_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return "track";
+  if (REFERENCE_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return "reference";
+  return "overview";
+}
 
 export default function Layout() {
   const queryClient = useQueryClient();
+  const location = useLocation();
   const {
     projects,
     activeProject,
@@ -51,7 +63,10 @@ export default function Layout() {
   };
 
   return (
-    <div className={styles.layout}>
+    <div
+      className="flex h-screen flex-col bg-background text-foreground"
+      data-section={sectionForPath(location.pathname)}
+    >
       <DemoBanner />
       <Header
         projects={projects}
@@ -61,13 +76,12 @@ export default function Layout() {
         onNewProject={handleNewProject}
         onRestartSetup={wizard.open}
       />
-      <div className={styles.body}>
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className={styles.content}>
+        <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
         </main>
       </div>
-      <AssistantWidget />
       <ToastContainer />
       {showWizard && (
         <SetupWizard

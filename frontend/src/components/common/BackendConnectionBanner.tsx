@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBackendStatus } from "@/hooks/useBackendStatus";
-import styles from "./BackendConnectionBanner.module.scss";
 
 export default function BackendConnectionBanner() {
   const { t } = useTranslation("common");
@@ -24,12 +23,16 @@ export default function BackendConnectionBanner() {
   };
 
   return (
-    <div role="alert" aria-live="assertive" className={styles.banner}>
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-destructive px-4 py-2 text-[13px] font-medium text-destructive-foreground animate-[slide-down_0.25s_ease-out]"
+    >
       <span aria-hidden="true">⚠️</span>
       <span>{t("errors.backendDisconnected")}</span>
       <button
         type="button"
-        className={styles.retry}
+        className="ml-2 cursor-pointer rounded-[var(--radius)] border border-destructive-foreground bg-transparent px-2.5 py-0.5 font-bold text-destructive-foreground [&:hover:not(:disabled)]:bg-destructive-foreground [&:hover:not(:disabled)]:text-destructive disabled:cursor-progress disabled:opacity-60"
         onClick={handleRetry}
         disabled={retrying}
         data-testid="backend-retry"

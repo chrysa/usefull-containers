@@ -5,10 +5,11 @@ import type { Plan, PlanCreate, PlanUpdate } from "./types";
 const QUERY_KEY = "plans";
 const API_BASE = "/v1/plans";
 
-export function usePlansQuery() {
+export function usePlansQuery(options?: { enabled?: boolean }) {
   return useQuery<Plan[]>({
     queryKey: [QUERY_KEY],
     queryFn: () => http.get<Plan[]>(API_BASE),
+    enabled: options?.enabled ?? true,
   });
 }
 

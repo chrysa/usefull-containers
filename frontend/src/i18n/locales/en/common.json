@@ -1,6 +1,5 @@
 {
   "assistant": {
-    "close": "Close",
     "error": "An error occurred. Please try again.",
     "placeholder": "Ask me anything…",
     "plan": {
@@ -16,16 +15,15 @@
       "warnings": "Warnings"
     },
     "plan_mode": "Generate a factory plan",
-    "plan_mode_active": "Plan mode",
     "plan_mode_hint": "Describe what to produce, e.g. \"120 iron plate per minute\".",
     "send": "Send",
     "title": "Factory Assistant",
-    "toggle_label": "Open assistant",
     "welcome": "Hi! I'm your Factory Manager assistant. How can I help you?"
   },
   "blueprint_detail": {
     "back": "Back to Blueprints",
     "cancel": "Cancel",
+    "confirm_delete": "Delete blueprint \"{{name}}\"? This cannot be undone.",
     "delete": "Delete",
     "description": "Description",
     "description_empty": "No description. Click Edit to add one.",
@@ -47,7 +45,11 @@
     "clear_filters": "Clear filters",
     "confirm_delete": "Delete blueprint \"{{name}}\"? This cannot be undone.",
     "count": "{{count}} blueprint(s)",
+    "delete": "Delete",
+    "delete_aria": "Delete {{name}}",
+    "download": "Export",
     "download_all": "Download All (.zip)",
+    "download_aria": "Download {{name}}",
     "downloading": "Downloading...",
     "empty": "No blueprints found. Import a .sbp file to get started.",
     "filter_by_tag": "Filter by tag",
@@ -60,7 +62,12 @@
     "tag_placeholder": "Enter a tag...",
     "tag_remove": "Remove tag {{tag}}",
     "tags_label": "Blueprint tags",
-    "title": "Blueprint Sync"
+    "title": "Blueprint Sync",
+    "upload_cfg": "+ .sbpcfg",
+    "upload_cfg_hint": "Select the blueprint config file (.sbpcfg, optional)",
+    "upload_sbp": "↑ Import .sbp",
+    "upload_sbp_hint": "Select a Satisfactory blueprint file (.sbp)",
+    "uploading": "Uploading..."
   },
   "calculator": {
     "add_to_plan": "Add to Plan",
@@ -120,16 +127,41 @@
     "message": "Exploring fixture data — no real credentials are used.",
     "readonly_hint": "Read-only demo — connect a backend to save."
   },
+  "diff": {
+    "choose": "Choose…",
+    "col_actual": "Built",
+    "col_planned": "Planned",
+    "col_recipe": "Recipe",
+    "col_status": "Status",
+    "empty": "Select a plan and a snapshot to see the diff.",
+    "needs_gamedata": "Import game data first to compute the planned side.",
+    "select_plan": "Plan",
+    "select_snapshot": "Snapshot",
+    "status_missing": "Missing",
+    "status_ok": "OK",
+    "status_over": "Over",
+    "status_under": "Under",
+    "status_unmatched": "Unmatched",
+    "status_unplanned": "Unplanned",
+    "table_title": "Plan vs real",
+    "title": "Diff"
+  },
   "error": "An error occurred",
   "errors": {
     "backendDisconnected": "Backend unreachable — some features are unavailable.",
     "retryNow": "Retry now"
+  },
+  "factory": {
+    "no_factory": "No factory — import a save",
+    "select_label": "Factory",
+    "snapshot_count": "{{count}} snapshot(s)"
   },
   "gamedata": {
     "calculate": "Calculate",
     "count_items": "{{count}} item(s)",
     "count_recipes": "{{count}} recipe(s)",
     "empty": "No game data imported yet. Use \"Import ZIP\" to load a Satisfactory Tools export.",
+    "error": "Failed to load game data. Please try again.",
     "explore": "Explore game data",
     "import": "Import ZIP",
     "import_hint": "Select a Satisfactory Tools data.zip file",
@@ -158,27 +190,49 @@
     "hub_offline": "Offline",
     "hub_online": "Online",
     "no_plans": "No plans yet.",
+    "no_plans_error": "Couldn’t load plans. Check your connection and retry.",
+    "overview_buildings": "Buildings",
+    "overview_imported": "Imported",
+    "overview_no_auth": "Sign in and select a save to see its live status here.",
+    "overview_no_snapshot": "No snapshot yet for this save.",
+    "overview_no_snapshot_cta": "Import a save",
+    "overview_play_time": "Play time",
+    "overview_power": "Power (prod / cons)",
+    "overview_save_name": "Save",
+    "overview_title": "Factory Overview",
     "quicklinks_title": "Quick Access",
     "recent_empty": "No blueprints yet.",
+    "recent_error": "Couldn’t load blueprints. Check your connection and retry.",
     "recent_plans_title": "Recent Plans",
     "recent_title": "Recent Blueprints",
+    "shortcut_assistant": "Ask the assistant",
+    "shortcut_diff": "Compare plan vs real",
+    "shortcut_import": "Import",
+    "shortcuts_title": "Shortcuts",
     "stat_blueprints": "Blueprints",
     "stat_hub": "Hub Status",
     "stat_plans": "Plans",
     "stat_tags": "Unique Tags",
+    "stat_unavailable": "—",
     "subtitle": "Blueprint Sync Hub",
-    "title": "Dashboard",
-    "recent_error": "Couldn’t load blueprints. Check your connection and retry.",
-    "no_plans_error": "Couldn’t load plans. Check your connection and retry.",
-    "stat_unavailable": "—"
+    "title": "Dashboard"
   },
   "loading": "Loading...",
   "nav": {
+    "assistant": "Assistant",
     "blueprints": "Blueprints",
     "calculator": "Calculator",
+    "diff": "Diff",
     "gamedata": "Game Data",
     "home": "Home",
-    "plans": "Plans"
+    "plans": "Plans",
+    "sections": {
+      "overview": "Overview",
+      "plan": "Plan",
+      "reference": "Reference",
+      "track": "Track"
+    },
+    "snapshots": "Snapshots"
   },
   "not_found": "Page not found",
   "plan_detail": {
@@ -212,8 +266,11 @@
     "confirm_delete": "Delete this plan? This cannot be undone.",
     "create": "New Plan",
     "delete": "Delete",
+    "delete_aria": "Delete {{name}}",
     "duplicate": "Duplicate",
+    "duplicate_aria": "Duplicate {{name}}",
     "edit": "Edit",
+    "edit_aria": "Edit {{name}}",
     "empty": "No plans yet. Create a plan to start organising your production.",
     "error": "Failed to load plans.",
     "form": {
@@ -327,6 +384,20 @@
       "lead": "This short walkthrough configures the essentials so you can start planning your Satisfactory production.",
       "title": "Let's set up your first factory"
     }
+  },
+  "snapshots": {
+    "confirm_delete": "Delete snapshot \"{{name}}\"? This cannot be undone.",
+    "delete": "Delete",
+    "delete_aria": "Delete snapshot {{name}}",
+    "empty": "No snapshot — import a save",
+    "import": "Import save",
+    "import_hint": "Import a .sav file",
+    "importing": "Importing…",
+    "parse_error": "Failed to parse the save file.",
+    "play_time": "Play time: {{value}}",
+    "save_error": "Failed to save snapshot. Please try again.",
+    "save_name": "Save: {{name}}",
+    "title": "Snapshots"
   },
   "theme": {
     "toggle": "Toggle theme"

@@ -1,6 +1,5 @@
 {
   "assistant": {
-    "close": "Fermer",
     "error": "Une erreur est survenue. Veuillez réessayer.",
     "placeholder": "Posez votre question…",
     "plan": {
@@ -16,16 +15,15 @@
       "warnings": "Avertissements"
     },
     "plan_mode": "Générer un plan d'usine",
-    "plan_mode_active": "Mode plan",
     "plan_mode_hint": "Décrivez quoi produire, ex. « 120 iron plate per minute ».",
     "send": "Envoyer",
     "title": "Assistant Factory",
-    "toggle_label": "Ouvrir l'assistant",
     "welcome": "Bonjour ! Je suis votre assistant Factory Manager. Comment puis-je vous aider ?"
   },
   "blueprint_detail": {
     "back": "Retour aux blueprints",
     "cancel": "Annuler",
+    "confirm_delete": "Supprimer le blueprint « {{name}} » ? Cette action est irréversible.",
     "delete": "Supprimer",
     "description": "Description",
     "description_empty": "Pas de description. Cliquez sur Modifier pour en ajouter une.",
@@ -47,7 +45,11 @@
     "clear_filters": "Effacer les filtres",
     "confirm_delete": "Supprimer le blueprint « {{name}} » ? Cette action est irréversible.",
     "count": "{{count}} blueprint(s)",
+    "delete": "Supprimer",
+    "delete_aria": "Supprimer {{name}}",
+    "download": "Exporter",
     "download_all": "Tout télécharger (.zip)",
+    "download_aria": "Télécharger {{name}}",
     "downloading": "Téléchargement...",
     "empty": "Aucun blueprint trouvé. Importez un fichier .sbp pour commencer.",
     "filter_by_tag": "Filtrer par tag",
@@ -60,7 +62,12 @@
     "tag_placeholder": "Saisir un tag...",
     "tag_remove": "Supprimer le tag {{tag}}",
     "tags_label": "Tags du blueprint",
-    "title": "Sync Blueprints"
+    "title": "Sync Blueprints",
+    "upload_cfg": "+ .sbpcfg",
+    "upload_cfg_hint": "Sélectionnez le fichier de configuration du blueprint (.sbpcfg, optionnel)",
+    "upload_sbp": "↑ Importer .sbp",
+    "upload_sbp_hint": "Sélectionnez un fichier de blueprint Satisfactory (.sbp)",
+    "uploading": "Import en cours..."
   },
   "calculator": {
     "add_to_plan": "Ajouter au plan",
@@ -120,16 +127,41 @@
     "message": "Données fictives explorées — aucune information réelle n'est utilisée.",
     "readonly_hint": "Démo en lecture seule — connectez un backend pour enregistrer."
   },
+  "diff": {
+    "choose": "Choisir…",
+    "col_actual": "Construit",
+    "col_planned": "Prévu",
+    "col_recipe": "Recette",
+    "col_status": "Statut",
+    "empty": "Sélectionnez un plan et un snapshot pour voir l'écart.",
+    "needs_gamedata": "Importez d'abord les données du jeu pour calculer le prévu.",
+    "select_plan": "Plan",
+    "select_snapshot": "Snapshot",
+    "status_missing": "Manquant",
+    "status_ok": "OK",
+    "status_over": "Sur-capacité",
+    "status_under": "Sous-capacité",
+    "status_unmatched": "Non reconnu",
+    "status_unplanned": "Non prévu",
+    "table_title": "Prévu vs réel",
+    "title": "Écarts"
+  },
   "error": "Une erreur est survenue",
   "errors": {
     "backendDisconnected": "Backend injoignable — certaines fonctionnalités sont indisponibles.",
     "retryNow": "Réessayer"
+  },
+  "factory": {
+    "no_factory": "Aucune usine — importer une sauvegarde",
+    "select_label": "Usine",
+    "snapshot_count": "{{count}} snapshot(s)"
   },
   "gamedata": {
     "calculate": "Calculer",
     "count_items": "{{count}} objet(s)",
     "count_recipes": "{{count}} recette(s)",
     "empty": "Aucune donnée de jeu importée. Utilisez \"Importer un ZIP\" pour charger un export Satisfactory Tools.",
+    "error": "Échec du chargement des données de jeu. Veuillez réessayer.",
     "explore": "Explorer les données de jeu",
     "import": "Importer un ZIP",
     "import_hint": "Sélectionnez un fichier data.zip de Satisfactory Tools",
@@ -158,27 +190,49 @@
     "hub_offline": "Hors ligne",
     "hub_online": "En ligne",
     "no_plans": "Aucun plan pour l'instant.",
+    "no_plans_error": "Chargement des plans impossible. Vérifiez la connexion et réessayez.",
+    "overview_buildings": "Bâtiments",
+    "overview_imported": "Importé le",
+    "overview_no_auth": "Connectez-vous et sélectionnez une sauvegarde pour voir son état ici.",
+    "overview_no_snapshot": "Aucun instantané pour cette sauvegarde.",
+    "overview_no_snapshot_cta": "Importer une sauvegarde",
+    "overview_play_time": "Temps de jeu",
+    "overview_power": "Énergie (prod / conso)",
+    "overview_save_name": "Sauvegarde",
+    "overview_title": "Vue d'ensemble de l'usine",
     "quicklinks_title": "Accès rapide",
     "recent_empty": "Aucun blueprint.",
+    "recent_error": "Chargement des blueprints impossible. Vérifiez la connexion et réessayez.",
     "recent_plans_title": "Plans récents",
     "recent_title": "Blueprints récents",
+    "shortcut_assistant": "Demander à l'assistant",
+    "shortcut_diff": "Comparer plan / réel",
+    "shortcut_import": "Importer",
+    "shortcuts_title": "Raccourcis",
     "stat_blueprints": "Blueprints",
     "stat_hub": "Statut du hub",
     "stat_plans": "Plans",
     "stat_tags": "Tags uniques",
+    "stat_unavailable": "—",
     "subtitle": "Blueprint Sync Hub",
-    "title": "Tableau de bord",
-    "recent_error": "Chargement des blueprints impossible. Vérifiez la connexion et réessayez.",
-    "no_plans_error": "Chargement des plans impossible. Vérifiez la connexion et réessayez.",
-    "stat_unavailable": "—"
+    "title": "Tableau de bord"
   },
   "loading": "Chargement...",
   "nav": {
+    "assistant": "Assistant",
     "blueprints": "Blueprints",
     "calculator": "Calculateur",
+    "diff": "Diff",
     "gamedata": "Données de jeu",
     "home": "Accueil",
-    "plans": "Plans"
+    "plans": "Plans",
+    "sections": {
+      "overview": "Vue d'ensemble",
+      "plan": "Planifier",
+      "reference": "Référence",
+      "track": "Suivre"
+    },
+    "snapshots": "Snapshots"
   },
   "not_found": "Page introuvable",
   "plan_detail": {
@@ -212,8 +266,11 @@
     "confirm_delete": "Supprimer ce plan ? Cette action est irréversible.",
     "create": "Nouveau plan",
     "delete": "Supprimer",
+    "delete_aria": "Supprimer {{name}}",
     "duplicate": "Dupliquer",
+    "duplicate_aria": "Dupliquer {{name}}",
     "edit": "Modifier",
+    "edit_aria": "Modifier {{name}}",
     "empty": "Aucun plan. Créez un plan pour organiser votre production.",
     "error": "Impossible de charger les plans.",
     "form": {
@@ -327,6 +384,20 @@
       "lead": "Ce court parcours configure l'essentiel pour planifier votre production Satisfactory.",
       "title": "Démarrons votre première usine"
     }
+  },
+  "snapshots": {
+    "confirm_delete": "Supprimer le snapshot « {{name}} » ? Cette action est irréversible.",
+    "delete": "Supprimer",
+    "delete_aria": "Supprimer le snapshot {{name}}",
+    "empty": "Aucun snapshot — importez une sauvegarde",
+    "import": "Importer une sauvegarde",
+    "import_hint": "Importer un fichier .sav",
+    "importing": "Import en cours…",
+    "parse_error": "Échec de l'analyse du fichier de sauvegarde.",
+    "play_time": "Temps de jeu : {{value}}",
+    "save_error": "Échec de l'enregistrement du snapshot. Veuillez réessayer.",
+    "save_name": "Sauvegarde : {{name}}",
+    "title": "Snapshots"
   },
   "theme": {
     "toggle": "Changer le thème"

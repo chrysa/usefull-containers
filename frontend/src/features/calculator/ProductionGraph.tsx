@@ -4,53 +4,19 @@ import {
   Background,
   Controls,
   MiniMap,
-  Handle,
-  Position,
-  type Node,
   type NodeTypes,
-  type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { CalculationNode } from "@/domain/gamedata/calculator";
-import {
-  buildGraph,
-  getDescendantIds,
-  type GraphNodeData,
-} from "./graphLayout";
-import styles from "./ProductionGraph.module.scss";
-
-// ── Custom node ───────────────────────────────────────────────────────────────
-
-type ProductionNodeType = Node<GraphNodeData, "productionNode">;
-
-function formatQty(n: number): string {
-  return n % 1 === 0 ? String(n) : n.toFixed(2);
-}
-
-function ProductionNode({ data }: NodeProps<ProductionNodeType>) {
-  return (
-    <div className={`${styles.node} ${data.isRaw ? styles.nodeRaw : ""}`}>
-      <Handle type="target" position={Position.Top} className={styles.handle} />
-      <span className={styles.nodeName}>{data.label}</span>
-      <span className={styles.nodeQty}>{formatQty(data.quantity)}</span>
-      {data.recipeName && (
-        <span className={styles.nodeRecipe}>via {data.recipeName}</span>
-      )}
-      {data.isRaw && <span className={styles.nodeRawBadge}>raw</span>}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className={styles.handle}
-      />
-    </div>
-  );
-}
+import { buildGraph, getDescendantIds, type GraphNodeData } from "./graphLayout";
+import ProductionGraphNode from "./ProductionGraphNode";
 
 const NODE_TYPES: NodeTypes = {
-  productionNode: ProductionNode as React.ComponentType<NodeProps>,
+  productionNode: ProductionGraphNode,
 };
 
-// ── Public component ──────────────────────────────────────────────────────────
+const DIMMED_CLASS = "opacity-10 transition-opacity duration-150";
+const VISIBLE_CLASS = "opacity-100 transition-opacity duration-150";
 
 interface Props {
   readonly tree: CalculationNode;
@@ -69,12 +35,12 @@ export default function ProductionGraph({ tree }: Props) {
     () =>
       highlightedIds === null
         ? edges
-        : edges.map((e) => ({
-            ...e,
+        : edges.map((edge) => ({
+            ...edge,
             className:
-              highlightedIds.has(e.source) || highlightedIds.has(e.target)
-                ? ""
-                : (styles.edgeDimmed ?? ""),
+              highlightedIds.has(edge.source) || highlightedIds.has(edge.target)
+                ? VISIBLE_CLASS
+                : DIMMED_CLASS,
           })),
     [edges, highlightedIds],
   );
@@ -83,15 +49,15 @@ export default function ProductionGraph({ tree }: Props) {
     () =>
       highlightedIds === null
         ? nodes
-        : nodes.map((n) => ({
-            ...n,
-            className: highlightedIds.has(n.id) ? "" : (styles.nodeDimmed ?? ""),
+        : nodes.map((node) => ({
+            ...node,
+            className: highlightedIds.has(node.id) ? VISIBLE_CLASS : DIMMED_CLASS,
           })),
     [nodes, highlightedIds],
   );
 
   return (
-    <div className={styles.container}>
+    <div className="h-[580px] overflow-hidden rounded-[var(--radius)] border border-border bg-background [&_.react-flow__background]:bg-background [&_.react-flow__controls]:border [&_.react-flow__controls]:border-border [&_.react-flow__controls]:bg-card [&_.react-flow__controls-button]:border-border [&_.react-flow__controls-button]:bg-transparent [&_.react-flow__controls-button]:fill-foreground [&_.react-flow__controls-button]:text-foreground [&_.react-flow__controls-button:hover]:bg-muted [&_.react-flow__minimap]:border [&_.react-flow__minimap]:border-border [&_.react-flow__minimap]:bg-card">
       <ReactFlow
         nodes={displayNodes}
         edges={displayEdges}
@@ -103,18 +69,20 @@ export default function ProductionGraph({ tree }: Props) {
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
-        onNodeMouseEnter={(_evt, node) => setHoveredId(node.id)}
-        onNodeMouseLeave={() => setHoveredId(null)}
+        onNodeMouseEnter={(_event, node) => {
+          setHoveredId(node.id);
+        }}
+        onNodeMouseLeave={() => {
+          setHoveredId(null);
+        }}
       >
-        <Background gap={20} size={1} color="var(--color-border, #333)" />
+        <Background gap={20} size={1} color="var(--border)" />
         <Controls showInteractive={false} />
         <MiniMap
-          nodeColor={(n) =>
-            (n.data as GraphNodeData).isRaw
-              ? "var(--color-accent-raw, #a16207)"
-              : "var(--color-surface, #1e1e2e)"
+          nodeColor={(node) =>
+            (node.data as GraphNodeData).isRaw ? "var(--primary)" : "var(--card)"
           }
-          maskColor="rgba(0,0,0,0.4)"
+          maskColor="color-mix(in srgb, var(--background) 60%, transparent)"
         />
       </ReactFlow>
     </div>

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { BlueprintCard, TagFilterBar, UploadButton } from "@/features/blueprints";
 import Skeleton from "@/components/ui/Skeleton";
 import { DropZone } from "@/components/DropZone/DropZone";
+import { Button } from "@/components/ui/button";
 import {
   useBatchUploadMutation,
   useBlueprintsQuery,
@@ -11,7 +12,6 @@ import {
   useImportZipMutation,
   useUploadBlueprintMutation,
 } from "@/domain/blueprints/queries";
-import styles from "./Blueprints.module.scss";
 
 export default function BlueprintsPage() {
   const { t } = useTranslation();
@@ -43,7 +43,7 @@ export default function BlueprintsPage() {
   const filteredBlueprints = useMemo(() => {
     const bps = data?.blueprints ?? [];
     if (activeTags.size === 0) return bps;
-    return bps.filter((bp) => bp.tags.some((t) => activeTags.has(t)));
+    return bps.filter((bp) => bp.tags.some((tag) => activeTags.has(tag)));
   }, [data, activeTags]);
 
   function toggleTag(tag: string) {
@@ -56,25 +56,22 @@ export default function BlueprintsPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <h1>{t("blueprints.title")}</h1>
-        <div className={styles.actions}>
-          <button
+    <div className="flex flex-col gap-4 p-6">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold text-foreground">{t("blueprints.title")}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
             type="button"
-            className={styles.downloadAllButton}
+            variant="outline"
             onClick={() => downloadAllMutation.mutate()}
             disabled={downloadAllMutation.isPending}
           >
             {downloadAllMutation.isPending
               ? t("blueprints.downloading")
               : t("blueprints.download_all")}
-          </button>
-          <UploadButton
-            onUpload={handleUpload}
-            isUploading={uploadMutation.isPending}
-          />
-          <label className={styles.importZipLabel}>
+          </Button>
+          <UploadButton onUpload={handleUpload} isUploading={uploadMutation.isPending} />
+          <label className="inline-flex cursor-pointer items-center">
             <input
               type="file"
               accept=".zip"
@@ -86,7 +83,7 @@ export default function BlueprintsPage() {
                 e.target.value = "";
               }}
             />
-            <span className={styles.importZipButton}>
+            <span className="inline-flex h-9 items-center justify-center gap-2 rounded-[var(--radius)] border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
               {importZipMutation.isPending
                 ? t("blueprints.importing_zip")
                 : t("blueprints.import_zip")}
@@ -96,22 +93,32 @@ export default function BlueprintsPage() {
       </header>
 
       {uploadMutation.isError && (
-        <p className={styles.error}>{t("error")}: {uploadMutation.error.message}</p>
+        <p className="text-sm text-destructive" role="alert">
+          {t("error")}: {uploadMutation.error.message}
+        </p>
       )}
       {deleteMutation.isError && (
-        <p className={styles.error}>{t("error")}: {deleteMutation.error.message}</p>
+        <p className="text-sm text-destructive" role="alert">
+          {t("error")}: {deleteMutation.error.message}
+        </p>
       )}
       {downloadAllMutation.isError && (
-        <p className={styles.error}>{t("error")}: {downloadAllMutation.error.message}</p>
+        <p className="text-sm text-destructive" role="alert">
+          {t("error")}: {downloadAllMutation.error.message}
+        </p>
       )}
       {batchUploadMutation.isError && (
-        <p className={styles.error}>{t("error")}: {batchUploadMutation.error.message}</p>
+        <p className="text-sm text-destructive" role="alert">
+          {t("error")}: {batchUploadMutation.error.message}
+        </p>
       )}
       {importZipMutation.isError && (
-        <p className={styles.error}>{t("error")}: {importZipMutation.error.message}</p>
+        <p className="text-sm text-destructive" role="alert">
+          {t("error")}: {importZipMutation.error.message}
+        </p>
       )}
       {importZipMutation.isSuccess && importZipMutation.data && (
-        <p className={styles.batchResult}>
+        <p className="text-sm text-muted-foreground">
           {t("blueprints.import_result", {
             created: importZipMutation.data.created.length,
             updated: importZipMutation.data.updated.length,
@@ -127,17 +134,17 @@ export default function BlueprintsPage() {
       />
 
       {isLoading && (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
           {Array.from({ length: 6 }).map((_item, i) => (
             <Skeleton key={`blueprint-sk-${i}`} height="120px" radius="8px" />
           ))}
         </div>
       )}
 
-      {isError && <p className={styles.error}>{t("error")}</p>}
+      {isError && <p className="text-sm text-destructive">{t("error")}</p>}
 
       {data?.blueprints.length === 0 && (
-        <p className={styles.empty}>{t("blueprints.empty")}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t("blueprints.empty")}</p>
       )}
 
       {data != null && data.blueprints.length > 0 && (
@@ -148,20 +155,20 @@ export default function BlueprintsPage() {
             onToggle={toggleTag}
             onClear={() => setActiveTags(new Set())}
           />
-          <p className={styles.count}>
-            {t("blueprints.count", { count: activeTags.size > 0 ? filteredBlueprints.length : data.total })}
+          <p className="text-sm text-muted-foreground">
+            {t("blueprints.count", {
+              count: activeTags.size > 0 ? filteredBlueprints.length : data.total,
+            })}
           </p>
-          <div className={styles.grid}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
             {filteredBlueprints.map((bp) => (
-              <BlueprintCard
-                key={bp.name}
-                blueprint={bp}
-                onDelete={handleDelete}
-              />
+              <BlueprintCard key={bp.name} blueprint={bp} onDelete={handleDelete} />
             ))}
           </div>
           {filteredBlueprints.length === 0 && activeTags.size > 0 && (
-            <p className={styles.empty}>{t("blueprints.no_tag_match")}</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              {t("blueprints.no_tag_match")}
+            </p>
           )}
         </>
       )}

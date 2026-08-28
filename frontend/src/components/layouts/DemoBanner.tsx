@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { useHealthQuery } from "@/api/health/queries";
-import styles from "./DemoBanner.module.scss";
 
 /**
  * Persistent amber strip shown at the top of every page while the app runs on
@@ -22,9 +21,13 @@ export default function DemoBanner() {
   if (!envDemo && !backendDemo) return null;
 
   return (
-    <div role="status" data-testid="demo-banner" className={styles.banner}>
+    <div
+      role="status"
+      data-testid="demo-banner"
+      className="sticky top-0 z-[100] flex items-center justify-center gap-2 bg-warning px-4 py-2 text-center text-sm font-medium text-warning-foreground"
+    >
       <span aria-hidden="true">🧪</span>
-      <span className={styles.label}>{t("demo.label")}</span>
+      <span className="font-bold uppercase tracking-wide">{t("demo.label")}</span>
       <span>{t("demo.message")}</span>
     </div>
   );

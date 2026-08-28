@@ -1,11 +1,11 @@
-import React from "react";
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Blueprint } from "@/domain/blueprints/types";
 import { downloadAuthedFile } from "@/domain/blueprints/download";
 import { formatDate } from "@/utils/formatDate";
+import { Button } from "@/components/ui/button";
 import { TagEditor } from "./TagEditor";
-import styles from "./BlueprintCard.module.scss";
 
 interface Props {
   readonly blueprint: Blueprint;
@@ -19,19 +19,22 @@ function formatBytes(bytes: number): string {
 }
 
 export default function BlueprintCard({ blueprint, onDelete }: Props) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const downloadUrl = `/api/v1/blueprints/${encodeURIComponent(blueprint.name)}/download`;
   const modifiedDate = formatDate(blueprint.modified_at, i18n.language);
 
   return (
-    <article className={styles.card}>
-      <header className={styles.header}>
-        <Link to={`/blueprints/${encodeURIComponent(blueprint.name)}`} className={styles.name}>
+    <article className="flex flex-col gap-2 rounded-[var(--radius)] border border-border bg-card p-3.5 transition-colors hover:border-primary">
+      <header className="flex items-center gap-2">
+        <Link
+          to={`/blueprints/${encodeURIComponent(blueprint.name)}`}
+          className="flex-1 truncate font-medium text-foreground hover:text-primary"
+        >
           {blueprint.name}
         </Link>
         {blueprint.color && (
           <span
-            className={styles.colorDot}
+            className="size-4 shrink-0 rounded-full border border-border"
             // CSS custom properties allow dynamic theming without inline styles
             style={
               {
@@ -39,38 +42,47 @@ export default function BlueprintCard({ blueprint, onDelete }: Props) {
                 "--swatch-g": Math.round(blueprint.color.g * 255),
                 "--swatch-b": Math.round(blueprint.color.b * 255),
                 "--swatch-a": blueprint.color.a,
-              } as React.CSSProperties
+                backgroundColor:
+                  "rgba(var(--swatch-r), var(--swatch-g), var(--swatch-b), var(--swatch-a))",
+              } as CSSProperties
             }
           />
         )}
       </header>
 
       {blueprint.description && (
-        <p className={styles.description}>{blueprint.description}</p>
+        <p className="line-clamp-2 text-[0.8rem] text-muted-foreground">
+          {blueprint.description}
+        </p>
       )}
 
       <TagEditor blueprintName={blueprint.name} tags={blueprint.tags} />
 
-      <footer className={styles.footer}>
-        <span className={styles.meta}>{formatBytes(blueprint.size_bytes)}</span>
-        <span className={styles.meta}>{modifiedDate}</span>
-        <div className={styles.actions}>
-          <button
+      <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>{formatBytes(blueprint.size_bytes)}</span>
+          <span>{modifiedDate}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => downloadAuthedFile(downloadUrl, `${blueprint.name}.sbp`)}
-            className={styles.btnDownload}
-            aria-label={`Download ${blueprint.name}`}
+            aria-label={t("blueprints.download_aria", { name: blueprint.name })}
           >
-            ↓ Export
-          </button>
-          <button
+            ↓ {t("blueprints.download")}
+          </Button>
+          <Button
             type="button"
-            className={styles.btnDelete}
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
             onClick={() => onDelete(blueprint.name)}
-            aria-label={`Delete ${blueprint.name}`}
+            aria-label={t("blueprints.delete_aria", { name: blueprint.name })}
           >
-            Delete
-          </button>
+            {t("blueprints.delete")}
+          </Button>
         </div>
       </footer>
     </article>

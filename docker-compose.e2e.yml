@@ -45,7 +45,7 @@ services:
       BASE_URL: http://frontend:4173
       CI: 'true'
       HOME: /tmp
-    image: mcr.microsoft.com/playwright:v1.52.0-noble
+    image: mcr.microsoft.com/playwright:v1.61.1-noble
     user: ${UID:-1000}:${GID:-1000}
     volumes:
     - ./test-results:/e2e/test-results

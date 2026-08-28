@@ -5,6 +5,7 @@ import { useToast } from "@/context/useToast";
 import { useHealthQuery } from "@/api/health/queries";
 import { PlanCard, PlanForm } from "@/features/plans";
 import Skeleton from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/button";
 import {
   useCreatePlanMutation,
   useDeletePlanMutation,
@@ -14,7 +15,6 @@ import {
   useUpdatePlanMutation,
 } from "@/domain/plans/queries";
 import type { Plan, PlanCreate } from "@/domain/plans/types";
-import styles from "./Plans.module.scss";
 
 export default function PlansPage() {
   const { t } = useTranslation();
@@ -122,13 +122,13 @@ export default function PlansPage() {
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <h1>{t("plans.title")}</h1>
-        <div className={styles.headerActions}>
-          <button
+    <div className="flex flex-col gap-4 p-6">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold text-foreground">{t("plans.title")}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
             type="button"
-            className={styles.btnImport}
+            variant="outline"
             onClick={handleImportClick}
             disabled={importMutation.isPending || isDemo}
             title={isDemo ? t("demo.readonly_hint") : t("plans.import_json_hint")}
@@ -136,36 +136,35 @@ export default function PlansPage() {
             {importMutation.isPending
               ? t("plans.importing_json")
               : t("plans.import_json")}
-          </button>
+          </Button>
           <input
             ref={importInputRef}
             type="file"
             accept=".json,application/json"
             aria-label={t("plans.import_json_hint")}
-            className={styles.hiddenInput}
+            className="hidden"
             onChange={handleImportFile}
           />
-          <button
+          <Button
             type="button"
-            className={styles.btnCreate}
             onClick={openCreate}
             disabled={isDemo}
             title={isDemo ? t("demo.readonly_hint") : undefined}
           >
             + {t("plans.create")}
-          </button>
+          </Button>
         </div>
       </header>
 
       {importError && (
-        <p className={styles.importError} role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {importError}
         </p>
       )}
 
-      <div className={styles.toolbar}>
+      <div className="flex flex-wrap gap-3">
         <input
-          className={styles.searchInput}
+          className="w-full max-w-xs rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           type="search"
           placeholder={t("plans.search_placeholder")}
           value={searchQuery}
@@ -177,17 +176,17 @@ export default function PlansPage() {
       </div>
 
       {isLoading && (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} height="140px" />
           ))}
         </div>
       )}
 
-      {isError && <p className={styles.error}>{t("plans.error")}</p>}
+      {isError && <p className="text-sm text-destructive">{t("plans.error")}</p>}
 
       {!isLoading && !isError && plans && plans.length === 0 && (
-        <p className={styles.empty}>{t("plans.empty")}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t("plans.empty")}</p>
       )}
 
       {!isLoading &&
@@ -195,11 +194,11 @@ export default function PlansPage() {
         plans &&
         plans.length > 0 &&
         filteredPlans.length === 0 && (
-          <p className={styles.empty}>{t("plans.no_results")}</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">{t("plans.no_results")}</p>
         )}
 
       {!isLoading && !isError && filteredPlans.length > 0 && (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
           {filteredPlans.map((plan) => (
             <PlanCard
               key={plan.id}

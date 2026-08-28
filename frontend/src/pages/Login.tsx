@@ -2,7 +2,8 @@ import { useState } from "react";
 import type React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/useAuth";
-import styles from "./Login.module.scss";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Tab = "login" | "register";
 
@@ -40,23 +41,33 @@ export default function Login() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.logo}>
-          <h1>Satisfactory Factory Manager</h1>
-          <p>Sign in to sync your factories</p>
+    <div className="flex min-h-dvh items-center justify-center bg-background p-6">
+      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-[var(--radius)] border border-border bg-card p-8">
+        <div className="text-center">
+          <h1 className="m-0 text-2xl font-bold text-foreground">
+            Satisfactory Factory Manager
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Sign in to sync your factories
+          </p>
         </div>
 
-        <div className={styles.tabs}>
+        <div className="flex border-b border-border">
           <button
-            className={`${styles.tab} ${tab === "login" ? styles.active : ""}`}
+            className={cn(
+              "flex-1 border-b-2 border-transparent px-4 py-2 text-sm text-muted-foreground transition-colors",
+              tab === "login" && "border-primary text-primary",
+            )}
             onClick={() => setTab("login")}
             type="button"
           >
             Sign in
           </button>
           <button
-            className={`${styles.tab} ${tab === "register" ? styles.active : ""}`}
+            className={cn(
+              "flex-1 border-b-2 border-transparent px-4 py-2 text-sm text-muted-foreground transition-colors",
+              tab === "register" && "border-primary text-primary",
+            )}
             onClick={() => setTab("register")}
             type="button"
           >
@@ -64,9 +75,11 @@ export default function Login() {
           </button>
         </div>
 
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <label htmlFor="username">Username</label>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground" htmlFor="username">
+              Username
+            </label>
             <input
               id="username"
               type="text"
@@ -76,10 +89,13 @@ export default function Login() {
               required
               minLength={3}
               maxLength={64}
+              className="rounded-[var(--radius)] border border-border bg-background px-4 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
             />
           </div>
-          <div className={styles.field}>
-            <label htmlFor="password">Password</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground" htmlFor="password">
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -89,18 +105,23 @@ export default function Login() {
               required
               minLength={8}
               maxLength={128}
+              className="rounded-[var(--radius)] border border-border bg-background px-4 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
             />
           </div>
-          {error && <p className={styles.error}>{error}</p>}
-          <button className={styles.submit} type="submit" disabled={loading}>
-            {loading ? "Please wait…" : (tab === "login" ? "Sign in" : "Create account")}
-          </button>
+          {error && (
+            <p className="text-center text-sm text-destructive">{error}</p>
+          )}
+          <Button type="submit" disabled={loading}>
+            {loading ? "Please wait…" : tab === "login" ? "Sign in" : "Create account"}
+          </Button>
         </form>
 
-        <div className={styles.divider}>or continue with</div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground before:h-px before:flex-1 before:bg-border before:content-[''] after:h-px after:flex-1 after:bg-border after:content-['']">
+          or continue with
+        </div>
 
         <button
-          className={styles.steamBtn}
+          className="flex items-center justify-center gap-2 rounded-[var(--radius)] bg-foreground px-4 py-2 text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
           type="button"
           onClick={() => loginWithSteam(backendUrl)}
         >
@@ -110,7 +131,11 @@ export default function Login() {
           Sign in with Steam
         </button>
 
-        <button className={styles.epicBtn} type="button" disabled>
+        <button
+          className="flex cursor-not-allowed items-center justify-center gap-2 rounded-[var(--radius)] border border-border bg-card px-4 py-2 text-sm text-muted-foreground opacity-55"
+          type="button"
+          disabled
+        >
           Epic Games — Coming soon
         </button>
       </div>

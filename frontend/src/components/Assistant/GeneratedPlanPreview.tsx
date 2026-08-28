@@ -3,7 +3,7 @@ import { useHealthQuery } from "@/api/health/queries";
 import { useCreatePlanMutation } from "@/domain/plans/queries";
 import { generatedPlanToPlanCreate } from "@/domain/plans/fromGeneratedPlan";
 import type { GeneratedFactoryPlan } from "@/api/assistant/types";
-import styles from "./GeneratedPlanPreview.module.scss";
+import { Button } from "@/components/ui/button";
 
 function rate(perMinute: number, name: string): string {
   return `${perMinute.toFixed(1)} ${name}/min`;
@@ -26,14 +26,17 @@ export default function GeneratedPlanPreview({
       : t("assistant.plan.save");
 
   return (
-    <div className={styles.preview} data-testid="generated-plan-preview">
-      <h3 className={styles.name}>{plan.name}</h3>
+    <div
+      className="mt-3 flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-background p-3 text-foreground"
+      data-testid="generated-plan-preview"
+    >
+      <h3 className="text-sm font-semibold">{plan.name}</h3>
 
-      <h4 className={styles.sectionTitle}>{t("assistant.plan.steps")}</h4>
-      <ul className={styles.steps}>
+      <h4 className="text-xs font-medium text-muted-foreground">{t("assistant.plan.steps")}</h4>
+      <ul className="m-0 list-disc pl-4 text-sm">
         {plan.steps.map((s) => (
-          <li key={s.item_id} className={styles.step}>
-            <span className={styles.stepHead}>
+          <li key={s.item_id}>
+            <span>
               {s.machine_count > 0
                 ? t("assistant.plan.machine_line", {
                     count: s.machine_count,
@@ -44,7 +47,7 @@ export default function GeneratedPlanPreview({
                 : t("assistant.plan.machine_unknown", { recipe: s.recipe_name })}
             </span>
             {s.inputs.length > 0 && (
-              <span className={styles.stepInputs}>
+              <span className="block text-xs text-muted-foreground">
                 {t("assistant.plan.consumes")}:{" "}
                 {s.inputs.map((i) => rate(i.per_minute, i.item_name)).join(", ")}
               </span>
@@ -53,40 +56,41 @@ export default function GeneratedPlanPreview({
         ))}
       </ul>
 
-      <h4 className={styles.sectionTitle}>{t("assistant.plan.raw_inputs")}</h4>
-      <ul className={styles.raw}>
+      <h4 className="text-xs font-medium text-muted-foreground">
+        {t("assistant.plan.raw_inputs")}
+      </h4>
+      <ul className="m-0 list-disc pl-4 text-sm">
         {plan.raw_inputs.map((r) => (
           <li key={r.item_id}>{rate(r.per_minute, r.item_name)}</li>
         ))}
       </ul>
 
       {plan.warnings.length > 0 && (
-        <ul className={styles.warnings} role="alert">
+        <ul className="m-0 list-none pl-0 text-sm text-warning" role="alert">
           {plan.warnings.map((w) => (
             <li key={w}>⚠️ {w}</li>
           ))}
         </ul>
       )}
 
-      <details className={styles.assumptions}>
+      <details className="text-sm text-muted-foreground">
         <summary>{t("assistant.plan.assumptions")}</summary>
-        <ul>
+        <ul className="pl-4">
           {plan.assumptions.map((a) => (
             <li key={a}>{a}</li>
           ))}
         </ul>
       </details>
 
-      <button
+      <Button
         type="button"
-        className={styles.saveBtn}
         data-testid="save-generated-plan"
         disabled={isDemo || createPlan.isPending || createPlan.isSuccess}
         title={isDemo ? t("demo.readonly_hint") : undefined}
         onClick={() => createPlan.mutate(generatedPlanToPlanCreate(plan))}
       >
         {saveLabel}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { useRef } from "react";
-import styles from "./UploadButton.module.scss";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 interface Props {
   readonly onUpload: (formData: FormData) => void;
@@ -7,6 +9,7 @@ interface Props {
 }
 
 export default function UploadButton({ onUpload, isUploading }: Props) {
+  const { t } = useTranslation();
   const sbpRef = useRef<HTMLInputElement>(null);
   const cfgRef = useRef<HTMLInputElement>(null);
 
@@ -28,28 +31,42 @@ export default function UploadButton({ onUpload, isUploading }: Props) {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <label className={styles.label} data-disabled={isUploading}>
-        <span>{isUploading ? "Uploading…" : "↑ Import .sbp"}</span>
+    <div className="flex flex-wrap items-center gap-2">
+      <label
+        className={cn(
+          buttonVariants({ variant: "default" }),
+          "cursor-pointer",
+          isUploading && "pointer-events-none opacity-50",
+        )}
+        data-disabled={isUploading}
+      >
+        <span>{isUploading ? t("blueprints.uploading") : t("blueprints.upload_sbp")}</span>
         <input
           ref={sbpRef}
           type="file"
           accept=".sbp"
-          className={styles.input}
+          className="hidden"
           disabled={isUploading}
           onChange={handleChange}
-          aria-label="Select a Satisfactory blueprint file (.sbp)"
+          aria-label={t("blueprints.upload_sbp_hint")}
         />
       </label>
-      <label className={styles.labelSecondary} data-disabled={isUploading}>
-        <span>+ .sbpcfg</span>
+      <label
+        className={cn(
+          buttonVariants({ variant: "outline" }),
+          "cursor-pointer",
+          isUploading && "pointer-events-none opacity-50",
+        )}
+        data-disabled={isUploading}
+      >
+        <span>{t("blueprints.upload_cfg")}</span>
         <input
           ref={cfgRef}
           type="file"
           accept=".sbpcfg"
-          className={styles.input}
+          className="hidden"
           disabled={isUploading}
-          aria-label="Select the blueprint config file (.sbpcfg, optional)"
+          aria-label={t("blueprints.upload_cfg_hint")}
         />
       </label>
     </div>

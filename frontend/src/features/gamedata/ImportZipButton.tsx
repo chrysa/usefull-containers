@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import styles from "./ImportZipButton.module.scss";
+import { Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   readonly onImport: (file: File) => void;
@@ -20,20 +21,21 @@ export default function ImportZipButton({ onImport, isImporting }: Props) {
 
   return (
     <label>
-      <button
+      <Button
         type="button"
-        className={styles.button}
+        variant="outline"
         disabled={isImporting}
         onClick={() => inputRef.current?.click()}
         aria-label={t("gamedata.import")}
       >
-        ↑ {isImporting ? t("gamedata.importing") : t("gamedata.import")}
-      </button>
+        <Upload />
+        {isImporting ? t("gamedata.importing") : t("gamedata.import")}
+      </Button>
       <input
         ref={inputRef}
         type="file"
         accept=".zip"
-        className={styles.input}
+        className="hidden"
         disabled={isImporting}
         onChange={handleChange}
       />

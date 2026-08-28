@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Plan, PlanCreate } from "@/domain/plans/types";
-import styles from "./PlanForm.module.scss";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   readonly initial?: Plan;
@@ -37,20 +37,26 @@ export default function PlanForm({ initial, onSubmit, onCancel, isPending }: Pro
 
   return (
     <div
-      className={styles.overlay}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4"
       role="dialog"
       aria-modal="true"
     >
-      <form className={styles.dialog} onSubmit={handleSubmit}>
-        <h2 className={styles.title}>
+      <form
+        className="flex w-full max-w-md flex-col gap-4 rounded-[var(--radius)] border border-border bg-card p-6 shadow-lg"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-lg font-semibold text-foreground">
           {initial ? t("plans.form.edit_title") : t("plans.form.create_title")}
         </h2>
 
-        <div className={styles.field}>
-          <label htmlFor="plan-name">{t("plans.form.name_label")}</label>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="plan-name" className="text-sm font-medium text-foreground">
+            {t("plans.form.name_label")}
+          </label>
           <input
             id="plan-name"
             type="text"
+            className="rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -59,27 +65,26 @@ export default function PlanForm({ initial, onSubmit, onCancel, isPending }: Pro
           />
         </div>
 
-        <div className={styles.field}>
-          <label htmlFor="plan-desc">{t("plans.form.description_label")}</label>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="plan-desc" className="text-sm font-medium text-foreground">
+            {t("plans.form.description_label")}
+          </label>
           <textarea
             id="plan-desc"
             rows={3}
+            className="rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
-        <div className={styles.actions}>
-          <button type="button" className={styles.btnCancel} onClick={onCancel}>
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onCancel}>
             {t("plans.form.cancel")}
-          </button>
-          <button
-            type="submit"
-            className={styles.btnSave}
-            disabled={isPending || !name.trim()}
-          >
+          </Button>
+          <Button type="submit" disabled={isPending || !name.trim()}>
             {isPending ? t("plans.form.saving") : t("plans.form.save")}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

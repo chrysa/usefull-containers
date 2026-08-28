@@ -1,60 +1,48 @@
-import { useState, useTransition } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ImportZipButton, ItemCard, RecipeCard } from "@/features/gamedata";
-import Skeleton from "@/components/ui/Skeleton";
-import {
-  useGameDataStatsQuery,
-  useImportGameDataMutation,
-  useItemsQuery,
-  useRecipesQuery,
-} from "@/domain/gamedata/queries";
-import styles from "./GameData.module.scss";
+import { ImportZipButton, ItemsList, RecipesList } from "@/features/gamedata";
+import { Button } from "@/components/ui/button";
+import { useGameDataStatsQuery, useImportGameDataMutation } from "@/domain/gamedata/queries";
 
 type Tab = "items" | "recipes";
 
 export default function GameDataPage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>("items");
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [, startTransition] = useTransition();
 
   const { data: stats, refetch } = useGameDataStatsQuery();
   const importMutation = useImportGameDataMutation();
   const hasData = (stats?.item_count ?? 0) > 0 || (stats?.recipe_count ?? 0) > 0;
-
-  const itemsQuery = useItemsQuery(tab === "items" ? debouncedSearch : "", hasData && tab === "items");
-  const recipesQuery = useRecipesQuery(tab === "recipes" ? debouncedSearch : "", hasData && tab === "recipes");
+  const result = importMutation.data;
 
   function handleImport(file: File) {
     importMutation.mutate(file, { onSuccess: () => void refetch() });
   }
 
-  function handleSearch(value: string) {
-    setSearch(value);
-    startTransition(() => setDebouncedSearch(value));
+  function handleTabKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const nextTab: Tab = tab === "items" ? "recipes" : "items";
+    setTab(nextTab);
+    const nextTabId = nextTab === "items" ? "gamedata-tab-items" : "gamedata-tab-recipes";
+    document.getElementById(nextTabId)?.focus();
   }
 
-  const result = importMutation.data;
-
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <h1>{t("gamedata.title")}</h1>
-        <ImportZipButton
-          onImport={handleImport}
-          isImporting={importMutation.isPending}
-        />
+    <div className="flex flex-col gap-4 p-6">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold text-foreground">{t("gamedata.title")}</h1>
+        <ImportZipButton onImport={handleImport} isImporting={importMutation.isPending} />
       </header>
 
       {importMutation.isError && (
-        <p className={styles.error} role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {importMutation.error.message}
         </p>
       )}
 
       {result != null && (
-        <output className={styles.result}>
+        <output className="rounded-[var(--radius)] border border-border bg-card px-4 py-2 text-sm text-foreground">
           {t("gamedata.import_result", {
             items: result.item_count,
             recipes: result.recipe_count,
@@ -64,83 +52,75 @@ export default function GameDataPage() {
       )}
 
       {stats != null && !hasData && result == null && (
-        <p className={styles.empty}>{t("gamedata.empty")}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t("gamedata.empty")}</p>
       )}
 
       {stats != null && (hasData || result != null) && (
         <>
-          <div className={styles.stats}>
-            <div className={styles.statCard}>
-              <span className={styles.statValue}>{stats.item_count}</span>
-              <span className={styles.statLabel}>{t("gamedata.items")}</span>
+          <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col rounded-[var(--radius)] border border-border bg-card px-4 py-2">
+              <span className="text-lg font-semibold text-foreground">{stats.item_count}</span>
+              <span className="text-xs text-muted-foreground">{t("gamedata.items")}</span>
             </div>
-            <div className={styles.statCard}>
-              <span className={styles.statValue}>{stats.recipe_count}</span>
-              <span className={styles.statLabel}>{t("gamedata.recipes")}</span>
+            <div className="flex flex-col rounded-[var(--radius)] border border-border bg-card px-4 py-2">
+              <span className="text-lg font-semibold text-foreground">{stats.recipe_count}</span>
+              <span className="text-xs text-muted-foreground">{t("gamedata.recipes")}</span>
             </div>
           </div>
+
           {stats.source_file != null && (
-            <p className={styles.meta}>
+            <p className="text-xs text-muted-foreground">
               {t("gamedata.source", { file: stats.source_file, date: stats.imported_at ?? "—" })}
             </p>
           )}
 
-          <div className={styles.tabs} role="tablist" aria-label={t("gamedata.explore")}>
-            <button
+          <div
+            className="inline-flex w-fit rounded-[var(--radius)] border border-border bg-muted p-1"
+            role="tablist"
+            aria-label={t("gamedata.explore")}
+            onKeyDown={handleTabKeyDown}
+          >
+            <Button
+              id="gamedata-tab-items"
               type="button"
               role="tab"
+              tabIndex={tab === "items" ? 0 : -1}
               aria-selected={tab === "items"}
-              className={tab === "items" ? styles.tabActive : styles.tab}
-              onClick={() => { setTab("items"); setSearch(""); setDebouncedSearch(""); }}
+              aria-controls="gamedata-panel-items"
+              variant={tab === "items" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setTab("items")}
             >
               {t("gamedata.items")} ({stats.item_count})
-            </button>
-            <button
+            </Button>
+            <Button
+              id="gamedata-tab-recipes"
               type="button"
               role="tab"
+              tabIndex={tab === "recipes" ? 0 : -1}
               aria-selected={tab === "recipes"}
-              className={tab === "recipes" ? styles.tabActive : styles.tab}
-              onClick={() => { setTab("recipes"); setSearch(""); setDebouncedSearch(""); }}
+              aria-controls="gamedata-panel-recipes"
+              variant={tab === "recipes" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setTab("recipes")}
             >
               {t("gamedata.recipes")} ({stats.recipe_count})
-            </button>
+            </Button>
           </div>
 
-          <input
-            type="search"
-            className={styles.searchInput}
-            placeholder={t("gamedata.search_placeholder")}
-            value={search}
-            aria-label={t("gamedata.search_placeholder")}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-
           {tab === "items" && (
-            <section className={styles.grid} aria-label={t("gamedata.items")}>
-              {itemsQuery.isLoading && Array.from({ length: 12 }).map((_, i) => (
-                <Skeleton key={`item-sk-${i}`} height="100px" radius="8px" />
-              ))}
-              {itemsQuery.data?.length === 0 && (
-                <p className={styles.noResults}>{t("gamedata.no_results")}</p>
-              )}
-              {itemsQuery.data?.map((item) => (
-                <ItemCard key={item.id} item={item} />
-              ))}
-            </section>
+            <div id="gamedata-panel-items" role="tabpanel" aria-labelledby="gamedata-tab-items">
+              <ItemsList hasData={hasData} />
+            </div>
           )}
-
           {tab === "recipes" && (
-            <section className={styles.grid} aria-label={t("gamedata.recipes")}>
-              {recipesQuery.isLoading && Array.from({ length: 12 }).map((_, i) => (
-                <Skeleton key={`recipe-sk-${i}`} height="130px" radius="8px" />
-              ))}
-              {recipesQuery.data?.length === 0 && (
-                <p className={styles.noResults}>{t("gamedata.no_results")}</p>
-              )}
-              {recipesQuery.data?.map((recipe) => (
-                <RecipeCard key={recipe.id} recipe={recipe} />
-              ))}
-            </section>
+            <div
+              id="gamedata-panel-recipes"
+              role="tabpanel"
+              aria-labelledby="gamedata-tab-recipes"
+            >
+              <RecipesList hasData={hasData} />
+            </div>
           )}
         </>
       )}

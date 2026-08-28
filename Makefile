@@ -88,7 +88,7 @@ agent-test: ## Run agent (sfm-agent) tests in Docker
 	$(DOCKER_COMPOSE) -f docker-compose.test.yml run --rm agent-test
 
 docker-e2e: ## Run E2E tests in Docker (Playwright)
-	$(DOCKER_COMPOSE) -f docker-compose.e2e.yml up --build -d backend frontend
+	$(DOCKER_COMPOSE) -f docker-compose.e2e.yml up --build -d api frontend
 	$(DOCKER_COMPOSE) -f docker-compose.e2e.yml run --rm playwright; \
 	EXIT_CODE=$$?; \
 	$(DOCKER_COMPOSE) -f docker-compose.e2e.yml down; \

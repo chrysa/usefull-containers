@@ -26,10 +26,10 @@ async function authToken(): Promise<string> {
   const api = await playwrightRequest.newContext({ baseURL: API_URL });
   try {
     const body = { username: USERNAME, password: PASSWORD };
-    let resp = await api.post("/api/v1/auth/register", body);
+    let resp = await api.post("/api/v1/auth/register", { data: body });
     // 409 → the user already exists from a previous run: log in instead.
     if (resp.status() === 409) {
-      resp = await api.post("/api/v1/auth/login", body);
+      resp = await api.post("/api/v1/auth/login", { data: body });
     }
     return resp.ok() ? ((await resp.json()).access_token as string) : "";
   } finally {

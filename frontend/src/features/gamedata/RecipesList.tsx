@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecipesQuery } from "@/domain/gamedata/queries";
 import { RecipeCard } from "./RecipeCard";
+import { SearchInput } from "./SearchInput";
 import Skeleton from "@/components/ui/Skeleton";
-import styles from "./SearchList.module.scss";
 
 interface Props {
   readonly hasData: boolean;
@@ -12,33 +12,37 @@ interface Props {
 export function RecipesList({ hasData }: Props) {
   const { t } = useTranslation();
   const [q, setQ] = useState("");
-  const { data: recipes, isLoading } = useRecipesQuery(q, hasData);
+  const { data: recipes, isLoading, isError } = useRecipesQuery(q, hasData);
 
   return (
-    <div className={styles.container}>
-      <label className={styles.search}>
-        <span>🔍</span>
-        <input
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={t("gamedata.search_recipes")}
-          disabled={!hasData}
-        />
-      </label>
+    <div className="flex flex-col gap-3">
+      <SearchInput
+        value={q}
+        onChange={setQ}
+        placeholder={t("gamedata.search_recipes")}
+        disabled={!hasData}
+      />
 
       {isLoading && (
-        <div className={styles.list}>
+        <div className="flex flex-col gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} />
           ))}
         </div>
       )}
 
-      {!isLoading && recipes != null && recipes.length > 0 && (
+      {!isLoading && isError && (
+        <p className="py-8 text-center text-sm text-destructive" role="alert">
+          {t("gamedata.error")}
+        </p>
+      )}
+
+      {!isLoading && !isError && recipes != null && recipes.length > 0 && (
         <>
-          <p className={styles.count}>{t("gamedata.count_recipes", { count: recipes.length })}</p>
-          <div className={styles.list}>
+          <p className="text-xs text-muted-foreground">
+            {t("gamedata.count_recipes", { count: recipes.length })}
+          </p>
+          <div className="flex flex-col gap-2">
             {recipes.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
@@ -46,12 +50,16 @@ export function RecipesList({ hasData }: Props) {
         </>
       )}
 
-      {!isLoading && recipes != null && recipes.length === 0 && (
-        <p className={styles.empty}>{t("gamedata.no_results")}</p>
+      {!isLoading && !isError && recipes != null && recipes.length === 0 && (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          {t("gamedata.no_results")}
+        </p>
       )}
 
       {!hasData && (
-        <p className={styles.empty}>{t("gamedata.empty")}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          {t("gamedata.empty")}
+        </p>
       )}
     </div>
   );

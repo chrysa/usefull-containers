@@ -5,13 +5,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@/api/http/client";
 import { usePlansQuery, useCreatePlanMutation } from "@/domain/plans/queries";
 import type { Plan, PlanCreate } from "@/domain/plans/types";
-import styles from "./SaveToPlanPanel.module.scss";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   readonly itemId: string;
   readonly itemName: string;
   readonly quantity: number;
 }
+
+const inputClass =
+  "w-full rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export default function SaveToPlanPanel({ itemId, itemName, quantity }: Props) {
   const { t } = useTranslation();
@@ -68,26 +72,37 @@ export default function SaveToPlanPanel({ itemId, itemName, quantity }: Props) {
   const displayQty = quantity % 1 === 0 ? String(quantity) : quantity.toFixed(2);
 
   return (
-    <section className={styles.panel}>
-      <h2 className={styles.title}>{t("calculator.save_to_plan")}</h2>
+    <section className="flex flex-col gap-3 rounded-[var(--radius)] border border-border bg-card p-4">
+      <h2 className="text-sm font-semibold text-foreground">{t("calculator.save_to_plan")}</h2>
 
-      <p className={styles.preview}>
-        <span className={styles.previewItem}>{itemName}</span>
-        <span className={styles.previewQty}>{displayQty}/min</span>
+      <p className="flex items-baseline justify-between gap-2 text-sm text-muted-foreground">
+        <span className="truncate text-foreground">{itemName}</span>
+        <span className="font-mono text-primary">{displayQty}/min</span>
       </p>
 
-      <div className={styles.modeToggle}>
+      <div className="flex gap-1 rounded-[var(--radius)] border border-border p-1">
         <button
           type="button"
-          className={`${styles.modeBtn} ${mode === "new" ? styles.active : ""}`}
-          onClick={() => { setMode("new"); }}
+          className={cn(
+            "flex-1 rounded-[var(--radius)] px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+            mode === "new" && "bg-primary text-primary-foreground hover:text-primary-foreground",
+          )}
+          onClick={() => {
+            setMode("new");
+          }}
         >
           {t("calculator.save_new_plan")}
         </button>
         <button
           type="button"
-          className={`${styles.modeBtn} ${mode === "existing" ? styles.active : ""}`}
-          onClick={() => { setMode("existing"); }}
+          className={cn(
+            "flex-1 rounded-[var(--radius)] px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50",
+            mode === "existing" &&
+              "bg-primary text-primary-foreground hover:text-primary-foreground",
+          )}
+          onClick={() => {
+            setMode("existing");
+          }}
           disabled={plans.length === 0}
         >
           {t("calculator.save_existing_plan")}
@@ -95,33 +110,35 @@ export default function SaveToPlanPanel({ itemId, itemName, quantity }: Props) {
       </div>
 
       {mode === "new" && (
-        <form className={styles.form} onSubmit={handleNew}>
+        <form className="flex flex-col gap-2" onSubmit={handleNew}>
           <input
-            className={styles.input}
+            className={inputClass}
             type="text"
             placeholder={t("calculator.plan_name_placeholder")}
+            aria-label={t("calculator.plan_name_placeholder")}
             value={planName}
-            onChange={(e) => { setPlanName(e.target.value); }}
+            onChange={(e) => {
+              setPlanName(e.target.value);
+            }}
             required
             autoComplete="off"
           />
-          <button
-            type="submit"
-            className={styles.btnSave}
-            disabled={isBusy || !planName.trim()}
-          >
+          <Button type="submit" disabled={isBusy || !planName.trim()}>
             {isBusy ? t("calculator.saving") : t("calculator.create_and_save")}
-          </button>
+          </Button>
         </form>
       )}
 
       {mode === "existing" && (
-        <form className={styles.form} onSubmit={handleAddToExisting}>
+        <form className="flex flex-col gap-2" onSubmit={handleAddToExisting}>
           <select
-            className={styles.select}
+            className={inputClass}
             value={selectedPlanId}
-            onChange={(e) => { setSelectedPlanId(e.target.value); }}
+            onChange={(e) => {
+              setSelectedPlanId(e.target.value);
+            }}
             required
+            aria-label={t("calculator.select_plan")}
           >
             <option value="" disabled>
               {plansQuery.isLoading ? t("calculator.loading") : t("calculator.select_plan")}
@@ -132,18 +149,14 @@ export default function SaveToPlanPanel({ itemId, itemName, quantity }: Props) {
               </option>
             ))}
           </select>
-          <button
-            type="submit"
-            className={styles.btnSave}
-            disabled={isBusy || !selectedPlanId}
-          >
+          <Button type="submit" disabled={isBusy || !selectedPlanId}>
             {isBusy ? t("calculator.saving") : t("calculator.add_to_plan")}
-          </button>
+          </Button>
         </form>
       )}
 
       {hasError && (
-        <p className={styles.error} role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {t("calculator.save_error")}
         </p>
       )}

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { BatchUploadResult } from "@/domain/blueprints/types";
-import styles from "./DropZone.module.scss";
+import { cn } from "@/lib/utils";
 
 interface DropZoneProps {
   onUpload: (files: FileList) => void;
@@ -31,8 +31,17 @@ export function DropZone({ onUpload, isUploading, result }: DropZoneProps) {
 
   return (
     <div
-      className={`${styles.zone} ${isDragging ? styles.dragging : ""} ${isUploading ? styles.uploading : ""}`}
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+      className={cn(
+        "cursor-pointer select-none rounded-[var(--radius)] border border-dashed border-border p-8 text-center transition-colors",
+        "hover:border-primary hover:bg-muted",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+        isDragging && "border-primary bg-muted",
+        isUploading && "cursor-wait opacity-70",
+      )}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragging(true);
+      }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={(e) => {
         e.preventDefault();
@@ -53,11 +62,11 @@ export function DropZone({ onUpload, isUploading, result }: DropZoneProps) {
         hidden
         onChange={(e) => e.target.files && handleFiles(e.target.files)}
       />
-      <span className={styles.hint}>
+      <span className="block text-sm text-muted-foreground">
         {isUploading ? t("blueprints.batch_uploading") : t("blueprints.batch_drop_hint")}
       </span>
       {result && (
-        <p className={styles.result} role="status">
+        <p className="mt-3 text-sm text-success" role="status">
           {t("blueprints.batch_result", {
             created: result.created.length,
             updated: result.updated.length,

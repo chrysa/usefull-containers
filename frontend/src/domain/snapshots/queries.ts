@@ -5,10 +5,11 @@ import type { SnapshotCreate, SnapshotRead } from "./types";
 const QUERY_KEY = "snapshots";
 const API_BASE = "/v1/snapshots";
 
-export function useSnapshotsQuery() {
+export function useSnapshotsQuery(options?: { enabled?: boolean }) {
   return useQuery<SnapshotRead[]>({
     queryKey: [QUERY_KEY],
     queryFn: () => http.get<SnapshotRead[]>(API_BASE),
+    enabled: options?.enabled ?? true,
   });
 }
 
