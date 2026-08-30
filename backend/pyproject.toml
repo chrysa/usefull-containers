@@ -56,10 +56,15 @@ line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "N", "C901", "PERF203", "PERF401", "PLR0402", "PLR0911", "PLR0912", "PLR0915", "PLR1714", "PLR1730", "PLR5501", "RUF005", "RUF006", "RUF007", "RUF009", "RUF012", "RUF013", "RUF022", "RUF043", "RUF059", "RUF100"]
+select = ["E", "F", "I", "UP", "B", "SIM", "N", "C901", "PERF203", "PERF401", "PLR0402", "PLR0911", "PLR0912", "PLR0915", "PLR1714", "PLR1730", "PLR5501", "RUF005", "RUF006", "RUF007", "RUF009", "RUF012", "RUF013", "RUF022", "RUF043", "RUF059", "RUF100", "PLR2004"]
 ignore = ["B008"]                               # FastAPI Depends() in argument defaults is intentional
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
 ignore_missing_imports = true
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["PLR2004"]
+"**/test_*.py" = ["PLR2004"]
+"**/conftest.py" = ["PLR2004"]
