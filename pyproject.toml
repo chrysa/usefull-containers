@@ -4,6 +4,7 @@
 # somewhere to write (chrysa/shared-standards#271).
 
 [tool.ruff]
+extend-exclude = [".claude", "scripts/quality_gate.py"]
 target-version = "py313"
 
 [tool.ruff.lint]
