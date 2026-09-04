@@ -1,0 +1,11 @@
+# Gitleaks fingerprint allowlist.
+#
+# Pre-existing false positives: the generic-api-key rule matches a password /
+# agent_api_key field in unit-test setup data at backend/tests/test_blueprint_sync.py:112
+# (introduced June 2026). These are test fixtures, not real credentials. Because the CI
+# scan is full-history, they fail the gitleaks check on every PR regardless of its own diff.
+# Suppressed here by fingerprint (rule stays armed, history is not rewritten). See the
+# security issue tracking this.
+a5bf19a152965aa890eb1e718b25aa779a24cbe8:backend/tests/test_blueprint_sync.py:generic-api-key:112
+4d6d35a19f78dc7c5ae47f52f9af6f27c913f7cb:backend/tests/test_blueprint_sync.py:generic-api-key:112
+21baf29f4482803e76b3dcdf2bcad18b504a2daf:backend/tests/test_blueprint_sync.py:generic-api-key:112
