@@ -100,3 +100,6 @@ Thumbs.db
 
 # Generated audit report (guideline-checker) — never committed
 guideline-report.html
+
+# Local-only E2E fixtures (real .sav files — never committed)
+tests/e2e/.local-fixtures/

@@ -1,4 +1,5 @@
 import { test as base, request as playwrightRequest } from "@playwright/test";
+import type { BrowserContext } from "@playwright/test";
 
 /**
  * Shared fixture for specs that are NOT about the setup wizard.
@@ -16,16 +17,24 @@ import { test as base, request as playwrightRequest } from "@playwright/test";
  * (A-04b), and the CRUD specs run as `describe.serial` chains that share state
  * across tests (e.g. "create" then "search"/"open"/"delete"). A fresh user per
  * test would give each test an empty, isolated store and break those chains.
+ *
+ * `authToken` and `seedAuthedContext` are exported so a spec that needs an
+ * *isolated* user (e.g. the gate import scenario, whose snapshot must not
+ * pollute another spec's empty-state assertions) reuses the exact same setup
+ * with a different username — without duplicating the localStorage seed.
  */
 const API_URL = process.env.API_URL ?? "http://backend:8000";
 const USERNAME = "e2e_shared_user";
-const PASSWORD = "e2e-password-123";
+const PASSWORD = "e2e-password-123"; // pragma: allowlist secret
 const PROJECT_ID = "e2e";
 
-async function authToken(): Promise<string> {
+export async function authToken(
+  username: string = USERNAME,
+  password: string = PASSWORD,
+): Promise<string> {
   const api = await playwrightRequest.newContext({ baseURL: API_URL });
   try {
-    const body = { username: USERNAME, password: PASSWORD };
+    const body = { username, password };
     let resp = await api.post("/api/v1/auth/register", { data: body });
     // 409 → the user already exists from a previous run: log in instead.
     if (resp.status() === 409) {
@@ -37,34 +46,40 @@ async function authToken(): Promise<string> {
   }
 }
 
+export async function seedAuthedContext(
+  context: BrowserContext,
+  token: string,
+  projectId: string = PROJECT_ID,
+): Promise<void> {
+  await context.addInitScript(
+    ({ tok, apiUrl, pid }) => {
+      try {
+        const project = {
+          id: pid,
+          name: "E2E",
+          backendUrl: apiUrl,
+          createdAt: "2026-01-01T00:00:00.000Z",
+        };
+        window.localStorage.setItem("sfm.projects", JSON.stringify([project]));
+        window.localStorage.setItem("sfm.activeProjectId", pid);
+        window.localStorage.setItem(`sfm.project.${pid}.setup.completed`, "true");
+        // Legacy global flag — harmless to keep for older code paths.
+        window.localStorage.setItem("sfm.setup.completed", "true");
+        if (tok) {
+          window.localStorage.setItem("sfm.auth.token", tok);
+        }
+      } catch {
+        /* noop */
+      }
+    },
+    { tok: token, apiUrl: API_URL, pid: projectId },
+  );
+}
+
 export const test = base.extend({
   context: async ({ context }, use) => {
     const token = await authToken();
-
-    await context.addInitScript(
-      ({ tok, apiUrl, projectId }) => {
-        try {
-          const project = {
-            id: projectId,
-            name: "E2E",
-            backendUrl: apiUrl,
-            createdAt: "2026-01-01T00:00:00.000Z",
-          };
-          window.localStorage.setItem("sfm.projects", JSON.stringify([project]));
-          window.localStorage.setItem("sfm.activeProjectId", projectId);
-          window.localStorage.setItem(`sfm.project.${projectId}.setup.completed`, "true");
-          // Legacy global flag — harmless to keep for older code paths.
-          window.localStorage.setItem("sfm.setup.completed", "true");
-          if (tok) {
-            window.localStorage.setItem("sfm.auth.token", tok);
-          }
-        } catch {
-          /* noop */
-        }
-      },
-      { tok: token, apiUrl: API_URL, projectId: PROJECT_ID },
-    );
-
+    await seedAuthedContext(context, token);
     await use(context);
   },
 });
