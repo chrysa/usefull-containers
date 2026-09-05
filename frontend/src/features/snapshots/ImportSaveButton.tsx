@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { parseSaveFile } from "@/domain/savefile/parseSave";
+import { parseSaveFile, UnsupportedSaveVersionError } from "@/domain/savefile/parseSave";
 import { useCreateSnapshotMutation } from "@/domain/snapshots/queries";
 
 /**
@@ -14,14 +14,20 @@ export default function ImportSaveButton() {
   const inputRef = useRef<HTMLInputElement>(null);
   const createSnapshot = useCreateSnapshotMutation();
   const [parseError, setParseError] = useState(false);
+  const [unsupportedVersion, setUnsupportedVersion] = useState<number | null>(null);
 
   async function handleFile(file: File) {
     setParseError(false);
+    setUnsupportedVersion(null);
     try {
       const snapshot = await parseSaveFile(file);
       createSnapshot.mutate({ name: snapshot.save_name, data: snapshot });
-    } catch {
-      setParseError(true);
+    } catch (err) {
+      if (err instanceof UnsupportedSaveVersionError) {
+        setUnsupportedVersion(err.saveVersion);
+      } else {
+        setParseError(true);
+      }
     }
   }
 
@@ -48,6 +54,11 @@ export default function ImportSaveButton() {
       >
         {isPending ? t("snapshots.importing") : t("snapshots.import")}
       </Button>
+      {unsupportedVersion !== null && (
+        <p className="text-sm text-destructive" role="alert">
+          {t("snapshots.parse_error_version", { version: unsupportedVersion })}
+        </p>
+      )}
       {parseError && (
         <p className="text-sm text-destructive" role="alert">
           {t("snapshots.parse_error")}

@@ -397,7 +397,8 @@
     "play_time": "Temps de jeu : {{value}}",
     "save_error": "Échec de l'enregistrement du snapshot. Veuillez réessayer.",
     "save_name": "Sauvegarde : {{name}}",
-    "title": "Snapshots"
+    "title": "Snapshots",
+    "parse_error_version": "Cette sauvegarde vient d'une version de Satisfactory trop récente (save v{{version}}), pas encore supportée. Essaie une sauvegarde plus ancienne pour l'instant."
   },
   "theme": {
     "toggle": "Changer le thème"

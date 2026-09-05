@@ -397,7 +397,8 @@
     "play_time": "Play time: {{value}}",
     "save_error": "Failed to save snapshot. Please try again.",
     "save_name": "Save: {{name}}",
-    "title": "Snapshots"
+    "title": "Snapshots",
+    "parse_error_version": "This save is from a newer Satisfactory version (save v{{version}}) that isn't supported yet. Try an older save for now."
   },
   "theme": {
     "toggle": "Toggle theme"
