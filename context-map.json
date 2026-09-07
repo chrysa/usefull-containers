@@ -1,0 +1,25 @@
+{
+  "adrs": [],
+  "contracts": [
+    "standards"
+  ],
+  "ddd_level": "(not available)",
+  "dependencies": {},
+  "depends_on_shared_standards": true,
+  "description": "[![CI](https://github.com/chrysa/satisfactory-factory-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/chrysa/satisfactory-factory-manager/actions/workflows/ci.yml)",
+  "entry_points": [],
+  "key_directories": [
+    ".claude",
+    ".github",
+    "agent",
+    "backend",
+    "docs",
+    "frontend",
+    "scripts",
+    "standards",
+    "tests"
+  ],
+  "name": "satisfactory-factory-manager",
+  "profiles": [],
+  "schema": "chrysa.context-map/1"
+}
