@@ -36,8 +36,8 @@ logs: ## Tail service logs
 
 # ─── Development ──────────────────────────────────────────────────────────────
 
-install: ## Install backend dev dependencies
-	pip install -e ".[dev]"
+install: ## Build the Docker images (deps installed in-image, container-first)
+	$(DOCKER_COMPOSE) build
 
 install-dev: install ## Alias for install (dev dependencies are the default set)
 
