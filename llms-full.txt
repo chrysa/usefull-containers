@@ -43,11 +43,6 @@ satisfactory-factory-manager — technical digest
       SKILL.md
     async-patterns/
       SKILL.md
-    check/
-      SKILL.md
-      references/
-      reviewers/
-      scripts/
     clean-architecture/
       SKILL.md
     contract-testing/
@@ -65,21 +60,11 @@ satisfactory-factory-manager — technical digest
       gitnexus-guide/
       gitnexus-impact-analysis/
       gitnexus-refactoring/
-    hunt/
-      SKILL.md
-    implement/
-      SKILL.md
-    plan/
-      SKILL.md
-    spec/
-      SKILL.md
     standards-authoring/
       SKILL.md
     testing-pytest/
       SKILL.md
     ui-ux/
-      SKILL.md
-    verification-loop/
       SKILL.md
   thresholds.json
 .editorconfig
@@ -130,6 +115,7 @@ GitVersion.yml
 LICENSE
 Makefile
 README.md
+ROADMAP.md
 agent/
   Dockerfile
   README.md
@@ -239,7 +225,6 @@ docker-compose.e2e.yml
 docker-compose.test.yml
 docker-compose.yml
 docs/
-  ROADMAP.md
   gate-v1-validation.md
   reference/
     github-inspiration.md
@@ -355,6 +340,9 @@ frontend/
   tsconfig.node.json
   vite.config.ts
   vitest.config.ts
+graphify-out/
+  architecture.html
+  architecture.json
 opencode.json
 scripts/
   quality_gate.py

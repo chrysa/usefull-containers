@@ -103,3 +103,10 @@ guideline-report.html
 
 # Local-only E2E fixtures (real .sav files — never committed)
 tests/e2e/.local-fixtures/
+# graphify artifacts (keep architecture diagram only)
+graphify-out/*
+!graphify-out/architecture.json
+!graphify-out/architecture.html
+
+# Session scratch (SDD ledger, run logs) — never committed
+.superpowers/

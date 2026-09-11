@@ -23,6 +23,20 @@ Canonical source of truth is the canon; edit there, then run `make gen-agent-vie
   private models. Each consumer wraps the external contract in a local adapter and degrades
   cleanly when the provider is gone. Detail: annexe `PROJECT-DECOUPLING.md`.
 
+- **A game engine stays behind the domain — the simulation core is engine-free.** In a
+  Unity/C# game, the simulation and its rules live in a pure-C# assembly with **no
+  `using UnityEngine`**, unit-tested headless; the engine-facing code (rendering, input,
+  editor tooling) sits in separate assembly definitions that depend inward on the domain,
+  never the reverse. The boundary is the assembly (`.asmdef`), not a folder convention, and
+  it is machine-checked by the assembly reference graph. The simulation tick is deterministic
+  and framerate-independent — no `Time.deltaTime`, `Random`, or wall-clock inside the domain;
+  the presentation layer feeds a fixed timestep. Serialized Unity state is exposed through
+  `[SerializeField] private` with typed accessors, never raw `public` fields, and per-frame
+  `Update` paths allocate nothing and cache their lookups (no `GameObject.Find`/`Camera.main`
+  in the hot loop). C# naming follows the platform: types/methods `PascalCase`, interfaces
+  `IPascalCase`, private fields `_camelCase`; enforced by `.editorconfig` Roslyn analyzers.
+  Detail: annexe `ARCHITECTURE-DDD.md` (Python & C#/.NET structure).
+
 - **Everything is machine-agnostic and portable — no rule, repo, or script is bound to one
   machine.** A standard, a Makefile target, a script, a hook, a compose file, or a CI job must
   behave identically on any developer machine, any runner, and the server, with nothing but a

@@ -68,6 +68,7 @@ This project is indexed by GitNexus as **satisfactory-factory-manager** (8 symbo
 - Repo provenance — every code repo depends on `project-init`
 - Every repo declares its profile and DDD level
 - Projects talk through versioned contracts only
+- A game engine stays behind the domain — the simulation core is engine-free
 - Everything is machine-agnostic and portable — no rule, repo, or script is bound to one machine
 - Every external server the service talks to is addressed through the environment — never hardcoded
 - Every tracked file and folder must earn its place — a repo holds only what is useful to it now
