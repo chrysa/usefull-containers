@@ -116,7 +116,6 @@ usefull-containers — technical digest
     action-check.yml
     approved-label.yml
     auto-assign.yml
-    auto-update-pre-commit.yml
     build-and-publish.yml
     ci.yml
     dependabot-auto-merge.yml
@@ -251,6 +250,7 @@ safety/
   docker-entrypoint.sh
   safety.Makefile
 scripts/
+  gen_context_files.py
   quality_gate.py
 sonar-project.properties
 sphinx/
@@ -298,4 +298,5 @@ yamllint/
 ## Modules
 
 .claude/ape/ape_hook.py
+scripts/gen_context_files.py — Generate the standardised per-repo context files from the repo's own content.
 scripts/quality_gate.py
