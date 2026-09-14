@@ -122,6 +122,7 @@ usefull-containers — technical digest
     dependencies.yml
     detect-conflicts.yml
     enforce-feature-branch.yml
+    enforce-shortcut-link.yml
     labeler.yml
     pr-dependencies.yml
     pull-request-size.yml
