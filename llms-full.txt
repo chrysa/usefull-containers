@@ -19,6 +19,10 @@ satisfactory-factory-manager — technical digest
     general-solution-architect.md
     general-technical-project-lead.md
     general-technical-writer.md
+  ape/
+    README.md
+    ape-transform-v2.md
+    ape_hook.py
   commands/
     adr-new.md
     commit.md
@@ -412,6 +416,7 @@ tests/
 
 ## Modules
 
+.claude/ape/ape_hook.py
 agent/sfm_agent/__init__.py — Satisfactory Factory Manager — local sync agent.
 agent/sfm_agent/cli.py
 agent/sfm_agent/config.py
@@ -451,4 +456,3 @@ backend/app/models/factory_plan.py — Models for the NL factory-plan generator 
 backend/app/models/gamedata.py
 backend/app/models/plan.py
 backend/app/models/snapshot.py
-backend/app/models/steam.py
