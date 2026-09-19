@@ -212,4 +212,7 @@ make docker-up   # start with Docker Compose
 - Release & changelog config (canonical)
 - GitHub Actions (reuse first · custom actions centralised · thin workflows)
 - Pre-commit & git hooks (native, via pre-commit.com — never wrapped in make)
+
+### Local AI orchestration & local-first · `standards/rules/ai-orchestration.md`
+- AI orchestration & local-first
 <!-- chrysa:standards-copilot:end -->
