@@ -26,6 +26,28 @@
           }
         ],
         "matcher": "Write|Edit|MultiEdit"
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "name": "dockerfile-build-check",
+            "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/dockerfile-build-check.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
+            "timeout": 15000
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "name": "compose-validate",
+            "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/compose-validate.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
+            "timeout": 15000
+          }
+        ]
       }
     ],
     "PreCompact": [
