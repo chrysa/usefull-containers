@@ -140,8 +140,13 @@
       {
         "hooks": [
           {
-            "command": "python3 .claude/ape/ape_hook.py --spec .claude/ape/ape-transform-v2.md",
-            "type": "command"
+            "command": "python3",
+            "type": "command",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/ape/ape_hook.py",
+              "--spec",
+              ".claude/ape/ape-transform-v2.md"
+            ]
           }
         ]
       }
