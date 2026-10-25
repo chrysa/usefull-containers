@@ -1,5 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "autoCompact": true,
   "autoCompactThreshold": 0.85,
   "effortLevel": "medium",
@@ -29,39 +33,39 @@
         "matcher": "Write|Edit"
       },
       {
-        "matcher": "Write|Edit",
         "hooks": [
           {
-            "type": "command",
-            "name": "dockerfile-build-check",
             "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/dockerfile-build-check.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
-            "timeout": 15000
+            "name": "dockerfile-build-check",
+            "timeout": 15000,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Write|Edit"
       },
       {
-        "matcher": "Write|Edit",
         "hooks": [
           {
-            "type": "command",
-            "name": "compose-validate",
             "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/compose-validate.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
-            "timeout": 15000
+            "name": "compose-validate",
+            "timeout": 15000,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Write|Edit"
       },
       {
-        "matcher": "Edit|Write",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/format.py"
             ],
-            "timeout": 30
+            "command": "python3",
+            "timeout": 30,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Edit|Write"
       }
     ],
     "PreCompact": [
@@ -77,12 +81,12 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "bash",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-compact.sh"
             ],
-            "timeout": 10
+            "command": "bash",
+            "timeout": 10,
+            "type": "command"
           }
         ]
       }
@@ -112,15 +116,29 @@
         "matcher": "Bash"
       },
       {
-        "matcher": "Read",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/read_guard.py"
             ],
-            "timeout": 10
+            "command": "python3",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "Read"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-context.sh"
+            ],
+            "command": "bash",
+            "timeout": 10,
+            "type": "command"
           }
         ]
       }
@@ -140,36 +158,19 @@
       {
         "hooks": [
           {
-            "command": "python3",
-            "type": "command",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/ape/ape_hook.py",
               "--spec",
               ".claude/ape/ape-transform-v2.md"
-            ]
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-context.sh"
             ],
-            "timeout": 10
+            "command": "python3",
+            "type": "command"
           }
         ]
       }
     ]
   },
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
+  "model": "haiku",
   "permissions": {
     "allow": [
       "Bash(rtk git status *)",
@@ -279,6 +280,5 @@
       "Read(**/*.min.js)",
       "Read(**/*.map)"
     ]
-  },
-  "model": "haiku"
+  }
 }
