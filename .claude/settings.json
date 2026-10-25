@@ -1,5 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "autoCompact": true,
   "autoCompactThreshold": 0.85,
   "effortLevel": "medium",
@@ -29,39 +33,39 @@
         "matcher": "Write|Edit"
       },
       {
-        "matcher": "Write|Edit",
         "hooks": [
           {
-            "type": "command",
-            "name": "dockerfile-build-check",
             "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/dockerfile-build-check.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
-            "timeout": 15000
+            "name": "dockerfile-build-check",
+            "timeout": 15000,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Write|Edit"
       },
       {
-        "matcher": "Write|Edit",
         "hooks": [
           {
-            "type": "command",
-            "name": "compose-validate",
             "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/compose-validate.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
-            "timeout": 15000
+            "name": "compose-validate",
+            "timeout": 15000,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Write|Edit"
       },
       {
-        "matcher": "Edit|Write",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/format.py"
             ],
-            "timeout": 30
+            "command": "python3",
+            "timeout": 30,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Edit|Write"
       }
     ],
     "PreCompact": [
@@ -121,10 +125,6 @@
         ]
       }
     ]
-  },
-  "attribution": {
-    "commit": "",
-    "pr": ""
   },
   "permissions": {
     "allow": [
