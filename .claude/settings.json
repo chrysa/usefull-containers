@@ -81,12 +81,12 @@
       {
         "hooks": [
           {
+            "type": "command",
+            "command": "bash",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-compact.sh"
             ],
-            "command": "bash",
-            "timeout": 10,
-            "type": "command"
+            "timeout": 10
           }
         ]
       }
@@ -116,29 +116,15 @@
         "matcher": "Bash"
       },
       {
+        "matcher": "Read",
         "hooks": [
           {
+            "type": "command",
+            "command": "python3",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/read_guard.py"
             ],
-            "command": "python3",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": "Read"
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-context.sh"
-            ],
-            "command": "bash",
-            "timeout": 10,
-            "type": "command"
+            "timeout": 10
           }
         ]
       }
@@ -158,19 +144,32 @@
       {
         "hooks": [
           {
+            "command": "python3",
+            "type": "command",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/ape/ape_hook.py",
               "--spec",
               ".claude/ape/ape-transform-v2.md"
+            ]
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-context.sh"
             ],
-            "command": "python3",
-            "type": "command"
+            "timeout": 10
           }
         ]
       }
     ]
   },
-  "model": "haiku",
   "permissions": {
     "allow": [
       "Bash(rtk git status *)",
@@ -280,5 +279,6 @@
       "Read(**/*.min.js)",
       "Read(**/*.map)"
     ]
-  }
+  },
+  "model": "haiku"
 }
