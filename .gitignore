@@ -87,3 +87,10 @@ Thumbs.db
 
 # Guideline Compliance Check report (generated)
 guideline-report.html
+
+# prism-ai-lint: keep secrets and local config out of git
+.env.*
+*.pem
+*.key
+secrets/
+CLAUDE.local.md
