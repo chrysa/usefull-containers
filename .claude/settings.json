@@ -119,7 +119,12 @@
       {
         "hooks": [
           {
-            "command": "python3 .claude/ape/ape_hook.py --spec .claude/ape/ape-transform-v2.md",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/ape/ape_hook.py",
+              "--spec",
+              ".claude/ape/ape-transform-v2.md"
+            ],
+            "command": "python3",
             "type": "command"
           }
         ]
@@ -150,9 +155,9 @@
       "Bash(rtk docker images *)",
       "Bash(rtk docker compose ps *)",
       "Bash(rtk docker compose logs *)",
-      "Bash(docker compose config *)",
-      "Bash(docker compose up *)",
-      "Bash(docker compose down *)",
+      "Bash(rtk docker compose config *)",
+      "Bash(rtk docker compose up *)",
+      "Bash(rtk docker compose down *)",
       "Bash(rtk gh pr view *)",
       "Bash(rtk gh pr list *)",
       "Bash(rtk gh pr diff *)",
